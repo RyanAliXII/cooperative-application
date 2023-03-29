@@ -1,5 +1,6 @@
 
 <script lang="ts">
+   import 'sweetalert2/src/sweetalert2.scss' 
     let sidebarState:Record<string, boolean> = {
         registration: false,
         loan: false
@@ -49,7 +50,7 @@
                     </div>
            
                     <div class="pl-10 text-sm hover:bg-white">
-                        <a href="/coop/register" >
+                        <a href="/coop/" >
                             Cooperative
                           </a>
                     </div>

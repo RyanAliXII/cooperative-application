@@ -9,12 +9,28 @@ import  axios from "axios"
 import { CreateCooperativeSchema } from "$lib/definitions/schema";
 import {createForm} from "felte"
 import { validateSchema, validator } from '@felte/validator-yup';
-
-
+import Swal from 'sweetalert2'
+type Account = {
+    email : string,
+    password: string
+}
 const {form, errors, } = createForm({
- 
-    onSubmit:(data)=>{
-        console.log(data)
+    
+
+    onSubmit:async(body)=>{
+      try{
+        const response = await axios.post("/api/cooperatives", body)
+        const {data} = response.data
+        const account = data?.account
+     
+        Swal.fire("Cooperative registered",`The password for <strong>${account?.email}</strong> is <strong>${account.password}</strong>. 
+        Copy, since this will be the only it will be shown.` ,"success")
+      }
+      catch{
+        toast.error("Unknown error occured, while creating resource.")
+      }
+   
+     
     },
     onError:(er)=>{
         console.log(er)
