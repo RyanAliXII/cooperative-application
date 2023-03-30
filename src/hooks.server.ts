@@ -1,8 +1,7 @@
 import type { Handle } from "@sveltejs/kit";
 
-import { CooperativeAccount } from "$lib/models/model";
 export const handle: Handle = async ({ event, resolve }) => {
   const response = await resolve(event);
-
+  console.log(event.url.pathname);
   return response;
 };

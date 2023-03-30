@@ -8,12 +8,9 @@ import toast, { Toaster } from 'svelte-french-toast';
 import  axios from "axios"
 import { CreateCooperativeSchema } from "$lib/definitions/schema";
 import {createForm} from "felte"
-import { validateSchema, validator } from '@felte/validator-yup';
+import { validator } from '@felte/validator-yup';
 import Swal from 'sweetalert2'
-type Account = {
-    email : string,
-    password: string
-}
+
 const {form, errors, } = createForm({
     
 
@@ -22,9 +19,9 @@ const {form, errors, } = createForm({
         const response = await axios.post("/api/cooperatives", body)
         const {data} = response.data
         const account = data?.account
-     
-        Swal.fire("Cooperative registered",`The password for <strong>${account?.email}</strong> is <strong>${account.password}</strong>. 
-        Copy, since this will be the only it will be shown.` ,"success")
+    
+        Swal.fire("Cooperative registered",`The password for <strong>${account?.email}</strong> is <br><strong>${account.password}</strong>. 
+          Copy the password, since this will be the only time it will be shown.` ,"success")
       }
       catch{
         toast.error("Unknown error occured, while creating resource.")
@@ -46,14 +43,16 @@ const {form, errors, } = createForm({
     <div class="container bg-base-100 w-full  p-3 rounded">
 
         <form use:form >
-        <div class="w-full h-10 rounded flex items-center px-2 text-gray-600 font-semibold gap-2">
-            <i class="fa-regular fa-address-card"></i>  COOPERATIVE INFO
-        </div>
-        <div class="grid grid-cols-1 gap-2 md:grid-cols-3">
-            <TextField  label="Cooperative name" labelFor="name" error={$errors?.name?.[0]}  name="name" ></TextField>
-            <TextField   label="Registration No" labelFor="registrationNumber" error={$errors?.registrationNumber?.[0]} name="registrationNumber"></TextField>
-            <TextField   label="Cooperative Initials" labelFor="initials" error={$errors?.initials?.[0]} name="initials"></TextField>  
-        </div>
+          <form use:form >
+            <div class="w-full h-10 rounded flex items-center px-2 text-gray-600 font-semibold gap-2">
+                <i class="fa-regular fa-address-card"></i>  COOPERATIVE INFO
+            </div>
+            <div class="grid grid-cols-1 gap-2 md:grid-cols-3">
+                <TextField  label="Cooperative name" labelFor="name" error={$errors?.name?.[0]}  name="name" ></TextField>
+                <TextField   label="Registration No" labelFor="registrationNumber" error={$errors?.registrationNumber?.[0]} name="registrationNumber"></TextField>
+                <TextField   label="Cooperative Initials" labelFor="initials" error={$errors?.initials?.[0]} name="initials"></TextField>  
+            </div>
+    
 
         <TextAreaField  label="Address" labelFor="address" error={$errors?.address?.[0]} name="address">
 

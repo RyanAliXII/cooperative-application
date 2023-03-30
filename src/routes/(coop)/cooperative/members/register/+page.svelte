@@ -1,1 +1,0 @@
-<h1>Register member</h1>

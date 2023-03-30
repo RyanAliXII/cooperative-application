@@ -26,7 +26,7 @@
         </div>
       </header>
 
-      <div class="h-screen w-full flex">
+      <div class=" w-full flex" style="min-height:100vh;">
         <div class="h-full  bg-white hidden lg:block">
             <ul class="menu bg-base-100 w-64 p-2 rounded-box">
                 <li>
