@@ -6,7 +6,6 @@
         loan: false
     }
     function toggle (sidebarKey: string){
-        console.log(sidebarKey)
         sidebarState[sidebarKey] = !sidebarState[sidebarKey]
     }
 </script>
@@ -31,7 +30,7 @@
         <div class="h-full  bg-white hidden lg:block">
             <ul class="menu bg-base-100 w-64 p-2 rounded-box">
                 <li>
-                  <a href="/dashboard">
+                  <a href="/app/dashboard">
                     <i class="fa-solid fa-chart-line"></i>
                     Dashboard
                   </a>
@@ -44,13 +43,13 @@
                     </button>
                     {#if sidebarState["registration"] }
                     <div class="pl-10 mt-1 text-sm hover:bg-white">
-                        <a href="/coop/register" >
+                        <a href="/app/cooperative/register" >
                             Add Cooperative
                           </a>
                     </div>
            
                     <div class="pl-10 text-sm hover:bg-white">
-                        <a href="/coop/" >
+                        <a href="/app/cooperative/" >
                             Cooperative
                           </a>
                     </div>
