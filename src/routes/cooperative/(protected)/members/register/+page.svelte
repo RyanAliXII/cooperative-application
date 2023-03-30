@@ -4,8 +4,10 @@
   import TextAreaField from "$lib/components/form/TextAreaField.svelte";
   import TextField from "$lib/components/form/TextField.svelte";
   import {createForm} from "felte"
-  import { array, object, string } from "yup";
-    import { validator } from '@felte/validator-yup';
+  import { validator } from '@felte/validator-yup';
+  import { NewMemberValidationSchema } from "$lib/definitions/schema";
+  import axios from "axios";
+  import toast,{ Toaster} from "svelte-french-toast";
 
   type Dependent = {
     name: string,
@@ -13,29 +15,6 @@
     birthday: string
   }
 
-  const NewMemberValidationSchema = object({
-    givenName: string().required("Given name is required."),
-    middleName: string().required("middle name is required."),
-    surname: string().required("Surname is required."),
-    birthday: string().required("Date of birth is required."),
-    educationalAttainment: string().required("Educational Attainment is required."),
-    civilStatus: string().required("Civil status is required."),
-    TIN: string().notRequired(),
-    spouseName: string().notRequired(),
-    presentAddress: string().required("Present address is required."),
-    provincialAddress: string().notRequired(),
-    officeAddress: string().notRequired(),
-    email: string().email().required("Email is required."),
-    mobileNumber: string().required("Mobile number is required."),
-    officePhoneNumber: string().notRequired(),
-    dependents: array().of(object(
-      {
-        name: string().required("Dependent name is required."),
-        relationship: string().required("Relationship of the dependent must be specified."),
-        birthday: string().required("Dependent's date of birth must be specified.")
-      }
-    )).min(0)
-  })
 
   type Member = {
     givenName: string
@@ -61,8 +40,19 @@
         dependents:[]
     },
     extend: [validator({schema: NewMemberValidationSchema, castValues:  true })],
-    onSubmit:(body)=>{
-      console.log(body)
+    onSubmit:async(body)=>{
+      try{
+        const response  = await axios.post("/api/members", body, {
+          withCredentials: true
+        })
+        console.log(response.data)
+        toast.success("Member has been registered.")
+      }
+      catch(error){
+          console.log(error)
+          toast.error("Unknown error occured.")
+      }
+    
     }
   })
 
@@ -74,15 +64,12 @@
     })
   }
   const removeDependent = (index: number)=>{
-
     data.update(prev=>{
       prev.dependents = prev.dependents.filter((_, i)=>i != index)
       return prev
     })
   }
-  errors.subscribe((val)=>{
-    console.log(val)
-  })
+
 </script>
 <div>
   
@@ -98,7 +85,12 @@
                 <TextField   label="Middle name" labelFor="middleName"  name="middleName" error={$errors?.givenName?.[0]}/>
                 <TextField   label="Surname" labelFor="surname"  name="surname" error={$errors?.surname?.[0]}/>
                 <TextField   label="Date of Birth" labelFor="birthday"  name="birthday" type="date" error={$errors?.birthday?.[0]}/>
-                <TextField  label="Educational Attainment" labelFor="educationalAttainment"  name="educationalAttainment" error={$errors?.educationalAttainment?.[0]}/>
+                <SelectField label="Educational Attainment" name="educationalAttainment" error={$errors?.educationalAttainment?.[0]}>
+                  <option value="high-school-graduate">Highschool Graduate</option>
+                  <option value="high-school-undergraduate">Highschool Undergraduate</option>
+                  <option value="college-undergraduate">College Undergraduate</option>
+                  <option value="college-graduate">College Graduate</option>
+              </SelectField>
                 <TextField   label="Tax Identification No." labelFor="TIN"  name="TIN" error={$errors?.TIN?.[0]}/>
                 <SelectField label="Civil Status" name="civilStatus" error={$errors?.civilStatus?.[0]}>
                     <option value="single">Single</option>
@@ -130,7 +122,6 @@
             </div>
             <button class="btn btn-outline btn-primary mt-5" type="button" on:click={addDependent}>Add Dependent</button>
             <div class="overflow-x-auto mt-5">
-              {$errors?.dependents?.[0]}
                 <table class="table w-full">
                   <!-- head -->
                   <thead>
@@ -178,4 +169,5 @@
         <button class="btn btn-primary mt-10" type="submit">Register Member</button>
       </form>
       </div>
+      <Toaster/>
 </div>

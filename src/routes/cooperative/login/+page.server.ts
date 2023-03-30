@@ -1,6 +1,6 @@
 /** @type {import('./$types').Actions} */
 import { redirect } from "@sveltejs/kit";
-import { CooperativeAccount } from "$lib/models/model";
+import { Cooperative, CooperativeAccount, Session } from "$lib/models/model";
 import { compare } from "bcrypt";
 
 export const actions = {
@@ -15,6 +15,12 @@ export const actions = {
       where: {
         email: email,
       },
+      include: [
+        {
+          model: Cooperative,
+          foreignKey: "cooperative_id",
+        },
+      ],
     });
 
     if (!account) {
@@ -24,12 +30,17 @@ export const actions = {
     if (!isPasswordSame) {
       return { message: "Invalid username or password." };
     }
-    const sid = crypto.randomUUID();
-    cookies.set("coop_sid", sid, {
-      path: "/cooperative",
+    const expiration = new Date();
+    expiration.setDate(expiration.getDate() + 1); // add 1 day expiration
+    const session = await Session.create({
+      data: account.dataValues,
+      expiresAt: expiration.toISOString(),
+    });
+    cookies.set("coop_sid", session.dataValues.sid, {
+      path: "/",
       httpOnly: true,
       sameSite: "strict",
-      maxAge: 60 * 60 * 24 * 30, //one month
+      maxAge: 3600 * 24, //one day
     });
     throw redirect(303, "/cooperative/dashboard");
   },
