@@ -71,6 +71,11 @@ export const CooperativeAccount = sequelize.define(
         key: "id",
       },
     },
+    isOwner: {
+      type: DataTypes.BOOLEAN,
+      field: "is_owner",
+      defaultValue: false,
+    },
   },
   {
     underscored: true,
@@ -113,6 +118,10 @@ export const Member = sequelize.define(
     spouseName: {
       type: DataTypes.STRING,
       field: "spouse_name",
+    },
+    educationalAttainment: {
+      type: DataTypes.STRING,
+      field: "educational_attainment",
     },
     presentAddress: {
       type: DataTypes.TEXT,
@@ -216,3 +225,8 @@ export const Account = sequelize.define(
 );
 
 CooperativeAccount.belongsTo(Cooperative, { foreignKey: "cooperative_id" });
+
+Cooperative.hasMany(CooperativeAccount, {
+  foreignKey: "cooperative_id",
+  as: "accounts",
+});

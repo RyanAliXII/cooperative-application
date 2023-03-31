@@ -8,33 +8,7 @@
   import { NewMemberValidationSchema } from "$lib/definitions/schema";
   import axios from "axios";
   import toast,{ Toaster} from "svelte-french-toast";
-
-  type Dependent = {
-    name: string,
-    relationship:string,
-    birthday: string
-  }
-
-
-  type Member = {
-    givenName: string
-    middleName: string,
-    surname: string
-    birthday: string,
-    educationalAttainment: string,
-    TIN: string,
-    spouseName:string,
-    civilStatus: string
-    presentAddress: string,
-    provincialAddress:string
-    officeAddress: string,
-    email:string
-    mobileNumber:string
-    officePhoneNumber:string
-    dependents: Dependent[]
-
-  }
-  
+  import type { Member } from "$lib/definitions/types";
   const {form, data, errors} = createForm<Member>({
     initialValues:{
         dependents:[]
@@ -166,7 +140,11 @@
                 </table>
               </div>
           </div>
-        <button class="btn btn-primary mt-10" type="submit">Register Member</button>
+          <div class="mt-5 w-full flex justify-end">
+        <button class="btn btn-primary mt-10" type="submit">
+          <i class="fa-regular fa-floppy-disk mr-2 text-lg"></i>
+          Save</button>
+          </div>
       </form>
       </div>
       <Toaster/>

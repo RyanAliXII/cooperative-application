@@ -28,7 +28,7 @@
                 <td>{coop?.name}</td>
                 <td>{coop?.registrationNumber}</td>
                 <td>{coop?.initials}</td>
-                <td><button class="btn btn-outline btn-info"><i class="fa-solid fa-pen-to-square"></i></button></td>
+                <td><a href="/app/cooperative/view/{coop.id}" class="btn btn-outline btn-info"><i class="fa-regular fa-eye"></i></a></td>
               </tr>
             {/each}
          

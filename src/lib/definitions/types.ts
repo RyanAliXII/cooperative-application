@@ -15,3 +15,27 @@ export type CooperativeAccount = {
   surname: string;
   email: string;
 };
+
+export type Dependent = {
+  name: string;
+  relationship: string;
+  birthday: string;
+};
+
+export type Member = {
+  givenName: string;
+  middleName: string;
+  surname: string;
+  birthday: string;
+  educationalAttainment: string;
+  TIN: string;
+  spouseName: string;
+  civilStatus: string;
+  presentAddress: string;
+  provincialAddress: string;
+  officeAddress: string;
+  email: string;
+  mobileNumber: string;
+  officePhoneNumber: string;
+  dependents: Dependent[];
+};
