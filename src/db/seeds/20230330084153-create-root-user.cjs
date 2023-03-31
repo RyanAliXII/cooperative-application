@@ -1,9 +1,8 @@
 "use strict";
-
+/** @type {import('sequelize-cli').Migration} */
 require("dotenv").config();
 const bcrypt = require("bcrypt");
 const { v4: uuidv4 } = require("uuid");
-/** @type {import('sequelize-cli').Migration} */
 
 const EMAIL = process.env.ROOT_USER_EMAIL;
 const PASSWORD = process.env.ROOT_USER_PASSWORD;

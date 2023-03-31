@@ -1,9 +1,5 @@
-import { Session } from "$lib/models/model";
-import { redirect, type Handle } from "@sveltejs/kit";
 import { StatusCodes } from "http-status-codes";
-export const handle: Handle = async ({ event, resolve }) => {
-  const response = await resolve(event);
-
+export const handle = async ({ event, resolve }) => {
   /*
     app_sid set on cookies are meant for session of CCDCO application
     coop_sid set on cookies are meant for cooperative's application
@@ -17,7 +13,10 @@ export const handle: Handle = async ({ event, resolve }) => {
   ) {
     if (!coopSID) {
       console.log("INVALID COOPERATIVE SID");
-      throw redirect(StatusCodes.SEE_OTHER, "/cooperative/login");
+      return new Response("Redirect", {
+        status: StatusCodes.SEE_OTHER,
+        headers: { Location: "/cooperative/login" },
+      });
     }
   }
 
@@ -27,9 +26,14 @@ export const handle: Handle = async ({ event, resolve }) => {
   ) {
     if (!appSID) {
       console.log("INVALID APP SID");
-      throw redirect(StatusCodes.SEE_OTHER, "/app/login");
+      return new Response("Redirect", {
+        status: StatusCodes.SEE_OTHER,
+        headers: {
+          Location: "/app/login",
+        },
+      });
     }
   }
-
+  const response = await resolve(event);
   return response;
 };
