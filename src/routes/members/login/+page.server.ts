@@ -1,8 +1,8 @@
-import { MemberAccount } from "$lib/models/model";
+import { MemberAccount, Session } from "$lib/models/model";
 import { compare } from "bcrypt";
 import { redirect } from "@sveltejs/kit";
 import { StatusCodes } from "http-status-codes";
-import { STATUS_CODES } from "http";
+
 export const actions = {
   login: async ({ request, cookies }) => {
     const formData = await request.formData();
@@ -49,6 +49,18 @@ export const actions = {
           info: true,
         };
       }
+      const expiration = new Date();
+      expiration.setDate(expiration.getDate() + 1); // add 1 day expiration
+      const session = await Session.create({
+        data: account.dataValues,
+        expiresAt: expiration.toISOString(),
+      });
+      cookies.set("member_sid", session.dataValues.sid, {
+        path: "/",
+        httpOnly: true,
+        sameSite: "strict",
+        maxAge: 3600 * 24, //one day
+      });
     } catch (error) {
       return { message: "Logged In" };
     }
