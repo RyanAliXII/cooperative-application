@@ -45,13 +45,17 @@
                         <a href="/cooperative/members/register" >
                             Add Member
                           </a>
-                    </div>
-           
+                    </div>           
                     <div class="pl-10 text-sm hover:bg-white">
                         <a href="/cooperative/members" >
                             Members
                           </a>
                     </div>
+                    <div class="pl-10 mt-1 text-sm hover:bg-white">
+                      <a href="/cooperative/members/approval" >
+                        Approval
+                        </a>
+                   </div>
              
                     {/if}
 

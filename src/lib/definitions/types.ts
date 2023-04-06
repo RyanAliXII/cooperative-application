@@ -25,6 +25,7 @@ export type Dependent = {
 export type Member = {
   id?: number;
   givenName: string;
+  cooperativeId?: string;
   middleName: string;
   surname: string;
   birthday: string;
@@ -42,11 +43,13 @@ export type Member = {
   dependents: Dependent[];
 };
 
-export type MemberAccountRegistration = {
+export type MemberAccount = {
+  id?: string;
   givenName: string;
   middleName: string;
   surname: string;
   birthday: string;
   email: string;
   password: string;
+  member: Member;
 };

@@ -4,13 +4,16 @@ import { Cooperative } from "$lib/models/model";
 export async function load({ params }) {
   const cooperativeId = params?.cooperativeId;
 
-  const coop = await Cooperative.findOne({
-    where: {
-      id: cooperativeId,
-    },
-  });
-
-  return {
-    cooperative: coop?.dataValues,
-  };
+  try {
+    const coop = await Cooperative.findOne({
+      where: {
+        id: cooperativeId,
+      },
+    });
+    return {
+      cooperative: coop?.dataValues,
+    };
+  } catch (error) {
+    console.log(error);
+  }
 }

@@ -1,6 +1,6 @@
 import type {
   Member as MemberType,
-  MemberAccountRegistration,
+  MemberAccount as MemberAccountType,
 } from "$lib/definitions/types";
 import { MemberAccount, Member } from "$lib/models/model";
 import { sequelize } from "$lib/models/sequelize";
@@ -9,7 +9,7 @@ import { StatusCodes } from "http-status-codes";
 import { validate } from "uuid";
 import { hash } from "bcrypt";
 export const POST: RequestHandler = async ({ request, cookies, params }) => {
-  const body: MemberAccountRegistration = await request.json();
+  const body: MemberAccountType = await request.json();
   const transaction = await sequelize.transaction();
   try {
     const memberData = await Member.findOne({
