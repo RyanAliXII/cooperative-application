@@ -5,7 +5,6 @@
         loan: false
     }
     function toggle (sidebarKey: string){
-        console.log(sidebarKey)
         sidebarState[sidebarKey] = !sidebarState[sidebarKey]
     }
 </script>
@@ -53,7 +52,6 @@
                             Members
                           </a>
                     </div>
-               
              
                     {/if}
 
@@ -78,6 +76,12 @@
 
                     
                  
+                </li>
+                <li>
+                  <a href="/cooperative/settings">
+                    <i class="fa-solid fa-gear"></i>
+                    Settings
+                  </a>
                 </li>
               </ul>
         </div>

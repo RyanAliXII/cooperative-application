@@ -23,10 +23,12 @@ export type Dependent = {
 };
 
 export type Member = {
+  id?: number;
   givenName: string;
   middleName: string;
   surname: string;
   birthday: string;
+  gender: string;
   educationalAttainment: string;
   TIN: string;
   spouseName: string;
@@ -38,4 +40,13 @@ export type Member = {
   mobileNumber: string;
   officePhoneNumber: string;
   dependents: Dependent[];
+};
+
+export type MemberAccountRegistration = {
+  givenName: string;
+  middleName: string;
+  surname: string;
+  birthday: string;
+  email: string;
+  password: string;
 };

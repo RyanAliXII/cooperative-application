@@ -110,9 +110,12 @@ export const Member = sequelize.define(
       allowNull: false,
       field: "birthday",
     },
+    gender: {
+      type: DataTypes.STRING,
+    },
     civilStatus: {
       type: DataTypes.STRING,
-      allowNull: false,
+
       field: "civil_status",
     },
     spouseName: {
@@ -125,7 +128,6 @@ export const Member = sequelize.define(
     },
     presentAddress: {
       type: DataTypes.TEXT,
-      allowNull: false,
       field: "present_address",
     },
     email: {
@@ -134,7 +136,6 @@ export const Member = sequelize.define(
     },
     mobileNumber: {
       type: DataTypes.STRING,
-      allowNull: false,
       field: "mobile_number",
     },
     officePhoneNumber: {
@@ -223,7 +224,63 @@ export const Account = sequelize.define(
     underscored: true,
   }
 );
-
+export const MemberAccount = sequelize.define(
+  "member_account",
+  {
+    id: {
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+      primaryKey: true,
+    },
+    givenName: {
+      type: DataTypes.STRING,
+      field: "given_name",
+    },
+    middleName: {
+      type: DataTypes.STRING,
+      field: "middle_name",
+    },
+    surname: {
+      type: DataTypes.STRING,
+    },
+    email: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true,
+    },
+    password: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    memberId: {
+      type: DataTypes.BIGINT,
+      field: "member_id",
+      references: {
+        model: "member",
+        key: "id",
+      },
+    },
+    createdAt: {
+      type: DataTypes.DATE,
+      field: "created_at",
+    },
+    updatedAt: {
+      type: DataTypes.DATE,
+      field: "updated_at",
+    },
+    approvedAt: {
+      type: DataTypes.DATE,
+      field: "approved_at",
+    },
+    rejectedAt: {
+      type: DataTypes.DATE,
+      field: "rejected_at",
+    },
+  },
+  {
+    underscored: true,
+  }
+);
 CooperativeAccount.belongsTo(Cooperative, { foreignKey: "cooperative_id" });
 
 Cooperative.hasMany(CooperativeAccount, {

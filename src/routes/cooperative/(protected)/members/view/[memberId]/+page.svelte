@@ -72,6 +72,11 @@
                   <TextField   label="Middle name" labelFor="middleName"  name="middleName" error={$errors?.givenName?.[0]} disabled={isViewMode}/>
                   <TextField   label="Surname" labelFor="surname"  name="surname" error={$errors?.surname?.[0]} disabled={isViewMode}/>
                   <TextField   label="Date of Birth" labelFor="birthday"  name="birthday" type="date" error={$errors?.birthday?.[0]} disabled={isViewMode}/>
+                  <SelectField label="Gender" name="gender" error={$errors?.gender?.[0]} disabled={isViewMode}>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="female">Others</option>
+                </SelectField>
                   <SelectField label="Educational Attainment" name="educationalAttainment" error={$errors?.educationalAttainment?.[0]} disabled={isViewMode}>
                     <option value="high-school-graduate">Highschool Graduate</option>
                     <option value="high-school-undergraduate">Highschool Undergraduate</option>
@@ -84,7 +89,7 @@
                       <option value="married">Married</option>
                       <option value="divorced">Divorced</option>
                   </SelectField>
-                  <TextField   label="Name of Spouse(If married)" labelFor="spouseName"  name="spouseName" error={$errors?.spouseName?.[0]}/>
+                  <TextField   label="Name of Spouse(If married)" labelFor="spouseName"  name="spouseName" error={$errors?.spouseName?.[0]} disabled={isViewMode}/>
               </div>
               <div class="bg-base-200 w-full h-10 rounded flex items-center px-2 text-gray-600 font-semibold gap-2 mt-5">
                   <i class="fa-regular fa-address-card"></i>  ADDRESSES

@@ -31,6 +31,10 @@ module.exports = {
         allowNull: false,
         field: "surname",
       },
+      gender: {
+        type: Sequelize.DataTypes.STRING,
+        field: "gender",
+      },
       birthday: {
         type: Sequelize.DataTypes.DATEONLY,
         allowNull: false,
@@ -38,7 +42,6 @@ module.exports = {
       },
       civilStatus: {
         type: Sequelize.DataTypes.STRING,
-        allowNull: false,
         field: "civil_status",
       },
       spouseName: {
@@ -47,16 +50,13 @@ module.exports = {
       },
       presentAddress: {
         type: Sequelize.DataTypes.TEXT,
-        allowNull: false,
         field: "present_address",
       },
       email: {
         type: Sequelize.DataTypes.STRING,
-        allowNull: false,
       },
       mobileNumber: {
         type: Sequelize.DataTypes.STRING,
-        allowNull: false,
         field: "mobile_number",
       },
       officePhoneNumber: {
@@ -77,6 +77,10 @@ module.exports = {
       updatedAt: {
         type: Sequelize.DataTypes.DATE,
         field: "updated_at",
+      },
+      filledAt: {
+        type: Sequelize.DataTypes.DATE,
+        field: "filled_at",
       },
       cooperativeId: {
         type: Sequelize.DataTypes.UUID,

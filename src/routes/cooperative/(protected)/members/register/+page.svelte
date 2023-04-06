@@ -59,6 +59,11 @@
                 <TextField   label="Middle name" labelFor="middleName"  name="middleName" error={$errors?.givenName?.[0]}/>
                 <TextField   label="Surname" labelFor="surname"  name="surname" error={$errors?.surname?.[0]}/>
                 <TextField   label="Date of Birth" labelFor="birthday"  name="birthday" type="date" error={$errors?.birthday?.[0]}/>
+                <SelectField label="Gender" name="gender" error={$errors?.gender?.[0]}>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                  <option value="female">Others</option>
+              </SelectField>
                 <SelectField label="Educational Attainment" name="educationalAttainment" error={$errors?.educationalAttainment?.[0]}>
                   <option value="high-school-graduate">Highschool Graduate</option>
                   <option value="high-school-undergraduate">Highschool Undergraduate</option>

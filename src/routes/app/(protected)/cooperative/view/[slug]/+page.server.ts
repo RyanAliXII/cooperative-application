@@ -43,8 +43,6 @@ export async function load({ params }) {
     };
   } catch (err) {
     console.log(err);
-    throw error(StatusCodes.INTERNAL_SERVER_ERROR, {
-      message: "Unknown error occured.",
-    });
+    return { status: StatusCodes.INTERNAL_SERVER_ERROR };
   }
 }
