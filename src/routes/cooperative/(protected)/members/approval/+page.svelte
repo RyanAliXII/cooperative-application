@@ -2,8 +2,8 @@
 <script lang="ts">
   import type { MemberAccount } from "$lib/definitions/types";
   import axios from "axios";
-  import toast from "svelte-french-toast";
-  import { each } from "svelte/internal";
+  import toast, {Toaster} from "svelte-french-toast";
+
  
     export let data;
     console.log(data)
@@ -62,3 +62,4 @@
           </div>
       </div>
 </div>
+<Toaster/>

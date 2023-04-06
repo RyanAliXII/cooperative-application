@@ -18,7 +18,7 @@ export const actions = {
     });
 
     if (!account) {
-      throw redirect(303, "/app/login");
+      return { message: "Invalid username or password." };
     }
     const isPasswordSame = await compare(password, account.dataValues.password);
     if (!isPasswordSame) {

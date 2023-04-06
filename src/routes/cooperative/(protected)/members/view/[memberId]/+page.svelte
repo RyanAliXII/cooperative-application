@@ -12,7 +12,7 @@
   
     let isViewMode = true
     export let data;
-    
+   
     const {form, data: body, errors} = createForm<Member>({
       initialValues: data?.member,
       extend: [validator({schema: EditMemberValidationSchema, castValues:  true })],
@@ -125,7 +125,7 @@
                       </tr>
                     </thead>
                     <tbody>
-                      {#each $body?.dependents as _, i }
+                      {#each $body?.dependents ?? [] as _, i }
                       <tr>
                         <td>
                           <TextField placeholder="Dependent name" name="" bind:value={$body.dependents[i].name} type="text"  error={$errors?.dependents?.[i]?.name?.[0]} noErrorText={true} disabled={isViewMode}/>
