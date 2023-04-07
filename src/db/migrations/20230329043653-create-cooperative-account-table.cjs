@@ -46,6 +46,11 @@ module.exports = {
             key: "id",
           },
         },
+        isOwner: {
+          type: Sequelize.BOOLEAN,
+          field: "is_owner",
+          defaultValue: false,
+        },
         createdAt: {
           type: Sequelize.DATE,
           field: "created_at",

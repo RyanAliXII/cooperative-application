@@ -16,21 +16,17 @@ module.exports = {
         defaultValue: Sequelize.DataTypes.UUIDV4,
         primaryKey: true,
       },
-      givenName: {
-        type: Sequelize.DataTypes.STRING,
-        field: "given_name",
-      },
-      middleName: {
-        type: Sequelize.DataTypes.STRING,
-        field: "middle_name",
-      },
-      surname: {
-        type: Sequelize.DataTypes.STRING,
-      },
       email: {
         type: Sequelize.DataTypes.STRING,
         allowNull: false,
         unique: true,
+      },
+      email: {
+        type: Sequelize.DataTypes.STRING,
+      },
+      mobileNumber: {
+        type: Sequelize.DataTypes.STRING,
+        field: "mobile_number",
       },
       password: {
         type: Sequelize.DataTypes.STRING,
@@ -51,14 +47,6 @@ module.exports = {
       updatedAt: {
         type: Sequelize.DATE,
         field: "updated_at",
-      },
-      approvedAt: {
-        type: Sequelize.DATE,
-        field: "approved_at",
-      },
-      rejectedAt: {
-        type: Sequelize.DATE,
-        field: "rejected_at",
       },
     });
   },

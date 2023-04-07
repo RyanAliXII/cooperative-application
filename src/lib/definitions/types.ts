@@ -32,24 +32,20 @@ export type Member = {
   gender: string;
   educationalAttainment: string;
   TIN: string;
+  account: MemberAccount;
   spouseName: string;
   civilStatus: string;
   presentAddress: string;
   provincialAddress: string;
   officeAddress: string;
-  email: string;
-  mobileNumber: string;
   officePhoneNumber: string;
   dependents: Dependent[];
 };
 
 export type MemberAccount = {
   id?: string;
-  givenName: string;
-  middleName: string;
-  surname: string;
-  birthday: string;
   email: string;
+  mobileNumber: string;
   password: string;
-  member: Member;
+  member?: Member;
 };

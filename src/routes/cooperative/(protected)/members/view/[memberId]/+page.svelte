@@ -5,7 +5,7 @@
     import TextField from "$lib/components/form/TextField.svelte";
     import {createForm} from "felte"
     import { validator } from '@felte/validator-yup';
-    import { EditMemberValidationSchema, NewMemberValidationSchema } from "$lib/definitions/schema";
+    import { EditMemberValidationSchema } from "$lib/definitions/schema";
     import axios from "axios";
     import toast,{ Toaster} from "svelte-french-toast";
     import type { Member } from "$lib/definitions/types";
@@ -104,8 +104,8 @@
                   <i class="fa-regular fa-address-card"></i>  CONTACT INFO
               </div>
               <div class="grid grid-cols-1 gap-2 md:grid-cols-3">
-                  <TextField  label="Email" labelFor="email"  name="email" type="email" error={$errors?.email?.[0]} disabled={isViewMode}/>
-                  <TextField   label="Phone number" labelFor="mobileNumber"  name="mobileNumber" error={$errors?.mobileNumber?.[0]}  disabled={isViewMode}/>
+                  <TextField  label="Email" labelFor="email"  name="account.email" type="email" error={$errors?.account?.email?.[0]} disabled={isViewMode}/>
+                  <TextField   label="Phone number" labelFor="mobileNumber"  name="account.mobileNumber" error={$errors?.account?.mobileNumber?.[0]}  disabled={isViewMode}/>
                   <TextField   label="Office Phone Number" labelFor="officePhoneNumber"  name="officePhoneNumber" error={$errors?.officePhoneNumber?.[0]} disabled={isViewMode}/>
                 
               </div>

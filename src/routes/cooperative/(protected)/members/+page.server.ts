@@ -13,18 +13,19 @@ export async function load({ cookies }) {
     },
   });
   const coopId = session?.dataValues?.data?.cooperative?.id;
-
-  const members = await Member.findAll({
-    where: {
-      cooperativeId: coopId,
-    },
-  });
-
-  if (!session) {
-    throw redirect(StatusCodes.SEE_OTHER, "/cooperative/login");
+  try {
+    const members = await Member.findAll({
+      where: {
+        cooperativeId: coopId,
+      },
+    });
+    return {
+      members: members.map((d) => d.dataValues) ?? [],
+    };
+  } catch (error) {
+    console.log(error);
+    return {
+      members: [],
+    };
   }
-
-  return {
-    members: members.map((d) => d.dataValues) ?? [],
-  };
 }

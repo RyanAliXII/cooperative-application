@@ -1,9 +1,12 @@
 import { json, type RequestHandler } from "@sveltejs/kit";
 import { StatusCodes } from "http-status-codes";
 
-import { Member, Session } from "$lib/models/model";
+import { Member, MemberAccount, Session } from "$lib/models/model";
+import type { Member as MemberType } from "$lib/definitions/types";
 import { NewMemberValidationSchema } from "$lib/definitions/schema";
-
+import { sequelize } from "$lib/models/sequelize";
+import generator from "generate-password";
+import { hash } from "bcrypt";
 export const POST: RequestHandler = async ({ request, cookies }) => {
   const sid = cookies.get("coop_sid");
   if (!sid) {
@@ -16,7 +19,7 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
       }
     );
   }
-
+  const transaction = await sequelize.transaction();
   try {
     const session = await Session.findOne({
       where: {
@@ -36,14 +39,41 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
     }
     //data from session
     const coopId = session.dataValues?.data?.cooperative?.id;
-    const body = await request.json();
+    const body: MemberType = await request.json();
     const data = await NewMemberValidationSchema.validate(body);
-    await Member.create({ ...data, cooperativeId: coopId });
+    const member = await Member.create(
+      { ...data, cooperativeId: coopId, approvedAt: sequelize.fn("NOW") },
+      { transaction }
+    );
+
+    const password = generator.generate({
+      strict: true,
+    });
+
+    const hashedPassword = await hash(password, 5);
+    await MemberAccount.create(
+      {
+        ...data.account,
+        memberId: member?.dataValues?.id,
+        password: hashedPassword,
+      },
+      { transaction }
+    );
+    transaction.commit();
     return json(
-      { message: "Member has been registered" },
+      {
+        message: "Member has been registered",
+        data: {
+          account: {
+            email: data.account.email,
+            password,
+          },
+        },
+      },
       { status: StatusCodes.OK }
     );
   } catch (error) {
+    transaction.rollback();
     console.error(error);
     return json(
       { message: "Unknown error occured." },

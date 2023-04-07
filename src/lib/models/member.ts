@@ -48,20 +48,20 @@ export const MemberModel = sequelize.define(
       type: DataTypes.TEXT,
       field: "present_address",
     },
-    email: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    mobileNumber: {
-      type: DataTypes.STRING,
-      field: "mobile_number",
-    },
     officePhoneNumber: {
       type: DataTypes.STRING,
       field: "office_phone_number",
     },
     dependents: {
       type: DataTypes.JSONB,
+    },
+    approvedAt: {
+      type: DataTypes.DATE,
+      field: "approved_at",
+    },
+    declinedAt: {
+      type: DataTypes.DATE,
+      field: "declined_at",
     },
     cooperativeId: {
       type: DataTypes.UUID,

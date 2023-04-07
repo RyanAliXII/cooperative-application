@@ -8,21 +8,14 @@ export const MemberAccountModel = sequelize.define(
       defaultValue: DataTypes.UUIDV4,
       primaryKey: true,
     },
-    givenName: {
-      type: DataTypes.STRING,
-      field: "given_name",
-    },
-    middleName: {
-      type: DataTypes.STRING,
-      field: "middle_name",
-    },
-    surname: {
-      type: DataTypes.STRING,
-    },
     email: {
       type: DataTypes.STRING,
       allowNull: false,
       unique: true,
+    },
+    mobileNumber: {
+      type: DataTypes.STRING,
+      field: "mobile_number",
     },
     password: {
       type: DataTypes.STRING,
@@ -43,14 +36,6 @@ export const MemberAccountModel = sequelize.define(
     updatedAt: {
       type: DataTypes.DATE,
       field: "updated_at",
-    },
-    approvedAt: {
-      type: DataTypes.DATE,
-      field: "approved_at",
-    },
-    rejectedAt: {
-      type: DataTypes.DATE,
-      field: "rejected_at",
     },
   },
   {

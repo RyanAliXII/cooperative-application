@@ -57,27 +57,7 @@ const {form, errors, } = createForm({
         <TextAreaField  label="Address" labelFor="address" error={$errors?.address?.[0]} name="address">
 
         </TextAreaField>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-            <SelectField label="Province" labelFor="province" name="province" error={$errors?.province?.[0]}>
-              <option disabled selected>Select Province</option>
-              <option>Star Wars</option>
-              <option>Harry Potter</option>
-              <option>Lord of the Rings</option>
-              <option>Planet of the Apes</option>
-              <option>Star Trek</option>
-            </SelectField>
 
-
-            <SelectField label="City" labelFor="city" name="city" error={$errors?.city?.[0]} >
-              <option disabled selected>Select City</option>
-              <option>Star Wars</option>
-              <option>Harry Potter</option>
-              <option>Lord of the Rings</option>
-              <option>Planet of the Apes</option>
-              <option>Star Trek</option>
-            </SelectField>
-
-        </div>
 
      
         <div class="bg-base-200 w-full h-10 rounded flex items-center px-2 text-gray-600 font-semibold gap-2 mt-5">

@@ -35,6 +35,10 @@ module.exports = {
         type: Sequelize.DataTypes.STRING,
         field: "gender",
       },
+      educationalAttainment: {
+        type: Sequelize.DataTypes.STRING,
+        field: "educational_attainment",
+      },
       birthday: {
         type: Sequelize.DataTypes.DATEONLY,
         allowNull: false,
@@ -52,19 +56,13 @@ module.exports = {
         type: Sequelize.DataTypes.TEXT,
         field: "present_address",
       },
-      email: {
-        type: Sequelize.DataTypes.STRING,
-      },
-      mobileNumber: {
-        type: Sequelize.DataTypes.STRING,
-        field: "mobile_number",
-      },
       officePhoneNumber: {
         type: Sequelize.DataTypes.STRING,
         field: "office_phone_number",
       },
       dependents: {
         type: Sequelize.DataTypes.JSONB,
+        defaultValue: [],
       },
       cooperativeId: {
         type: Sequelize.DataTypes.UUID,
@@ -81,6 +79,14 @@ module.exports = {
       filledAt: {
         type: Sequelize.DataTypes.DATE,
         field: "filled_at",
+      },
+      approvedAt: {
+        type: Sequelize.DataTypes.DATE,
+        field: "approved_at",
+      },
+      declinedAt: {
+        type: Sequelize.DataTypes.DATE,
+        field: "declined_at",
       },
       cooperativeId: {
         type: Sequelize.DataTypes.UUID,

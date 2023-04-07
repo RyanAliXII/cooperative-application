@@ -23,12 +23,6 @@ export const CooperativeModel = sequelize.define(
     address: {
       type: DataTypes.STRING,
     },
-    province: {
-      type: DataTypes.STRING,
-    },
-    city: {
-      type: DataTypes.STRING,
-    },
   },
   {
     underscored: true,

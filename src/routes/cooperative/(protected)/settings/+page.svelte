@@ -56,9 +56,9 @@
         <div class="container bg-base-100 w-full  p-3 rounded">
 
           {#if isViewMode }
-          <button class="btn btn-secondary btn-outline my-3 mx-1" on:click={toggleMode}><i class="fa-regular fa-pen-to-square mr-2" ></i> Switch to Edit Mode</button>
+          <button class="btn btn-secondary btn-outline my-3 mx-1" type="button" on:click={toggleMode}><i class="fa-regular fa-pen-to-square mr-2"  ></i> Switch to Edit Mode</button>
           {:else}
-          <button class="btn btn-secondary btn-outline my-3 mx-1" on:click={toggleMode}><i class="fa-regular fa-eye mr-2"></i> Switch to View Mode</button> 
+          <button class="btn btn-secondary btn-outline my-3 mx-1" type="button" on:click={toggleMode}><i class="fa-regular fa-eye mr-2"></i> Switch to View Mode</button> 
           
           {/if}
           
@@ -78,27 +78,6 @@
             <TextAreaField  label="Address" labelFor="address" error={$errors?.address?.[0]} name="address" disabled={isViewMode}>
     
             </TextAreaField>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-                <SelectField label="Province" labelFor="province" name="province" error={$errors?.province?.[0]} disabled={isViewMode}>
-                  <option disabled selected>Select Province</option>
-                  <option>Star Wars</option>
-                  <option>Harry Potter</option>
-                  <option>Lord of the Rings</option>
-                  <option>Planet of the Apes</option>
-                  <option>Star Trek</option>
-                </SelectField>
-    
-    
-                <SelectField label="City" labelFor="city" name="city" error={$errors?.city?.[0]}  disabled={isViewMode}>
-                  <option disabled selected>Select City</option>
-                  <option>Star Wars</option>
-                  <option>Harry Potter</option>
-                  <option>Lord of the Rings</option>
-                  <option>Planet of the Apes</option>
-                  <option>Star Trek</option>
-                </SelectField>
-    
-            </div>
             <div class="grid gap-2 md:grid-cols-2 mt-5">
             <div class="flex items-center">
             <input class="input input-bordered w-full" readonly={true} value={registrationURL}/>

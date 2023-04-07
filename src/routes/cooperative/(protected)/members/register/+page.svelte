@@ -9,6 +9,7 @@
   import axios from "axios";
   import toast,{ Toaster} from "svelte-french-toast";
   import type { Member } from "$lib/definitions/types";
+  import Swal from "sweetalert2";
   const {form, data, errors} = createForm<Member>({
     initialValues:{
         dependents:[]
@@ -19,8 +20,10 @@
         const response  = await axios.post("/api/members", body, {
           withCredentials: true
         })
-        console.log(response.data)
-        toast.success("Member has been registered.")
+        const {data} = response.data
+      
+        Swal.fire("Member registered",`The password for <strong>${data?.account?.email}</strong> is <br><strong>${data?.account?.password}</strong>. 
+          Copy the password, since this will be the only time it will be shown.` ,"success")
       }
       catch(error){
           console.log(error)
@@ -56,7 +59,7 @@
             </div>
             <div class="grid grid-cols-1 gap-2 md:grid-cols-3">
                 <TextField  label="Given name" labelFor="givenName"  name="givenName" error={$errors?.givenName?.[0]}/>
-                <TextField   label="Middle name" labelFor="middleName"  name="middleName" error={$errors?.givenName?.[0]}/>
+                <TextField   label="Middle name" labelFor="middleName"  name="middleName" error={$errors?.middleName?.[0]}/>
                 <TextField   label="Surname" labelFor="surname"  name="surname" error={$errors?.surname?.[0]}/>
                 <TextField   label="Date of Birth" labelFor="birthday"  name="birthday" type="date" error={$errors?.birthday?.[0]}/>
                 <SelectField label="Gender" name="gender" error={$errors?.gender?.[0]}>
@@ -88,11 +91,11 @@
               
             </div>
             <div class="bg-base-200 w-full h-10 rounded flex items-center px-2 text-gray-600 font-semibold gap-2 mt-5">
-                <i class="fa-regular fa-address-card"></i>  CONTACT INFO
+                <i class="fa-regular fa-address-card"></i>  ACCOUNT INFO
             </div>
             <div class="grid grid-cols-1 gap-2 md:grid-cols-3">
-                <TextField  label="Email" labelFor="email"  name="email" type="email" error={$errors?.email?.[0]}/>
-                <TextField   label="Phone number" labelFor="mobileNumber"  name="mobileNumber" error={$errors?.mobileNumber?.[0]} />
+                <TextField  label="Email" labelFor="email"  name="account.email" type="email" error={$errors?.account?.email?.[0]}/>
+                <TextField   label="Phone number" labelFor="mobileNumber"  name="account.mobileNumber" error={$errors?.account?.mobileNumber?.[0]} />
                 <TextField   label="Office Phone Number" labelFor="officePhoneNumber"  name="officePhoneNumber" error={$errors?.officePhoneNumber?.[0]}/>
               
             </div>

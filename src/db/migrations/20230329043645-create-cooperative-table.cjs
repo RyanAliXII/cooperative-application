@@ -29,12 +29,6 @@ module.exports = {
       address: {
         type: Sequelize.DataTypes.STRING,
       },
-      province: {
-        type: Sequelize.DataTypes.STRING,
-      },
-      city: {
-        type: Sequelize.DataTypes.STRING,
-      },
       createdAt: {
         type: Sequelize.DATE,
         field: "created_at",
