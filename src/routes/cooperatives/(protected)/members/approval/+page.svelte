@@ -6,14 +6,17 @@
 
  
     export let data;
-    const accounts: MemberAccount[] = data?.accounts
+
+   
+    let accounts: MemberAccount[] = data?.accounts
     const approve = async(account :  MemberAccount)=>{
         try{
-            const response = await axios.patch(`/api/members/${account.member.id}`, {
+          await axios.patch(`/api/members/${account.member.id}`, {
                 approved:true,
                 declined: false,
             })
             toast.success("Account has been apprroved")
+            fetchUnapprovedMembers()
         }
         catch(error){
           console.log(error)
@@ -21,10 +24,16 @@
         }
 
     }
+    const fetchUnapprovedMembers = async()=>{
+      const response = await axios.get("/api/members/accounts/unapproved")
+      const {data} =  response.data
+      accounts = data?.members ?? []
+    }
+
+
 </script>
 
 <div>
-  
     <h1 class="text-lg font-semibold mb-3 text-gray-500">Online Registration</h1>
     <div class="container bg-base-100 w-full  p-3 rounded">
         <div class="overflow-x-auto">
@@ -52,7 +61,7 @@
                     </td>
                     <td>
                         <button class="btn btn-success btn-outline" on:click={()=>{approve(account)}}>Approve</button>
-                        <button class="btn btn-error btn-outline">Decline</button>
+                        <button class="btn btn-error btn-outline" on:click={()=>{fetchUnapprovedMembers()}}>Decline</button>
                     </td>
                 </tr>
                 {/each}

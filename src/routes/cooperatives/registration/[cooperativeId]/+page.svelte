@@ -5,6 +5,7 @@
   import axios, { AxiosError } from "axios";
   import { RegisterMemberAccountSchema } from "$lib/definitions/schema";
   import type { MemberAccount } from "$lib/definitions/types.js";
+  import {goto} from "$app/navigation"
 
 
     export let data;
@@ -16,14 +17,14 @@
         try{ 
             const response = await axios.post(`/api/cooperatives/${data?.cooperative?.id}/members`, body)
             const {data: responseData} = response.data
-            location.replace(`/cooperatives/registration/success?t=${encodeURIComponent(responseData.token) ?? ""}`)
+            goto(`/cooperatives/registration/success?t=${encodeURIComponent(responseData.token) ?? ""}`)
+        
         }catch(error){
             if(error instanceof AxiosError){
                 message = error?.response?.data?.message
             }
         }
-       
-       
+      
       }
     })
 </script>
