@@ -14,9 +14,9 @@ export const POST: RequestHandler = async ({ request, cookies, params }) => {
   try {
     const memberData = await Member.findOne({
       where: {
-        givenName: body?.givenName,
-        surname: body?.surname,
-        birthday: body?.birthday,
+        givenName: body?.member?.givenName,
+        surname: body?.member?.surname,
+        birthday: body?.member?.birthday,
       },
     });
     if (memberData) {

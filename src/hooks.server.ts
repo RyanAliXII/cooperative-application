@@ -10,10 +10,10 @@ export const handle = async ({ event, resolve }) => {
   const memberSID = event.cookies.get("member_sid");
   if (
     event.url.pathname.startsWith("/cooperative") &&
-    event.url.pathname != "/cooperative/login"
+    event.url.pathname != "/cooperative/login" &&
+    !event.url.pathname.startsWith("/cooperative/registration")
   ) {
     if (!coopSID) {
-      console.log("INVALID COOPERATIVE SID");
       return new Response("Redirect", {
         status: StatusCodes.SEE_OTHER,
         headers: { Location: "/cooperative/login" },

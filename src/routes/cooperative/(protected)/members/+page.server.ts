@@ -1,6 +1,7 @@
 import { StatusCodes } from "http-status-codes";
 import { redirect } from "@sveltejs/kit";
 import { Member, Session } from "$lib/models/model";
+import { Op } from "sequelize";
 /** @type {import('./$types').PageServerLoad} */
 export async function load({ cookies }) {
   const sid = cookies.get("coop_sid");
@@ -17,6 +18,9 @@ export async function load({ cookies }) {
     const members = await Member.findAll({
       where: {
         cooperativeId: coopId,
+        approvedAt: {
+          [Op.not]: null,
+        },
       },
     });
     return {

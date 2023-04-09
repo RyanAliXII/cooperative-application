@@ -1,7 +1,6 @@
 <script>
   import TextField from "$lib/components/form/TextField.svelte";
   import { createForm } from "felte";
-  import { date, object, string,  } from "yup";
   import { validator } from '@felte/validator-yup';
   import axios, { AxiosError } from "axios";
   import { RegisterMemberAccountSchema } from "$lib/definitions/schema";
@@ -28,12 +27,10 @@
     })
 </script>
 
-<div>
-    <div class="w-96 mx-auto mb-5 mt-5">
-        <h1 class="text-center text-xl">You are registering as member for {data?.cooperative?.name} </h1>
-    </div>
+<div class="bg-gray-50 flex justify-center items-center" style="min-height:100vh;">
 
-    <div class="w-96 mx-auto">
+
+    <div class="w-11/12 lg:w-4/12">
         
     {#if message }
     <div class="alert alert-error mt-5 ">
@@ -43,16 +40,25 @@
         </div>
     </div>  
     {/if}
+    <div class="bg-base-100 p-3 shadow rounded " style="height: 42rem;">
+        <div class=" mb-5 mt-5 flex flex-col items-center">
+            <img src="https://api.dicebear.com/6.x/initials/svg?seed={data?.cooperative?.name}&backgroundColor=EB7C2A" alt="avatar" class="w-20 rounded-full">
+            <h1 class="text-xl text-center mt-2 font-bold"> {data?.cooperative?.name} </h1>
+            <p class="text-gray-400 ">Create your member account and get access.</p>
+        </div>
         <form use:form>
+            <div class="lg:grid lg:grid-cols-2 gap-2">
             <TextField name="givenName" label="Given name" labelFor="givenName"  error={$errors?.givenName?.[0]}/>
             <TextField name="middleName" label="Middle name" labelFor="middleName" error={$errors?.middleName?.[0]}/>
             <TextField name="surname" label="Surname" labelFor="surname"  error={$errors?.surname?.[0]}/>
-            <TextField name="birthday" label="Birthday" labelFor="birthday" type="date"  error={$errors?.birthdays?.[0]} />
+            <TextField name="birthday" label="Date of birth" labelFor="birthday" type="date"  error={$errors?.birthday?.[0]} />
+              </div>
             <div class="mt-5"></div>
             <TextField type="email" name="email" label="Email" labelFor="email"  error={$errors?.email?.[0]}></TextField>
             <TextField type="password" name="password" label="Password" labelFor="Password"   error={$errors?.password?.[0]}></TextField>
-            <button class="btn btn-primary mt-3" type="submit"> Sign Up</button>
+            <button class="btn btn-primary mt-3 text-white w-full" type="submit"> Sign Up</button>
         </form>
+    </div>
     </div>
     
 </div>

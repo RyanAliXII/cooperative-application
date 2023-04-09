@@ -121,7 +121,7 @@ export const RegisterMemberAccountSchema = object({
   givenName: string().required("Given name is required."),
   middleName: string().required("Middle name is required."),
   surname: string().required("Surname is required."),
-  birthday: string().required("Date is required."),
+  birthday: string().required("Date of birth is required."),
   email: string().required("Email is required.").email("Invalid email format."),
   password: string().required("Password is required."),
 });

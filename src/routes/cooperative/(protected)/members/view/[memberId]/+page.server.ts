@@ -9,9 +9,13 @@ export async function load({ cookies, params }) {
       where: {
         id: id,
       },
+
       include: [
         {
           model: MemberAccount,
+          attributes: {
+            exclude: ["password"],
+          },
           as: "account",
         },
       ],

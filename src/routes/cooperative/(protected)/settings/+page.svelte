@@ -3,13 +3,13 @@
 
     import TextField from "$lib/components/form/TextField.svelte";
     import TextAreaField from "$lib/components/form/TextAreaField.svelte";
-    import SelectField from "$lib/components/form/SelectField.svelte";
+  
     import toast, { Toaster } from 'svelte-french-toast';
-    import  axios from "axios"
     import { EditCooperativeSchema } from "$lib/definitions/schema";
     import {createForm} from "felte"
     import { validator } from '@felte/validator-yup';
     import {onMount} from "svelte"
+  import axios from "axios";
 
     export let data;
     let isViewMode = true
@@ -17,16 +17,16 @@
     const {form, errors, } = createForm({
         initialValues: data?.cooperative,
         onSubmit:async(body)=>{
-        //   if(isViewMode) return
-        //   try{
-        //     const response = await axios.put(`/api/cooperatives/${id}`, body)
-        //     const {data} = response.data
-        //     toast.success("Cooperative has been updated.")
-        //     isViewMode = true
-        //   }
-        //   catch{
-        //     toast.error("Unknown error occured, while updating resource.")
-        //   }
+          if(isViewMode) return
+          try{
+            const response = await axios.put(`/api/cooperatives/${body?.id}`, body)
+            const {data} = response.data
+            toast.success("Cooperative has been updated.")
+            isViewMode = true
+          }
+          catch{
+            toast.error("Unknown error occured, while updating resource.")
+          }
           
          
         },
