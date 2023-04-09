@@ -47,5 +47,5 @@ export type MemberAccount = {
   email: string;
   mobileNumber: string;
   password: string;
-  member?: Member;
+  member: Member;
 };

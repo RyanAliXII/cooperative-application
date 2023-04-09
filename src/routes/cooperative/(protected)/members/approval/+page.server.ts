@@ -25,21 +25,15 @@ export async function load({ cookies, params }) {
           required: true,
           where: {
             cooperativeId: coopId,
+            approvedAt: null,
           },
           model: Member,
         },
       ],
-      where: {
-        approvedAt: null,
-      },
     });
 
     return {
-      accounts:
-        accounts.map((a) => {
-          a.dataValues.member = a.dataValues?.member?.dataValues;
-          return a.dataValues as MemberAccountType;
-        }) ?? [],
+      accounts: accounts?.map((a) => a.get({ plain: true })) ?? [],
     };
   } catch (error) {
     console.log(error);

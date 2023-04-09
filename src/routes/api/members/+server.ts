@@ -1,12 +1,13 @@
 import { json, type RequestHandler } from "@sveltejs/kit";
 import { StatusCodes } from "http-status-codes";
-
+import { ENCRYPTION_KEY } from "$env/static/private";
 import { Member, MemberAccount, Session } from "$lib/models/model";
 import type { Member as MemberType } from "$lib/definitions/types";
 import { NewMemberValidationSchema } from "$lib/definitions/schema";
 import { sequelize } from "$lib/models/sequelize";
 import generator from "generate-password";
 import { hash } from "bcrypt";
+
 export const POST: RequestHandler = async ({ request, cookies }) => {
   const sid = cookies.get("coop_sid");
   if (!sid) {
@@ -60,6 +61,7 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
       { transaction }
     );
     transaction.commit();
+
     return json(
       {
         message: "Member has been registered",

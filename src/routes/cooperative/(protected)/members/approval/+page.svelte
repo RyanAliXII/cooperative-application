@@ -6,7 +6,7 @@
 
  
     export let data;
-    console.log(data)
+    const accounts: MemberAccount[] = data?.accounts
     const approve = async(account :  MemberAccount)=>{
         try{
             const response = await axios.patch(`/api/cooperatives/${account.member.cooperativeId}/members/accounts/${account.id}`, {
@@ -39,13 +39,13 @@
                 </tr>
               </thead>
               <tbody>
-                {#each data.accounts  as account }
+                {#each accounts  as account }
                 <tr >
                     <td>
-                        {account.givenName}
+                        {account.member.givenName}
                     </td>
                     <td>
-                        {account.surname}
+                        {account.member.surname}
                     </td>
                     <td>
                         {account.member.birthday}
