@@ -16,7 +16,7 @@
         try{ 
             const response = await axios.post(`/api/cooperatives/${data?.cooperative?.id}/members`, body)
             const {data: responseData} = response.data
-            location.replace(`/cooperative/registration/success?t=${encodeURIComponent(responseData.token) ?? ""}`)
+            location.replace(`/cooperatives/registration/success?t=${encodeURIComponent(responseData.token) ?? ""}`)
         }catch(error){
             if(error instanceof AxiosError){
                 message = error?.response?.data?.message

@@ -6,7 +6,7 @@
     <p class="text-gray-400 text-center">You have successfully registered. Please wait for an approval of the cooperative.</p>
     <div>
         <a href="/" class="btn btn-primary text-base-100">Back to home</a>
-        <a href="/cooperative/login" class="btn btn-primary btn-outline">Sign In</a>
+        <a href="/members/login" class="btn btn-primary btn-outline">Sign In</a>
     </div>
 </div>
 

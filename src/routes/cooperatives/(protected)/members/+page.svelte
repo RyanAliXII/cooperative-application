@@ -31,7 +31,7 @@
                         {member.surname}
                     </td>
                    
-                    <td><a href="/cooperative/members/view/{member.id}" class="btn btn-outline btn-info"><i class="fa-regular fa-eye"></i></a></td>
+                    <td><a href="/cooperatives/members/view/{member.id}" class="btn btn-outline btn-info"><i class="fa-regular fa-eye"></i></a></td>
                     
               
                  </tr>

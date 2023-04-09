@@ -17,7 +17,7 @@
                  
             {#if $page?.status === 500}
 
-            <p class="mt-4 mb-8 dark:text-gray-400">Unknown error occured, But don't worry everything is fine.</p>
+            <p class="mt-4 mb-8 dark:text-gray-400">Oops, something went wrong. Please try again later.</p>
             {/if}
            
 			<a rel="noopener noreferrer" href="/" class="btn btn-primary text-base-100">Back to homepage</a>

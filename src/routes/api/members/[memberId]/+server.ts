@@ -43,3 +43,40 @@ export const PUT: RequestHandler = async ({ request, params }) => {
     );
   }
 };
+
+export const PATCH: RequestHandler = async ({ request, params }) => {
+  const memberId = params?.memberId;
+  const body = await request.json();
+  try {
+    const member = await Member.findOne({
+      where: {
+        id: memberId,
+      },
+    });
+
+    if (!member) {
+      return json(
+        { message: "Invalid id params" },
+        { status: StatusCodes.BAD_REQUEST }
+      );
+    }
+
+    if (body.approved) {
+      member.update({
+        approvedAt: sequelize.fn("NOW"),
+      });
+    }
+    if (body.declined) {
+      member.update({
+        rejectedAt: sequelize.fn("NOW"),
+      });
+    }
+    return json({ message: "Account has been updated." });
+  } catch (error) {
+    console.log(error);
+    return json(
+      { message: "Unknown error occured." },
+      { status: StatusCodes.INTERNAL_SERVER_ERROR }
+    );
+  }
+};

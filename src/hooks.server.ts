@@ -9,14 +9,14 @@ export const handle = async ({ event, resolve }) => {
   const appSID = event.cookies.get("app_sid");
   const memberSID = event.cookies.get("member_sid");
   if (
-    event.url.pathname.startsWith("/cooperative") &&
-    event.url.pathname != "/cooperative/login" &&
-    !event.url.pathname.startsWith("/cooperative/registration")
+    event.url.pathname.startsWith("/cooperatives") &&
+    event.url.pathname != "/cooperatives/login" &&
+    !event.url.pathname.startsWith("/cooperatives/registration")
   ) {
     if (!coopSID) {
       return new Response("Redirect", {
         status: StatusCodes.SEE_OTHER,
-        headers: { Location: "/cooperative/login" },
+        headers: { Location: "/cooperatives/login" },
       });
     }
   }

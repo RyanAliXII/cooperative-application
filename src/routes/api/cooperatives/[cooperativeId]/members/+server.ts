@@ -10,6 +10,8 @@ import { validate } from "uuid";
 import { hash } from "bcrypt";
 import { ENCRYPTION_KEY } from "$env/static/private";
 import { AES } from "crypto-js";
+
+//endpoint for online registration
 export const POST: RequestHandler = async ({ request, cookies, params }) => {
   const body: MemberAccountType = await request.json();
   const transaction = await sequelize.transaction();
@@ -50,7 +52,17 @@ export const POST: RequestHandler = async ({ request, cookies, params }) => {
     body.password = await hash(body.password, 5);
 
     const memberModel = await Member.create(
-      { ...body.member, cooperativeId: coopId },
+      {
+        ...body.member,
+        cooperativeId: coopId,
+        gender: "",
+        educationalAttainment: "",
+        civilStatus: "",
+        officePhoneNumber: "",
+        dependents: [],
+        presentAddress: "",
+        spouseName: "",
+      },
       {
         transaction,
       }
@@ -60,6 +72,7 @@ export const POST: RequestHandler = async ({ request, cookies, params }) => {
       {
         ...body,
         memberId: member.id,
+        mobileNumber: "",
       },
       { transaction }
     );

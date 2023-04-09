@@ -29,7 +29,7 @@
         <div class="h-full  bg-white hidden lg:block">
             <ul class="menu bg-base-100 w-64 p-2 rounded-box">
                 <li>
-                  <a href="/cooperative/dashboard">
+                  <a href="/cooperatives/dashboard">
                     <i class="fa-solid fa-chart-line"></i>
                     Dashboard
                   </a>
@@ -42,17 +42,17 @@
                     </button>
                     {#if sidebarState["registration"] }
                     <div class="pl-10 mt-1 text-sm hover:bg-white">
-                        <a href="/cooperative/members/register" >
+                        <a href="/cooperatives/members/register" >
                             Add Member
                           </a>
                     </div>           
                     <div class="pl-10 text-sm hover:bg-white">
-                        <a href="/cooperative/members" >
+                        <a href="/cooperatives/members" >
                             Members
                           </a>
                     </div>
                     <div class="pl-10 mt-1 text-sm hover:bg-white">
-                      <a href="/cooperative/members/approval" >
+                      <a href="/cooperatives/members/approval" >
                         Approval
                         </a>
                    </div>
@@ -82,7 +82,7 @@
                  
                 </li>
                 <li>
-                  <a href="/cooperative/settings">
+                  <a href="/cooperatives/settings">
                     <i class="fa-solid fa-gear"></i>
                     Settings
                   </a>

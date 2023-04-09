@@ -12,7 +12,7 @@
   
     let isViewMode = true
     export let data;
-   
+    console.log(data.member)
     const {form, data: body, errors} = createForm<Member>({
       initialValues: data?.member,
       extend: [validator({schema: EditMemberValidationSchema, castValues:  true })],

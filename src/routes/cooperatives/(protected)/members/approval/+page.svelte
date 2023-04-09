@@ -9,7 +9,7 @@
     const accounts: MemberAccount[] = data?.accounts
     const approve = async(account :  MemberAccount)=>{
         try{
-            const response = await axios.patch(`/api/cooperatives/${account.member.cooperativeId}/members/accounts/${account.id}`, {
+            const response = await axios.patch(`/api/members/${account.member.id}`, {
                 approved:true,
                 declined: false,
             })

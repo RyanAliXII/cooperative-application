@@ -42,6 +42,6 @@ export const actions = {
       sameSite: "strict",
       maxAge: 3600 * 24, //one day
     });
-    throw redirect(303, "/cooperative/dashboard");
+    throw redirect(303, "/cooperatives/dashboard");
   },
 };

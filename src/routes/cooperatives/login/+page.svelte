@@ -33,7 +33,7 @@
               </div>
           </div>  
           {/if}
-          <!-- <a href="/cooperative/password" class="text-sm mt-1 block text-secondary">Forgot password?</a> -->
+          <!-- <a href="/password" class="text-sm mt-1 block text-secondary">Forgot password?</a> -->
         <button type="submit"  class="btn btn-primary mt-5">
                Sign In
     </button>
