@@ -40,6 +40,8 @@ export type Member = {
   officeAddress: string;
   officePhoneNumber: string;
   dependents: Dependent[];
+  approvedAt: string;
+  declinedAt: string;
 };
 
 export type MemberAccount = {

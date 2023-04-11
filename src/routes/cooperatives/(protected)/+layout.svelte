@@ -1,5 +1,7 @@
 
 <script lang="ts">
+    export let data;
+    console.log(data)
     let sidebarState:Record<string, boolean> = {
         registration: false,
         loan: false
@@ -16,7 +18,8 @@
           </button>
         </div>
         <div class="flex-1">
-          <a href="/" class="btn btn-ghost normal-case text-xl">COOP NAME</a>
+          
+          <a href="/cooperatives/dashboard" class="btn btn-ghost normal-case text-xl">{data?.cooperative?.name}</a>
         </div>
         <div class="flex-none">
           <button class="btn btn-square btn-ghost">

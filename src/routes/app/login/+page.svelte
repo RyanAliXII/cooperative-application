@@ -1,7 +1,7 @@
 <script>
 
     import logo from "$lib/assets/images/ccdco-logo.png"
-    import logo1 from "$lib/assets/images/data-trend.svg"
+
     export let form;
  
 </script>
@@ -16,9 +16,9 @@
         <img class="w-28 h-28 lg:w-32 lg:h-32" src={logo} alt="ccdco-logo">
       </div>
       <h1 class="text-3xl lg:text-4xl  mb-2 text-center font-semibold mt-2">Sign In</h1>
-
-  
-      <div class="form-control w-full">
+      <p class="text-gray-400 text-center ">Sign in and manage cooperatives in the Caloocan City</p>
+      
+      <div class="form-control w-full mt-4">
           <label class="label" for="email">
             <span class="label-text">Email</span>
           </label>

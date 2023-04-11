@@ -1,6 +1,5 @@
 import { json, type RequestHandler } from "@sveltejs/kit";
 import { StatusCodes } from "http-status-codes";
-import { ENCRYPTION_KEY } from "$env/static/private";
 import { Member, MemberAccount, Session } from "$lib/models/model";
 import type { Member as MemberType } from "$lib/definitions/types";
 import { NewMemberValidationSchema } from "$lib/definitions/schema";

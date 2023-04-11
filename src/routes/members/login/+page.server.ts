@@ -1,7 +1,8 @@
-import { MemberAccount, Session } from "$lib/models/model";
+import { Member, MemberAccount, Session } from "$lib/models/model";
 import { compare } from "bcrypt";
 import { redirect } from "@sveltejs/kit";
 import { StatusCodes } from "http-status-codes";
+import type { MemberAccount as MemberAccountType } from "$lib/definitions/types.js";
 
 export const actions = {
   login: async ({ request, cookies }) => {
@@ -10,29 +11,37 @@ export const actions = {
     const password = formData.get("password");
     password;
     try {
-      const account = await MemberAccount.findOne({
+      const accountModel = await MemberAccount.findOne({
         where: {
           email: email,
         },
+        include: [
+          {
+            model: Member,
+          },
+        ],
       });
-      if (!account) {
+
+      if (!accountModel) {
         return {
           message: "Invalid email or password.",
           error: true,
           info: false,
         };
       }
-      if (account?.dataValues?.rejectedAt) {
+
+      const account: MemberAccountType = accountModel.get({ plain: true });
+      if (account?.member?.declinedAt) {
         return {
           message:
-            "Your account has been unapproved. Please contact the cooperative.",
+            "Your account has been rejected. Please contact the cooperative.",
           error: true,
           info: false,
         };
       }
       const isPasswordSame = await compare(
         password?.toString() ?? "",
-        account?.dataValues?.password
+        account?.password
       );
       if (!isPasswordSame) {
         return {
@@ -42,7 +51,7 @@ export const actions = {
         };
       }
 
-      if (!account?.dataValues?.approvedAt) {
+      if (!account?.member?.approvedAt) {
         return {
           message: "Your account  is still waiting for approval.",
           error: false,
@@ -52,7 +61,7 @@ export const actions = {
       const expiration = new Date();
       expiration.setDate(expiration.getDate() + 1); // add 1 day expiration
       const session = await Session.create({
-        data: account.dataValues,
+        data: account,
         expiresAt: expiration.toISOString(),
       });
       cookies.set("member_sid", session.dataValues.sid, {
