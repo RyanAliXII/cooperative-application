@@ -45,6 +45,7 @@
     "pg-hstore": "^2.3.4",
     "sequelize": "^6.30.0",
     "svelte-french-toast": "^1.0.4-beta.0",
+    "svelte-time": "^0.7.1",
     "sweetalert2": "^11.4.8",
     "uuid": "^9.0.0",
     "validator": "^13.9.0",

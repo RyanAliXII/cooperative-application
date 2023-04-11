@@ -12,13 +12,30 @@ export const SharesLogModel = sequelize.define(
       type: DataTypes.STRING,
       defaultValue: "",
     },
+
     amount: {
       type: DataTypes.DECIMAL(10, 2),
+    },
+    cooperativeId: {
+      type: DataTypes.UUID,
+      field: "cooperative_id",
+      references: {
+        model: "cooperative",
+        key: "id",
+      },
+    },
+    memberId: {
+      type: DataTypes.BIGINT,
+      field: "member_id",
+      references: {
+        model: "member",
+        key: "id",
+      },
     },
     remarks: {
       type: DataTypes.TEXT,
       defaultValue: "",
     },
   },
-  { underscored: true }
+  { underscored: true, paranoid: true }
 );

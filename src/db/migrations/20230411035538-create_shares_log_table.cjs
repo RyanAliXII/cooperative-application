@@ -26,6 +26,14 @@ module.exports = {
       amount: {
         type: Sequelize.DECIMAL(10, 2),
       },
+      cooperativeId: {
+        type: Sequelize.DataTypes.UUID,
+        field: "cooperative_id",
+        references: {
+          model: "cooperative",
+          key: "id",
+        },
+      },
       memberId: {
         type: Sequelize.BIGINT,
         field: "member_id",
@@ -36,6 +44,10 @@ module.exports = {
       },
       createdAt: {
         field: "created_at",
+        type: Sequelize.DATE,
+      },
+      deletedAt: {
+        field: "deleted_at",
         type: Sequelize.DATE,
       },
       updatedAt: {

@@ -15,11 +15,19 @@ export const MemberAccount = MemberAccountModel;
 export const Account = AccountModel;
 export const Shares = SharesModel;
 export const SharesLog = SharesLogModel;
+
 CooperativeAccount.belongsTo(Cooperative, { foreignKey: "cooperative_id" });
 
 Cooperative.hasMany(CooperativeAccount, {
   foreignKey: "cooperative_id",
   as: "accounts",
 });
+
 MemberAccount.belongsTo(Member, { foreignKey: "member_id" });
 Member.hasOne(MemberAccount, { foreignKey: "member_id", as: "account" });
+
+Shares.belongsTo(Member, { foreignKey: "member_id" });
+Member.hasOne(Shares, { foreignKey: "member_id", as: "shares" });
+
+SharesLog.belongsTo(Member, { foreignKey: "member_id" });
+Member.hasMany(SharesLog, { foreignKey: "member_id", as: "sharesLogs" });

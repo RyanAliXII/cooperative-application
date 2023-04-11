@@ -51,3 +51,18 @@ export type MemberAccount = {
   password: string;
   member: Member;
 };
+
+export type Shares = {
+  id?: string;
+  memberId: number;
+  total: number;
+};
+export type SharesLog = {
+  id?: number;
+  memberId: number;
+  remarks: string;
+  amount: number;
+  member: Member;
+  type: string;
+  createdAt: string;
+};

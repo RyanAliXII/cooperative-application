@@ -64,10 +64,6 @@ module.exports = {
         type: Sequelize.DataTypes.JSONB,
         defaultValue: [],
       },
-      cooperativeId: {
-        type: Sequelize.DataTypes.UUID,
-        field: "cooperative_id",
-      },
       createdAt: {
         type: Sequelize.DataTypes.DATE,
         field: "created_at",
