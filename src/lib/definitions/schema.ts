@@ -127,3 +127,14 @@ export const RegisterMemberAccountSchema = object({
     birthday: string().required("Date of birth is required."),
   }),
 });
+
+export const AddSharesSchemaValidation = object({
+  memberId: number()
+    .integer("Invalid member id.")
+    .required("Please select a member.")
+    .min(1, "Please select a member."),
+  amount: number()
+    .required("Amount is required.")
+    .min(10, "Amount should be atleast 10."),
+  remarks: string().notRequired(),
+});

@@ -118,10 +118,12 @@ export const GET: RequestHandler = async ({ request, cookies }) => {
 
     const queryParams = new URL(request.url).searchParams;
     const query = queryParams.get("q");
-    //check if using search mode.
+    /* check if url has param "q" short for "query"
+       if there is a q url param, it means the endpoint will be returning result based on keyword.
+    */
     if (query) {
       if (query.length > 0) {
-        const [results, metaData] = await sequelize.query(
+        const [results, _] = await sequelize.query(
           `
         SELECT member.id, given_name as "givenName", 
           surname as "surname", 
@@ -141,7 +143,9 @@ export const GET: RequestHandler = async ({ request, cookies }) => {
         );
         return json({
           message: "Members has been fetched.",
-          members: results ?? [],
+          data: {
+            members: results ?? [],
+          },
         });
       }
     }
