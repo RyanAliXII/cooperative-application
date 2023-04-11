@@ -116,15 +116,46 @@ export const GET: RequestHandler = async ({ request, cookies }) => {
     //data from session
     const coopId = session.dataValues?.data?.cooperative?.id;
 
-    const memberModel = Member.findAll({
+    const queryParams = new URL(request.url).searchParams;
+    const query = queryParams.get("q");
+    //check if using search mode.
+    if (query) {
+      if (query.length > 0) {
+        const [results, metaData] = await sequelize.query(
+          `
+        SELECT member.id, given_name as "givenName", 
+          surname as "surname", 
+          middle_name as "middleName", 
+          json_build_object('id', ma.id, 'email', ma.email, 'memberId', ma.member_id) as account
+          FROM member
+          INNER JOIN member_account as ma on member.id = ma.member_id
+          where search_vector @@ (plainto_tsquery('simple', :query) :: text || ':*' ) :: tsquery
+          ORDER BY (ts_rank(search_vector, (plainto_tsquery('simple', :query) :: text || ':*' ) :: tsquery ) 
+          )  DESC
+        `,
+          {
+            replacements: {
+              query,
+            },
+          }
+        );
+        return json({
+          message: "Members has been fetched.",
+          members: results ?? [],
+        });
+      }
+    }
+    const memberModel = await Member.findAll({
       where: {
         cooperativeId: coopId,
       },
     });
     return json(
       {
-        message: "Member has been registered",
-        data: {},
+        message: "Members has been fetched.",
+        data: {
+          members: memberModel.map((m) => m.get({ plain: true })) ?? [],
+        },
       },
       { status: StatusCodes.OK }
     );

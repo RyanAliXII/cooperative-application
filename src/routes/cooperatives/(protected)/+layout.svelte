@@ -1,7 +1,6 @@
 
 <script lang="ts">
     export let data;
-    console.log(data)
     let sidebarState:Record<string, boolean> = {
         registration: false,
         loan: false
