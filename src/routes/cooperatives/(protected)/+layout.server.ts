@@ -1,15 +1,17 @@
+import { getSessionMetadata } from "$lib/internal/session";
 import { Session } from "$lib/models/model.js";
+import { error } from "@sveltejs/kit";
+import type { LayoutServerLoad } from "../$types";
+import { StatusCodes } from "http-status-codes";
 
-export async function load({ cookies }) {
-  const coopSID = cookies.get("coop_sid");
-  const sessionModel = await Session.findOne({
-    where: {
-      sid: coopSID,
-    },
-  });
-  const session = sessionModel?.get({ plain: true });
+export const load: LayoutServerLoad = async (event) => {
+  const { cookies } = event;
+  const { session } = await getSessionMetadata(event);
 
   return {
-    cooperative: session?.data?.cooperative ?? { id: "", name: "" },
+    cooperative: session.data?.cooperative ?? {
+      id: "",
+      name: "",
+    },
   };
-}
+};

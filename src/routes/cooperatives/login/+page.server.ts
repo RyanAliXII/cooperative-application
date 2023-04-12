@@ -2,6 +2,7 @@
 import { redirect } from "@sveltejs/kit";
 import { Cooperative, CooperativeAccount, Session } from "$lib/models/model";
 import { compare } from "bcrypt";
+import { AppTypes } from "$lib/internal/session.js";
 
 export const actions = {
   login: async ({ request, cookies }) => {
@@ -11,32 +12,36 @@ export const actions = {
     if (!email || !password) {
       return { message: "Invalid username or password." };
     }
-    const account = await CooperativeAccount.findOne({
-      where: {
-        email: email,
-      },
-      include: [
-        {
-          model: Cooperative,
-          foreignKey: "cooperative_id",
+    const account = (
+      await CooperativeAccount.findOne({
+        where: {
+          email: email,
         },
-      ],
-    });
+        include: [
+          {
+            model: Cooperative,
+            foreignKey: "cooperative_id",
+          },
+        ],
+      })
+    )?.get({ plain: true });
 
     if (!account) {
       return { message: "Invalid username or password." };
     }
-    const isPasswordSame = await compare(password, account.dataValues.password);
+
+    const isPasswordSame = await compare(password, account.password);
     if (!isPasswordSame) {
       return { message: "Invalid username or password." };
     }
     const expiration = new Date();
     expiration.setDate(expiration.getDate() + 1); // add 1 day expiration
     const session = await Session.create({
-      data: account.dataValues,
+      data: account,
+      appType: AppTypes.Cooperative,
       expiresAt: expiration.toISOString(),
     });
-    cookies.set("coop_sid", session.dataValues.sid, {
+    cookies.set("app_sid", session.dataValues.sid, {
       path: "/",
       httpOnly: true,
       sameSite: "strict",

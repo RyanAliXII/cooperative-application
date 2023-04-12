@@ -64,7 +64,8 @@ export const actions = {
         data: account,
         expiresAt: expiration.toISOString(),
       });
-      cookies.set("member_sid", session.dataValues.sid, {
+
+      cookies.set("app_sid", session.dataValues.sid, {
         path: "/",
         httpOnly: true,
         sameSite: "strict",

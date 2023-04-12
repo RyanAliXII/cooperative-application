@@ -11,6 +11,10 @@ export const SessionModel = sequelize.define(
     data: {
       type: DataTypes.JSONB,
     },
+    appType: {
+      type: DataTypes.STRING,
+      field: "app_type",
+    },
     expiresAt: {
       type: DataTypes.DATE,
       field: "expires_at",

@@ -2,47 +2,73 @@ import type { Cooperative, CooperativeAccount } from "$lib/definitions/types";
 import { Session } from "$lib/models/model";
 import type { RequestEvent } from "@sveltejs/kit";
 
-type CooperativeSession = {
-  sid: string;
-  data: CooperativeSessionData;
+export type SessionMeta = {
+  appType: "Member" | "Cooperative" | "Main" | null;
+  error?: boolean;
+  errorMsg?: string;
+  session: SessionType;
 };
 
-interface CooperativeSessionData extends CooperativeAccount {
-  cooperative: Cooperative;
+export type SessionType = {
+  sid: string;
+  data: any;
+  appType: "Main" | "Cooperative" | "Member" | null;
+  expiresAt: string;
+};
+export enum AppTypes {
+  Main = "Main",
+  Cooperative = "Cooperative",
+  Member = "Member",
 }
-export const getSessionMetadata = async (
-  { request, url, cookies }: RequestEvent,
-  requestOrigin: "cooperative" | "member" | "main" | undefined = undefined
-) => {
-  /* 
-    It is necessary to know where the request comes from to know which session data from db to fetch.
-    There are 3 types of sid set in cookies upon successful login, member_sid is for member portal, coop_sid is for cooperative portal and app_sid for CCDCO
-    You can provide requestOrigin or automatically determine the requestOrigin by checking Referer Header. 
-  */
+export const getSessionMetadata = async ({
+  request,
+  cookies,
+}: RequestEvent): Promise<SessionMeta> => {
   let sid;
   const requestorUrl = request.headers.get("Referer");
   const appUrl = new URL(requestorUrl ?? "https://www.facebook.com");
-
-  /*Providing request origin is mandatory if this function is called on +page.server since referrer header doesn't exist on page load.
-  Using referer to know where the request comes from is useful for API since AJAX calls have referer header.*/
-
-  if (
-    requestOrigin === "cooperative" ||
-    appUrl.pathname.startsWith("/cooperatives")
-  ) {
-    sid = cookies.get("coop_sid");
+  sid = cookies.get("app_sid");
+  if (!sid) {
+    const sessionMeta: SessionMeta = {
+      appType: null,
+      error: true,
+      errorMsg: "sid not found",
+      session: {
+        appType: null,
+        sid: "",
+        data: {},
+        expiresAt: "",
+      },
+    };
+    return sessionMeta;
   }
-  if (requestOrigin === "member" || appUrl.pathname.startsWith("/members")) {
-    sid = cookies.get("member_sid");
-  }
-  if (requestOrigin === "main" || appUrl.pathname.startsWith("/app")) {
-    sid = cookies.get("app_sid");
-  }
-
-  const SessionModel = await Session.findOne({
+  const sessionModel = await Session.findOne({
     where: {
       sid: sid ?? "",
     },
   });
-  return SessionModel?.get({ plain: true });
+
+  if (!sessionModel) {
+    const sessionMeta: SessionMeta = {
+      appType: null,
+      error: true,
+      errorMsg: "session not found",
+      session: {
+        sid: "",
+        data: {},
+        expiresAt: "",
+        appType: null,
+      },
+    };
+    return sessionMeta;
+  }
+
+  const session: SessionType = sessionModel.get({ plain: true });
+  const sessionMeta: SessionMeta = {
+    appType: session.appType,
+    session: session,
+    error: false,
+    errorMsg: "",
+  };
+  return sessionMeta;
 };

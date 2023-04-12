@@ -11,11 +11,13 @@ export const actions = {
     if (!email || !password) {
       return { message: "Invalid username or password." };
     }
-    const account = await Account.findOne({
-      where: {
-        email: email,
-      },
-    });
+    const account = (
+      await Account.findOne({
+        where: {
+          email: email,
+        },
+      })
+    )?.get({ plain: true });
 
     if (!account) {
       return { message: "Invalid username or password." };
