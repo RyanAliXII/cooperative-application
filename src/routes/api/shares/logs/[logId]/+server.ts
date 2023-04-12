@@ -1,5 +1,5 @@
 import { json } from "@sveltejs/kit";
-import type { RequestHandler } from "./$types";
+import type { RequestHandler } from "@sveltejs/kit";
 import type {
   Shares as SharesType,
   SharesLog as SharesLogType,
@@ -69,7 +69,9 @@ export const PUT: RequestHandler = async ({ request, params }) => {
   }
 };
 
-export const DELETE: RequestHandler = async ({ params, request }) => {
+export const DELETE: RequestHandler = async (event) => {
+  const { params } = event;
+
   const logId = params.logId;
   const transaction = await sequelize.transaction();
   try {

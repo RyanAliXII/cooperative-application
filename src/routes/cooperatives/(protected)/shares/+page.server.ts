@@ -3,22 +3,14 @@ import { redirect } from "@sveltejs/kit";
 import type { PageServerLoad } from "./$types";
 import { StatusCodes } from "http-status-codes";
 import { sequelize } from "$lib/models/sequelize";
+import { getSessionMetadata } from "$lib/internal/session";
 
-export const load: PageServerLoad = async ({ cookies }) => {
-  const sid = cookies.get("coop_sid");
-  if (!sid) {
+export const load: PageServerLoad = async (event) => {
+  const session = await getSessionMetadata(event, "cooperative");
+  if (!session) {
     throw redirect(StatusCodes.SEE_OTHER, "/cooperatives/login");
   }
-  const sessionModel = await Session.findOne({
-    where: {
-      sid: sid,
-    },
-  });
-
-  if (!sessionModel) {
-    throw redirect(StatusCodes.SEE_OTHER, "/cooperatives/login");
-  }
-  const session = await sessionModel.get({ plain: true });
+  console.log(session);
   const coopId = session?.data?.cooperative?.id;
 
   const [result, _] = await sequelize.query(

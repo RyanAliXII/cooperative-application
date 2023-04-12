@@ -10,40 +10,17 @@
   import toast, { Toaster } from "svelte-french-toast";
   import { SharesTransactionTypes } from "$lib/internal/transaction.js";
   import Time from "svelte-time";
+  import AccountSelector from "$lib/components/account-selector/AccountSelector.svelte";
  
   let isAddModalOpen = false;
   let isEditModalOpen = false;
   let isConfirmDialogOpen = false
-  let isSearchResultOpen = false
-  let timer:NodeJS.Timeout;
-  let members:Member[] = []
-
 
   export let data;
   let sharesLogs: SharesLog[] = data.sharesLogs
   let totalShares = data?.shares?.total ?? 0
-  const handleInput = (event: Event)=>{
-    const val = (event.target as HTMLInputElement)?.value;
-    if(val.length === 0){
-        isSearchResultOpen = false
-        return 
-    }
-    //debounce
-    clearTimeout(timer)
-    timer = setTimeout(()=>{
-        searchMembers(val)
-    }, 500)
-  }
-  const searchMembers = async(query: string)=>{
-    const response = await axios.get(`/api/members?q=${query}`)
-    const {data:responseData} = response.data
-    members = responseData?.members ?? []
-   isSearchResultOpen = true;
-  }
-  const handleInputBlur = (e: FocusEvent)=>{
-   
-    // isSearchResultOpen = false
-  }
+
+
 
   let selectedMember:Member | null;
 
@@ -96,23 +73,6 @@
        
     }
   })
-  const handleSearchResultSelection = (member: Member, mode:"add" | "edit")=>{ 
-    if(mode === "add"){
-      formBody.update((prev)=>{
-        prev.memberId = member.id ?? 0;
-        return prev
-    })
-    }
-    if(mode === "edit"){
-      editFormBody.update((prev)=>{
-        prev.memberId = member.id ?? 0;
-        return prev
-    })
-    } 
-    selectedMember = member
-    isSearchResultOpen = false
-  }
-
   const removeSelectedMember = ()=>{
     selectedMember = null
     formBody.update((prev)=>{
@@ -177,7 +137,20 @@
       closeConfirmDialog()
     }
   }
-
+ const selectMemberForAddShareForm = (member:Member)=>{
+    selectedMember = member
+    formBody.update((prev)=>{
+      prev.memberId = member.id ?? 0
+      return prev
+    })
+ }
+ const selectMemberForEditShareForm = (member:Member)=>{
+  selectedMember = member;
+  editFormBody.update((prev)=>{
+      prev.memberId = member.id ?? 0
+      return prev
+    })
+ }
   </script>
   <div>
     <h1 class="text-lg font-semibold mb-3 ml-1 text-gray-500">Shares</h1>
@@ -269,28 +242,31 @@
                 </div>
             </div> 
             {:else} 
-            <TextField label="Search member by name"  on:input={handleInput} on:blur={handleInputBlur} error={$errors?.memberId?.[0]}/>
+
+            <AccountSelector handleSelect={selectMemberForAddShareForm} error={$errors?.memberId?.[0]}/>
+            <!-- <TextField label="Search member by name"  on:input={handleInput} on:blur={handleInputBlur} error={$errors?.memberId?.[0]}/>
+            <div class="relative">
+              <div class="bg-base-100  w-full absolute rounded shadow mt-2 overflow-y-scroll z-10" class:hidden="{!isSearchResultOpen}"  style="max-height: 300px;"  >
+                  <ul class="list-none" >
+                          {#each members as member }
+                              <li class="cursor-pointer  flex items-center gap-2 border border-b h-20 px-3" on:click={()=>{handleSearchResultSelection(member, "add")}} role={"button"}>
+                                  <div>
+                                      <img src="https://api.dicebear.com/6.x/initials/svg?seed={member.givenName} {member.surname}&backgroundColor=EB7C2A" alt="avatar" class="w-10 rounded-full">
+
+                                  </div>
+                                  <div class="flex flex-col justify-center">
+                                  <span class="font-bold">{member.givenName} {member.surname}</span>
+                                  <small class="text-gray-400">{member.id}</small>
+                                  </div>
+                              
+                              </li>
+                          {/each}
+                  </ul>
+              </div>
+          </div> -->
             {/if}
              
-                <div class="relative">
-                    <div class="bg-base-100  w-full absolute rounded shadow mt-2 overflow-y-scroll z-10" class:hidden="{!isSearchResultOpen}"  style="max-height: 300px;"  >
-                        <ul class="list-none" >
-                                {#each members as member }
-                                    <li class="cursor-pointer  flex items-center gap-2 border border-b h-20 px-3" on:click={()=>{handleSearchResultSelection(member, "add")}} role={"button"}>
-                                        <div>
-                                            <img src="https://api.dicebear.com/6.x/initials/svg?seed={member.givenName} {member.surname}&backgroundColor=EB7C2A" alt="avatar" class="w-10 rounded-full">
-
-                                        </div>
-                                        <div class="flex flex-col justify-center">
-                                        <span class="font-bold">{member.givenName} {member.surname}</span>
-                                        <small class="text-gray-400">{member.id}</small>
-                                        </div>
-                                    
-                                    </li>
-                                {/each}
-                        </ul>
-                    </div>
-                </div>
+              
                 <TextField label="Amount" name="amount" type="number" step="{.01}" error={$errors?.amount?.[0]} />
                 <TextAreaField label="Remarks" name="remarks"   error={$errors?.remarks?.[0]}/>
                 <button type="submit" class="btn btn-primary mt-5 text-white">Save</button>
@@ -323,28 +299,10 @@
           </div>
       </div> 
       {:else} 
-      <TextField  label="Search member by name"  on:input={handleInput} on:blur={handleInputBlur} error={$editFormErrors?.memberId?.[0]}/>
+        <AccountSelector  handleSelect={selectMemberForEditShareForm} error={$editFormErrors?.memberId?.[0]}/>
       {/if}
        
-          <div class="relative">
-              <div class="bg-base-100  w-full absolute rounded shadow mt-2 overflow-y-scroll z-10" class:hidden="{!isSearchResultOpen}"  style="max-height: 300px;"  >
-                  <ul class="list-none" >
-                          {#each members as member }
-                              <li class="cursor-pointer  flex items-center gap-2 border border-b h-20 px-3" on:click={()=>{handleSearchResultSelection(member, "edit")}} role={"button"}>
-                                  <div>
-                                      <img src="https://api.dicebear.com/6.x/initials/svg?seed={member.givenName} {member.surname}&backgroundColor=EB7C2A" alt="avatar" class="w-10 rounded-full">
-
-                                  </div>
-                                  <div class="flex flex-col justify-center">
-                                  <span class="font-bold">{member.givenName} {member.surname}</span>
-                                  <small class="text-gray-400">{member.id}</small>
-                                  </div>
-                              
-                              </li>
-                          {/each}
-                  </ul>
-              </div>
-          </div>
+       
           <TextField value={$editFormBody.amount} label="Amount" name="amount" type="number" step="{.01}" error={$errors?.amount?.[0]} />
           <TextAreaField value={$editFormBody.remarks} label="Remarks" name="remarks"   error={$editFormErrors?.remarks?.[0]}/>
           <button type="submit" class="btn btn-primary mt-5 text-white">Save</button>

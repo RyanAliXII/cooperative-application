@@ -4,21 +4,18 @@ import { json } from "@sveltejs/kit";
 import type { RequestHandler } from "./$types";
 import { StatusCodes } from "http-status-codes";
 
-import { Member, Session, Shares, SharesLog } from "$lib/models/model";
+import { Member, Shares, SharesLog } from "$lib/models/model";
 import { AddSharesSchemaValidation } from "$lib/definitions/schema";
 import { SharesTransactionTypes } from "$lib/internal/transaction";
+import { getSessionMetadata } from "$lib/internal/session";
 
-export const POST: RequestHandler = async ({ request, cookies }) => {
+export const POST: RequestHandler = async (event) => {
   const transaction = await sequelize.transaction();
-  const sid = cookies.get("coop_sid");
+  const { request } = event;
   try {
-    const sessionModel = await Session.findOne({
-      where: {
-        sid: sid,
-      },
-    });
+    const session = await getSessionMetadata(event);
 
-    if (!sessionModel) {
+    if (!session) {
       return json(
         {
           message: "Invalid SID",
@@ -28,7 +25,6 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
         }
       );
     }
-    const session = sessionModel.get({ plain: true });
     const coopId = session?.data?.cooperative?.id;
     const body = await request.json();
     const shares = await AddSharesSchemaValidation.validate(body);
@@ -72,17 +68,10 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
   }
 };
 
-export const GET: RequestHandler = async ({ cookies }) => {
+export const GET: RequestHandler = async (event) => {
   try {
-    const sid = cookies.get("coop_sid");
-
-    const sessionModel = await Session.findOne({
-      where: {
-        sid: sid,
-      },
-    });
-
-    if (!sessionModel) {
+    const session = await getSessionMetadata(event);
+    if (!session) {
       return json(
         {
           message: "Invalid SID",
@@ -92,7 +81,7 @@ export const GET: RequestHandler = async ({ cookies }) => {
         }
       );
     }
-    const session = sessionModel.get({ plain: true });
+
     const coopId = session?.data?.cooperative?.id;
 
     const sharesLogModel = await SharesLog.findAll({

@@ -10,10 +10,12 @@ export type Cooperative = {
 };
 
 export type CooperativeAccount = {
+  id?: string;
   givenName: string;
   middleName: string;
   surname: string;
   email: string;
+  isOwner: boolean;
 };
 
 export type Dependent = {
