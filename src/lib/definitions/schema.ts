@@ -150,3 +150,21 @@ export const EditSharesSchemaValidation = object({
     .min(10, "Amount should be atleast 10."),
   remarks: string().notRequired(),
 });
+
+export const AddLoanSchemaValidation = object({
+  memberId: number()
+    .integer("Invalid member id.")
+    .required("Please select a member.")
+    .min(1, "Please select a member."),
+  amount: number()
+    .required("Amount is required.")
+    .min(10, "Amount should be atleast 10."),
+  interest: number()
+    .required("Interest is required.")
+    .min(1, "Interest should be atleast 1.")
+    .integer("Interest value should not be decimal."),
+  tenure: number()
+    .required("Tenure is required.")
+    .min(1, "Tenure should be atleast 1.")
+    .integer("Tenure value should not be decimal."),
+});

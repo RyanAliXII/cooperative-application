@@ -1,3 +1,5 @@
+import type { LoanStatus } from "$lib/internal/transaction";
+
 export type Cooperative = {
   id?: string;
   name: string;
@@ -67,4 +69,15 @@ export type SharesLog = {
   member: Member;
   type: string;
   createdAt: string;
+};
+
+export type Loan = {
+  id?: string;
+  memberId: number;
+  principal: number;
+  totalDue: number;
+  interest: number;
+  status: LoanStatus;
+  remainingBalance: number;
+  tenure: number;
 };
