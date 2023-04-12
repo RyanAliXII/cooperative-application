@@ -6,9 +6,18 @@ import { Loan } from "$lib/models/model";
 import { json, type RequestHandler } from "@sveltejs/kit";
 import { StatusCodes } from "http-status-codes";
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async (event) => {
+  const { request } = event;
   try {
+    const session = await getSessionMetadata(event);
+    if (!session) {
+      return json(
+        { message: "Unauthorized" },
+        { status: StatusCodes.UNAUTHORIZED }
+      );
+    }
     const body = await request.json();
+    const coopId = session?.data?.cooperative.id;
     const parsedBody = await AddLoanSchemaValidation.validate(body);
 
     const interest = (parsedBody.interest / 100) * parsedBody.amount;
@@ -21,6 +30,7 @@ export const POST: RequestHandler = async ({ request }) => {
       status: LoanStatuses.Requested,
       interest,
       remainingBalance: totalDue,
+      cooperativeId: coopId,
       totalDue,
     });
 
@@ -36,8 +46,19 @@ export const POST: RequestHandler = async ({ request }) => {
 
 export const GET: RequestHandler = async (event) => {
   try {
-    const session = await getSessionMetadata(event);
-    const loanModel = await Loan.findAll({});
+    const session = await getSessionMetadata(event, "cooperative");
+
+    if (!session) {
+      return json(
+        { message: "Unauthorized" },
+        { status: StatusCodes.UNAUTHORIZED }
+      );
+    }
+    const loanModel = await Loan.findAll({
+      where: {
+        cooperativeId: session?.data?.cooperative?.id,
+      },
+    });
     return json({
       message: "Loans has been fetched.",
       data: {
@@ -45,6 +66,15 @@ export const GET: RequestHandler = async (event) => {
       },
     });
   } catch (error) {
-    return json({}, { status: StatusCodes.INTERNAL_SERVER_ERROR });
+    console.log(error);
+    return json(
+      {
+        message: "Unknown error occured",
+        data: {
+          loans: [],
+        },
+      },
+      { status: StatusCodes.INTERNAL_SERVER_ERROR }
+    );
   }
 };

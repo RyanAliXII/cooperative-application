@@ -11,10 +11,10 @@
   import axios from "axios";
   import { x64 } from "crypto-js";
   import { dataset_dev } from "svelte/internal";
+
+  export let data;
   let isAddLoanModalOpen = false
   let selectedMember: Member | null;
-
-
   const {form:addLoanForm, data:addLoanData, errors:addLoanFormErrors} = createForm({
    initialValues:{
     memberId: 0,

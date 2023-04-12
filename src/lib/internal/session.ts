@@ -21,7 +21,7 @@ export const getSessionMetadata = async (
   */
   let sid;
   const requestorUrl = request.headers.get("Referer");
-  const appUrl = new URL(requestorUrl ?? "");
+  const appUrl = new URL(requestorUrl ?? "https://www.facebook.com");
 
   /*Providing request origin is mandatory if this function is called on +page.server since referrer header doesn't exist on page load.
   Using referer to know where the request comes from is useful for API since AJAX calls have referer header.*/

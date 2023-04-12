@@ -38,6 +38,14 @@ export const LoanModel = sequelize.define(
         key: "id",
       },
     },
+    cooperativeId: {
+      type: DataTypes.UUID,
+      field: "cooperative_id",
+      references: {
+        model: "cooperative",
+        key: "id",
+      },
+    },
   },
   {
     paranoid: true,

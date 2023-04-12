@@ -45,6 +45,14 @@ module.exports = {
           key: "id",
         },
       },
+      cooperativeId: {
+        type: Sequelize.UUID,
+        field: "cooperative_id",
+        references: {
+          model: "cooperative",
+          key: "id",
+        },
+      },
       createdAt: {
         field: "created_at",
         type: Sequelize.DATE,
