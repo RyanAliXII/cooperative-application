@@ -12,7 +12,6 @@
   import { LoanStatuses } from "$lib/internal/transaction.js";
   import ConfirmDialog from "$lib/components/ui/ConfirmDialog.svelte";
 
-
   export let data;
   let isAddLoanModalOpen = false
   let isEditLoanModalOpen = false
@@ -86,7 +85,6 @@
     })
   }
   const edit = (loan:Loan)=>{
-
     editLoanData.update(()=>({
      id:loan.id ?? "",
      memberId: loan.memberId, 
@@ -135,7 +133,7 @@
         await axios.delete(`/api/loans/${selectedLoan?.id}`)
         invalidate((url)=>url.pathname === "/api/loans")
         invalidate((url)=>url.pathname === "/api/loans/total")
-        toast.success("Loan has been removed")
+        toast.success("Loan has been removed.")
      }
      catch{
         toast.error("Unknown error occured, Please try again later.")
@@ -409,7 +407,6 @@
     </div>
     <div class="w-full flex gap-3 mt-10">
         <button class="btn btn-success basis-1/2" type="button" on:click={approveLoan}>Approve</button>
-
         <button class="btn btn-error basis-1/2" type="button" on:click={declineLoan} >Decline</button>
     </div>
   
