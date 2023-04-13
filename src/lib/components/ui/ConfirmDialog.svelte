@@ -6,7 +6,7 @@
     export let title = ""
     export let text = ""
     export let cancelBtnText= "Cancel"
-    export let confirmBtnText = ""
+    export let confirmBtnText = "Yes, Delete it!"
 </script>
 
 <Modal isOpen={isOpen} close={close} >

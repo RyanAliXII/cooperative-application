@@ -1,6 +1,5 @@
 <script lang="ts">
   import AccountSelector from "$lib/components/account-selector/AccountSelector.svelte";
-  import TextAreaField from "$lib/components/form/TextAreaField.svelte";
   import TextField from "$lib/components/form/TextField.svelte";
   import Modal from "$lib/components/ui/Modal.svelte";
   import type { Loan, Member } from "$lib/definitions/types";
@@ -116,13 +115,43 @@
         isLoanPreviewModalOpen = false
      }
   }
+
+  const approveLoan = async()=>{
+     try{
+        await axios.patch(`/api/loans/${selectedLoan?.id}`, {status:LoanStatuses.Approved})
+        invalidate((url)=>url.pathname === "/api/loans")
+        invalidate((url)=>url.pathname === "/api/loans/total")
+        toast.success("Loan has been approved.")
+     }
+     catch{
+        toast.error("Unknown error occured, Please try again later.")
+     }
+     finally{
+        isLoanPreviewModalOpen = false
+     }
+  }
+  const deleteLoan = async()=>{
+    try{
+        await axios.delete(`/api/loans/${selectedLoan?.id}`)
+        invalidate((url)=>url.pathname === "/api/loans")
+        invalidate((url)=>url.pathname === "/api/loans/total")
+        toast.success("Loan has been removed")
+     }
+     catch{
+        toast.error("Unknown error occured, Please try again later.")
+     }
+     finally{
+        isDeleteLoanDialogOpen = false
+     }
+  }
+
+  
   $: interest = (($addLoanData.interest ?? 0) / 100 ) * ($addLoanData.amount ?? 0)
   $: totalDue = ($addLoanData.amount ?? 0) + interest 
   $: repaymentPrincipal = ($addLoanData.amount) / $addLoanData.tenure 
   $: repaymentInterest = interest / $addLoanData.tenure;
   $: repaymentTotalDue = repaymentPrincipal + repaymentInterest
   
-
   $: editLoanInterest = (($editLoanData.interest ?? 0) / 100 ) * ($editLoanData.amount ?? 0)
   $: editLoanTotalDue = ($editLoanData.amount ?? 0) + editLoanInterest 
   $: editLoanRepaymentPrincipal = ($editLoanData.amount) / $editLoanData.tenure 
@@ -172,7 +201,7 @@
                       <td>
                         <button class="btn btn-info btn-outline" on:click={()=>{preview(loan)}}> <i class="fa-solid fa-eye"></i></button>
                         <button class="btn btn-secondary btn-outline" on:click={()=>{ edit(loan)}}><i class="fa-regular fa-pen-to-square"></i></button>
-                        <button class="btn btn-error btn-outline" on:click={()=>{isDeleteLoanDialogOpen = true}}><i class="fa-solid fa-trash" ></i></button>
+                        <button class="btn btn-error btn-outline" on:click={()=>{isDeleteLoanDialogOpen = true; selectedLoan = loan}}><i class="fa-solid fa-trash" ></i></button>
                       </td>
                       </tr>
                     {/each
@@ -335,7 +364,6 @@
     <div class="flex mt-3 gap-2 w-full bg-white shadow-sm p-5 border">
         <div>
             <img src="https://api.dicebear.com/6.x/initials/svg?seed={selectedLoan?.member?.givenName} {selectedLoan?.member?.surname}&backgroundColor=EB7C2A" alt="avatar" class="w-10 rounded-full">
-
         </div>
         <div class="flex flex-col justify-center">
         <span class="font-bold">{selectedLoan?.member?.givenName} {selectedLoan?.member?.middleName} {selectedLoan?.member?.surname}</span>
@@ -380,14 +408,14 @@
         </div>
     </div>
     <div class="w-full flex gap-3 mt-10">
-        <button class="btn btn-success basis-1/2" type="button">Approve</button>
+        <button class="btn btn-success basis-1/2" type="button" on:click={approveLoan}>Approve</button>
 
         <button class="btn btn-error basis-1/2" type="button" on:click={declineLoan} >Decline</button>
     </div>
   
 </Modal>
 <!-- End of Loan Preview Modal -->
-<ConfirmDialog isOpen={isDeleteLoanDialogOpen} close={()=>{isDeleteLoanDialogOpen= false}} onConfirm={()=>{}}/>
+<ConfirmDialog isOpen={isDeleteLoanDialogOpen} close={()=>{isDeleteLoanDialogOpen= false}} title={"Delete Loan Request!"} text={"Are you sure you want to delete is this loan request?"} onConfirm={deleteLoan}/>
 <Toaster/>
 
 
