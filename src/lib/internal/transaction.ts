@@ -7,6 +7,12 @@ export enum LoanStatuses {
   Approved = "Approved",
   Disbursed = "Disbursed",
   Finished = "Finished",
+  Declined = "Declined",
 }
 
-export type LoanStatus = "Requested" | "Approved" | "Disbursed" | "Finished";
+export type LoanStatus =
+  | "Requested"
+  | "Approved"
+  | "Disbursed"
+  | "Finished"
+  | "Declined";

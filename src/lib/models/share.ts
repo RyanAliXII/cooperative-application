@@ -1,7 +1,7 @@
 import { sequelize } from "./sequelize";
 import { DataTypes } from "sequelize";
-export const SharesLogModel = sequelize.define(
-  "shares_log",
+export const ShareModel = sequelize.define(
+  "share",
   {
     id: {
       type: DataTypes.BIGINT,
@@ -15,6 +15,10 @@ export const SharesLogModel = sequelize.define(
 
     amount: {
       type: DataTypes.DECIMAL(10, 2),
+      get() {
+        const value = this.getDataValue("amount");
+        return Number(value);
+      },
     },
     cooperativeId: {
       type: DataTypes.UUID,

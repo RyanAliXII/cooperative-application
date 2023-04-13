@@ -1,58 +1,58 @@
 import { json } from "@sveltejs/kit";
 import type { RequestHandler } from "@sveltejs/kit";
 import type {
-  Shares as SharesType,
-  SharesLog as SharesLogType,
+  MemberShare as MemberShareType,
+  Share as ShareType,
 } from "$lib/definitions/types";
 import { sequelize } from "$lib/models/sequelize";
-import { Shares, SharesLog } from "$lib/models/model";
+import { Share, MemberShare } from "$lib/models/model";
 import { StatusCodes } from "http-status-codes";
 import { EditSharesSchemaValidation } from "$lib/definitions/schema";
 
 export const PUT: RequestHandler = async ({ request, params }) => {
-  const logId = params.logId;
-  const body: SharesLogType = await request.json();
+  const shareId = params.shareId;
+  const body: ShareType = await request.json();
   const transaction = await sequelize.transaction();
   try {
     const parsedBody = await EditSharesSchemaValidation.validate(body);
-    const sharesModel = await Shares.findOne({
+    const memberShareModel = await MemberShare.findOne({
       where: {
         memberId: parsedBody.memberId,
       },
       transaction,
     });
 
-    const sharesLogModel = await SharesLog.findOne({
+    const shareModel = await Share.findOne({
       where: {
-        id: logId,
+        id: shareId,
       },
       transaction,
     });
 
-    const shares: SharesType = sharesModel?.get({ plain: true });
-    const sharesLog: SharesLogType = sharesLogModel?.get({ plain: true });
+    const memberShare: MemberShareType = memberShareModel?.get({ plain: true });
+    const share: ShareType = shareModel?.get({ plain: true });
 
-    if (!shares || !sharesLog || !sharesLogModel || !sharesModel) {
+    if (!share || !memberShare || !shareModel || !memberShareModel) {
       transaction.rollback();
       return json(
         { message: "Invalid body and id params." },
         { status: StatusCodes.BAD_REQUEST }
       );
     }
-    const incrementOrDecrementValue = sharesLog.amount - parsedBody.amount;
-    if (sharesLog.amount > parsedBody.amount) {
-      sharesModel.decrement("total", {
+    const incrementOrDecrementValue = share.amount - parsedBody.amount;
+    if (share.amount > parsedBody.amount) {
+      memberShareModel.decrement("total", {
         by: incrementOrDecrementValue,
         transaction,
       });
     } else {
-      sharesModel.increment("total", {
+      memberShareModel.increment("total", {
         by: incrementOrDecrementValue,
         transaction,
       });
     }
 
-    await sharesLogModel.update({
+    await shareModel.update({
       remarks: parsedBody.remarks,
       amount: parsedBody.amount,
       memberId: parsedBody.memberId,
@@ -72,32 +72,35 @@ export const PUT: RequestHandler = async ({ request, params }) => {
 export const DELETE: RequestHandler = async (event) => {
   const { params } = event;
 
-  const logId = params.logId;
+  const shareId = params.shareId;
   const transaction = await sequelize.transaction();
   try {
-    const sharesLogModel = await SharesLog.findOne({
+    const shareModel = await Share.findOne({
       where: {
-        id: logId,
+        id: shareId,
       },
       transaction,
     });
-    const sharesLog: SharesLogType = sharesLogModel?.get({ plain: true });
-    const sharesModel = await Shares.findOne({
+    const share: ShareType = shareModel?.get({ plain: true });
+    const memberShareModel = await MemberShare.findOne({
       where: {
-        memberId: sharesLog.memberId,
+        memberId: share.memberId,
       },
       transaction,
     });
-    const shares: SharesType = sharesModel?.get({ plain: true });
-    if (!shares || !sharesLog || !sharesLogModel || !sharesModel) {
+    const memberShare: MemberShareType = memberShareModel?.get({ plain: true });
+    if (!memberShare || !share || !shareModel || !memberShareModel) {
       transaction.rollback();
       return json(
         { message: "Invalid body and id params." },
         { status: StatusCodes.BAD_REQUEST }
       );
     }
-    await sharesModel.decrement("total", { by: sharesLog.amount, transaction });
-    await sharesLogModel.destroy({ transaction });
+    await memberShareModel.decrement("total", {
+      by: share.amount,
+      transaction,
+    });
+    await shareModel.destroy({ transaction });
     await transaction.commit();
     return json({ message: "Shares has been deleted." });
   } catch (error) {

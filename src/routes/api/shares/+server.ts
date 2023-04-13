@@ -4,54 +4,42 @@ import { json } from "@sveltejs/kit";
 import type { RequestHandler } from "./$types";
 import { StatusCodes } from "http-status-codes";
 
-import { Member, Shares, SharesLog } from "$lib/models/model";
+import { Member, Share, MemberShare } from "$lib/models/model";
 import { AddSharesSchemaValidation } from "$lib/definitions/schema";
 import { SharesTransactionTypes } from "$lib/internal/transaction";
-import { getSessionMetadata } from "$lib/internal/session";
 
 export const POST: RequestHandler = async (event) => {
   const transaction = await sequelize.transaction();
-  const { request } = event;
+  const { request, locals } = event;
   try {
-    const session = await getSessionMetadata(event);
-
-    if (!session) {
-      return json(
-        {
-          message: "Invalid SID",
-        },
-        {
-          status: StatusCodes.UNAUTHORIZED,
-        }
-      );
-    }
-    const coopId = session?.data?.cooperative?.id;
+    const { session } = locals.session;
+    const coopId = session.data?.cooperative?.id;
     const body = await request.json();
-    const shares = await AddSharesSchemaValidation.validate(body);
-    const sharesModel = await Shares.findOne({
+    const parsedShare = await AddSharesSchemaValidation.validate(body);
+    const sharesModel = await MemberShare.findOne({
       where: {
-        memberId: shares?.memberId,
+        memberId: parsedShare?.memberId,
       },
     });
 
     if (!sharesModel) {
-      Shares.create(
+      MemberShare.create(
         {
-          memberId: shares?.memberId,
-          total: shares?.amount,
+          memberId: parsedShare?.memberId,
+          total: parsedShare?.amount,
         },
         { transaction }
       );
     } else {
-      sharesModel.increment("total", { by: shares.amount, transaction });
+      sharesModel.increment("total", { by: parsedShare.amount, transaction });
     }
 
-    await SharesLog.create(
+    await Share.create(
       {
         type: SharesTransactionTypes.Deposit,
-        remarks: shares.remarks,
-        memberId: shares.memberId,
-        amount: shares.amount,
+        remarks: parsedShare.remarks,
+        memberId: parsedShare.memberId,
+        amount: parsedShare.amount,
         cooperativeId: coopId,
       },
       { transaction }
@@ -69,22 +57,11 @@ export const POST: RequestHandler = async (event) => {
 };
 
 export const GET: RequestHandler = async (event) => {
+  const { locals } = event;
   try {
-    const session = await getSessionMetadata(event);
-    if (!session) {
-      return json(
-        {
-          message: "Invalid SID",
-        },
-        {
-          status: StatusCodes.UNAUTHORIZED,
-        }
-      );
-    }
-
-    const coopId = session?.data?.cooperative?.id;
-
-    const sharesLogModel = await SharesLog.findAll({
+    const { session } = locals.session;
+    const coopId = session.data?.cooperative.id;
+    const shareModel = await Share.findAll({
       where: {
         cooperativeId: coopId,
       },
@@ -99,10 +76,14 @@ export const GET: RequestHandler = async (event) => {
     return json({
       message: "Shares Logs has been fetched.",
       data: {
-        sharesLogs: sharesLogModel.map((log) => log.get({ plain: true })) ?? [],
+        shares: shareModel.map((log) => log.get({ plain: true })) ?? [],
       },
     });
-  } catch {
-    return json({}, { status: StatusCodes.INTERNAL_SERVER_ERROR });
+  } catch (error) {
+    console.log(error);
+    return json(
+      { message: "Unknown error occured." },
+      { status: StatusCodes.INTERNAL_SERVER_ERROR }
+    );
   }
 };

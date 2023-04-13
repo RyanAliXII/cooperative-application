@@ -1,25 +1,17 @@
 import { AddLoanSchemaValidation } from "$lib/definitions/schema";
-import type { Loan as LoanType } from "$lib/definitions/types";
-import { getSessionMetadata } from "$lib/internal/session";
-import { LoanStatuses } from "$lib/internal/transaction";
-import { Loan } from "$lib/models/model";
+import { LoanStatuses, type LoanStatus } from "$lib/internal/transaction";
+import { Loan, Member } from "$lib/models/model";
 import { json, type RequestHandler } from "@sveltejs/kit";
 import { StatusCodes } from "http-status-codes";
 
 export const POST: RequestHandler = async (event) => {
   const { request } = event;
   try {
-    const session = await getSessionMetadata(event);
-    if (!session) {
-      return json(
-        { message: "Unauthorized" },
-        { status: StatusCodes.UNAUTHORIZED }
-      );
-    }
-    const body = await request.json();
-    const coopId = session?.data?.cooperative.id;
-    const parsedBody = await AddLoanSchemaValidation.validate(body);
+    const { session } = event.locals.session;
 
+    const body = await request.json();
+    const coopId = session.data?.cooperative?.id;
+    const parsedBody = await AddLoanSchemaValidation.validate(body);
     const interest = (parsedBody.interest / 100) * parsedBody.amount;
     const totalDue = parsedBody.amount + interest;
 
@@ -44,20 +36,45 @@ export const POST: RequestHandler = async (event) => {
   }
 };
 
-export const GET: RequestHandler = async (event) => {
+export const GET: RequestHandler = async ({ locals, url }) => {
   try {
-    const session = await getSessionMetadata(event, "cooperative");
+    const { session } = locals.session;
 
-    if (!session) {
+    const loanStatus = url.searchParams.get("status");
+
+    if (!loanStatus) {
       return json(
-        { message: "Unauthorized" },
-        { status: StatusCodes.UNAUTHORIZED }
+        {
+          message: "Invalid loan status.",
+          data: {
+            loans: [],
+          },
+        },
+        { status: StatusCodes.BAD_REQUEST }
+      );
+    }
+    if (!Object.values(LoanStatuses).includes(loanStatus as LoanStatuses)) {
+      return json(
+        {
+          message: "Invalid loan status.",
+          data: {
+            loans: [],
+          },
+        },
+        { status: StatusCodes.BAD_REQUEST }
       );
     }
     const loanModel = await Loan.findAll({
       where: {
-        cooperativeId: session?.data?.cooperative?.id,
+        cooperativeId: session.data?.cooperative?.id,
+        status: loanStatus,
       },
+      include: [
+        {
+          model: Member,
+        },
+      ],
+      order: [["created_at", "desc"]],
     });
     return json({
       message: "Loans has been fetched.",

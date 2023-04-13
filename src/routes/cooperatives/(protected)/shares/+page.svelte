@@ -2,7 +2,7 @@
   import TextAreaField from "$lib/components/form/TextAreaField.svelte";
   import TextField from "$lib/components/form/TextField.svelte";
   import Modal from "$lib/components/ui/Modal.svelte";
-  import type { Member, SharesLog } from "$lib/definitions/types";
+  import type { Member, Share } from "$lib/definitions/types";
   import {createForm} from "felte"
   import axios from "axios";
   import {validator} from "@felte/validator-yup"
@@ -11,17 +11,15 @@
   import { SharesTransactionTypes } from "$lib/internal/transaction.js";
   import Time from "svelte-time";
   import AccountSelector from "$lib/components/account-selector/AccountSelector.svelte";
+  import { invalidate } from "$app/navigation";
  
   let isAddModalOpen = false;
   let isEditModalOpen = false;
   let isConfirmDialogOpen = false
 
   export let data;
-  let sharesLogs: SharesLog[] = data.sharesLogs
-  let totalShares = data?.shares?.total ?? 0
-
-  let selectedMember:Member | null;
-
+ 
+  let selectedMember:Member | null | undefined;
   const {form, data:formBody, errors, reset} = createForm({
     initialValues:{
         memberId:0,
@@ -33,8 +31,8 @@
         try{
              await axios.post("/api/shares", body)
              toast.success("Shares has been added.")
-             fetchSharesLogs()
-             fetchTotalShares()
+             invalidate((url)=>url.pathname === "/api/shares")
+             invalidate((url)=>url.pathname === "/api/shares/total")
         }
         catch{
           toast.error("Unkwown error occured, Please try again later.")
@@ -46,6 +44,7 @@
         }
     }
   })
+  
   const {form:editForm, data:editFormBody, errors:editFormErrors, reset:resetEditForm } = createForm({
     initialValues:{
         id:0,
@@ -56,10 +55,10 @@
     extend:validator({schema: EditSharesSchemaValidation, castValues: true, level: "error"}),
     onSubmit: async(body)=>{
       try{
-        await axios.put(`/api/shares/logs/${body.id}`, body)
+        await axios.put(`/api/shares/${body.id}`, body)
         toast.success("Shares has been updated.")
-        fetchSharesLogs()
-        fetchTotalShares()
+        invalidate((url)=>url.pathname === "/api/shares")
+        invalidate((url)=>url.pathname === "/api/shares/total")
     
       }
       catch{
@@ -89,44 +88,25 @@
     isConfirmDialogOpen = false
   }
   const d = new Date().toDateString()
-  const fetchSharesLogs = async()=>{
-    try{
-        const response = await axios.get("/api/shares")
-        const {data: responseData} = response.data
-        sharesLogs = responseData?.sharesLogs ?? []
-    }catch(error){
-          console.log(error)
-    }
-  }
 
-  const fetchTotalShares = async()=>{
-    try{
-        const response = await axios.get("/api/shares/total")
-        const {data: responseData} = response.data
-        totalShares = responseData?.shares?.total
-   
-    }catch(error){
-          console.log(error)
-    }
-  }
 
-  const edit = (log: SharesLog)=>{
+  const edit = (log: Share)=>{
     editFormBody.update(()=>({memberId: log.member?.id ?? 0, amount: log.amount, remarks: log.remarks, id: log.id ?? 0}))
     selectedMember = log.member
     isEditModalOpen = true
   }
 
-  let sharesToDelete:SharesLog;
-  const confirmDelete = (log: SharesLog)=>{
+  let sharesToDelete:Share;
+  const confirmDelete = (share: Share)=>{
        isConfirmDialogOpen = true
-       sharesToDelete = log;
+       sharesToDelete = share
   }
 
   const deleteShares = async()=>{
     try{
-    await axios.delete(`/api/shares/logs/${sharesToDelete.id}`)
-    fetchSharesLogs()
-    fetchTotalShares()
+    await axios.delete(`/api/shares/${sharesToDelete.id}`)
+    invalidate((url)=>url.pathname === "/api/shares")
+    invalidate((url)=>url.pathname === "/api/shares/total")
     toast.success("Shares has been deleted.")
     }catch(error){
       toast.error("Unknown error occured, Please try again later.")
@@ -156,12 +136,12 @@
 
     <div class="basis-1/2 h-full  flex items-center justify-center flex-col text-success gap-2">
       <i class="fa-solid fa-signal text-2xl "></i>
-      <h2 class="text-3xl font-bold">PHP {totalShares}</h2>
+      <h2 class="text-3xl font-bold">PHP {data?.total}</h2>
      <p>Total Shares</p>
     </div>
     <div class="basis-1/2 h-full  flex items-center justify-center flex-col text-secondary gap-2">
       <i class="fa-solid fa-chart-pie text-2xl"></i>
-      <h2 class="text-3xl font-bold">PHP {data?.shares?.total ?? 0}</h2>
+      <h2 class="text-3xl font-bold">PHP {data?.total ?? 0}</h2>
       <p>{d} Shares</p>
     </div>
    </div>
@@ -182,28 +162,29 @@
                 </tr>
               </thead>
               <tbody>
-                {#each sharesLogs as log }
+                {#each data.shares as share }
                 <tr>
                   <td>
-                   {log.member.givenName} {log.member.middleName} {log.member.surname}
+                   {share.member?.givenName} {share.member?.middleName} {share.member?.surname}
                   </td>
                   <td>
-                    {log.type}
+                    {share.type}
                   </td>
-                  <td class:text-success="{log.type === SharesTransactionTypes.Deposit}">
-                            +{log.amount} ₱
+                  <td class:text-success="{share.type === SharesTransactionTypes.Deposit}">
+                            +{share.amount} ₱
                   </td>
                   <td>
-                    {log.remarks}
+                    {share.remarks}
                   </td>
                   <td>
                 
-                    <Time  relative timestamp={log.createdAt}/>
+                    <Time  relative timestamp={share.createdAt}/>
                   </td>
                     <td>
-                      <button class="btn btn-secondary btn-outline" on:click={()=>{edit(log)}}><i class="fa-regular fa-pen-to-square"></i></button>
-                      <button class="btn btn-error btn-outline" on:click={()=>confirmDelete(log)}><i class="fa-solid fa-trash"></i></button>
-                      <a href="/cooperatives/members/view/{log.member.id}" class="btn btn-outline btn-info"><i class="fa-regular fa-eye"></i></a></td> 
+                      <a href="/cooperatives/members/view/{share.member?.id}" class="btn btn-outline btn-info"><i class="fa-regular fa-eye"></i></a>
+                      <button class="btn btn-secondary btn-outline" on:click={()=>{edit(share)}}><i class="fa-regular fa-pen-to-square"></i></button>
+                      <button class="btn btn-error btn-outline" on:click={()=>confirmDelete(share)}><i class="fa-solid fa-trash"></i></button>
+                    </td> 
                     
                    
                  </tr>
@@ -233,10 +214,7 @@
                 <small class="text-gray-400">{selectedMember?.id}</small>
                 </div>
                 <div class="text-error cursor-pointer flex items-center flex-1 justify-end gap-0.5" on:click={removeSelectedMember} role={"button"}>
-              
                         <i class="fa-solid fa-xmark text-lg"></i> Remove
-                 
-                 
                 </div>
             </div> 
             {:else} 

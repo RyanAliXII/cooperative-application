@@ -1,58 +1,29 @@
-import { StatusCodes } from "http-status-codes";
-import { error, redirect } from "@sveltejs/kit";
-import {
-  Cooperative,
-  CooperativeAccount,
-  Member,
-  Session,
-} from "$lib/models/model";
+import { Cooperative, CooperativeAccount } from "$lib/models/model";
 /** @type {import('./$types').PageServerLoad} */
-export async function load({ cookies }) {
-  const sid = cookies.get("coop_sid");
-  if (!sid) {
-    throw redirect(StatusCodes.SEE_OTHER, "/cooperative/login");
-  }
-  const session = await Session.findOne({
+export async function load({ cookies, locals }) {
+  const { session } = locals.session;
+  const cooperativeModel = await Cooperative.findOne({
     where: {
-      sid: sid,
+      id: session.data?.cooperative.id,
     },
-  });
-  const coopId = session?.dataValues?.data?.cooperative?.id;
-
-  try {
-    const cooperative = await Cooperative.findOne({
-      where: {
-        id: coopId,
-      },
-      include: [
-        {
-          model: CooperativeAccount,
-          where: {
-            isOwner: true,
-          },
-          as: "accounts",
+    include: [
+      {
+        model: CooperativeAccount,
+        attributes: {
+          exclude: ["password"],
         },
-      ],
-    });
-
-    if (!cooperative?.dataValues?.accounts) {
-      throw error(StatusCodes.NOT_FOUND, { message: "Not found" });
-    }
-    const accounts = cooperative?.dataValues.accounts?.map(
-      (a: any) => a?.dataValues
-    );
-
-    delete cooperative?.dataValues?.accounts;
-    return {
-      cooperative: {
-        ...cooperative?.dataValues,
-        account: accounts[0],
+        where: {
+          isOwner: true,
+        },
+        limit: 1,
+        as: "accounts",
       },
-    };
-  } catch (err) {
-    console.log(err);
-    throw error(StatusCodes.INTERNAL_SERVER_ERROR, {
-      message: "Unknown error occured.",
-    });
-  }
+    ],
+  });
+  const cooperative = cooperativeModel?.get({ plain: true });
+  cooperative.account = cooperative.accounts[0];
+  delete cooperative.accounts;
+  return {
+    cooperative: cooperative,
+  };
 }

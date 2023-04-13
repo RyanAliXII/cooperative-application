@@ -1,7 +1,7 @@
 import { sequelize } from "./sequelize";
 import { DataTypes } from "sequelize";
-export const SharesModel = sequelize.define(
-  "shares",
+export const MemberShareModel = sequelize.define(
+  "member_share",
   {
     id: {
       type: DataTypes.UUID,
@@ -17,7 +17,11 @@ export const SharesModel = sequelize.define(
       },
     },
     total: {
-      type: DataTypes.DECIMAL,
+      type: DataTypes.DECIMAL(10, 2),
+      get() {
+        const value = this.getDataValue("amount");
+        return Number(value);
+      },
     },
   },
   { underscored: true }

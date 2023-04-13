@@ -21,6 +21,6 @@ module.exports = {
      * Example:
      * await queryInterface.dropTable('users');
      */
-    await queryInterface.removeColumn("session", "appType");
+    await queryInterface.removeColumn("session", "app_type");
   },
 };

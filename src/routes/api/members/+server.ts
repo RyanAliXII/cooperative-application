@@ -7,38 +7,12 @@ import { sequelize } from "$lib/models/sequelize";
 import generator from "generate-password";
 import { hash } from "bcrypt";
 
-export const POST: RequestHandler = async ({ request, cookies }) => {
-  const sid = cookies.get("coop_sid");
-  if (!sid) {
-    return json(
-      {
-        message: "Invalid SID",
-      },
-      {
-        status: StatusCodes.UNAUTHORIZED,
-      }
-    );
-  }
+export const POST: RequestHandler = async ({ request, locals }) => {
   const transaction = await sequelize.transaction();
   try {
-    const session = await Session.findOne({
-      where: {
-        sid: sid,
-      },
-    });
-
-    if (!session) {
-      return json(
-        {
-          message: "Invalid SID",
-        },
-        {
-          status: StatusCodes.UNAUTHORIZED,
-        }
-      );
-    }
+    const { session } = locals.session;
     //data from session
-    const coopId = session.dataValues?.data?.cooperative?.id;
+    const coopId = session.data?.cooperative?.id;
     const body: MemberType = await request.json();
     const data = await NewMemberValidationSchema.validate(body);
     const member = await Member.create(
@@ -83,39 +57,11 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
   }
 };
 
-export const GET: RequestHandler = async ({ request, cookies }) => {
-  const sid = cookies.get("coop_sid");
-  if (!sid) {
-    return json(
-      {
-        message: "Invalid SID",
-      },
-      {
-        status: StatusCodes.UNAUTHORIZED,
-      }
-    );
-  }
-
+export const GET: RequestHandler = async ({ request, cookies, locals }) => {
   try {
-    const session = await Session.findOne({
-      where: {
-        sid: sid,
-      },
-    });
-
-    if (!session) {
-      return json(
-        {
-          message: "Invalid SID",
-        },
-        {
-          status: StatusCodes.UNAUTHORIZED,
-        }
-      );
-    }
+    const { session } = locals.session;
     //data from session
-    const coopId = session.dataValues?.data?.cooperative?.id;
-
+    const coopId = session.data?.cooperative?.id;
     const queryParams = new URL(request.url).searchParams;
     const query = queryParams.get("q");
     /* check if url has param "q" short for "query"

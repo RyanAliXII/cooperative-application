@@ -56,17 +56,18 @@ export type MemberAccount = {
   member: Member;
 };
 
-export type Shares = {
+export type MemberShare = {
   id?: string;
   memberId: number;
   total: number;
+  member?: Member;
 };
-export type SharesLog = {
+export type Share = {
   id?: number;
   memberId: number;
   remarks: string;
   amount: number;
-  member: Member;
+  member?: Member;
   type: string;
   createdAt: string;
 };
@@ -79,5 +80,6 @@ export type Loan = {
   interest: number;
   status: LoanStatus;
   remainingBalance: number;
+  member?: Member;
   tenure: number;
 };

@@ -4,8 +4,8 @@ import { SessionModel } from "./session";
 import { MemberModel } from "./member";
 import { MemberAccountModel } from "./member_account";
 import { AccountModel } from "./account";
-import { SharesModel } from "./shares";
-import { SharesLogModel } from "./shares_log";
+import { MemberShareModel } from "./member_share";
+import { ShareModel } from "./share";
 import { LoanModel } from "./loan";
 
 export const Member = MemberModel;
@@ -14,8 +14,8 @@ export const CooperativeAccount = CooperativeAccountModel;
 export const Session = SessionModel;
 export const MemberAccount = MemberAccountModel;
 export const Account = AccountModel;
-export const Shares = SharesModel;
-export const SharesLog = SharesLogModel;
+export const MemberShare = MemberShareModel;
+export const Share = ShareModel;
 export const Loan = LoanModel;
 CooperativeAccount.belongsTo(Cooperative, { foreignKey: "cooperative_id" });
 
@@ -27,8 +27,11 @@ Cooperative.hasMany(CooperativeAccount, {
 MemberAccount.belongsTo(Member, { foreignKey: "member_id" });
 Member.hasOne(MemberAccount, { foreignKey: "member_id", as: "account" });
 
-Shares.belongsTo(Member, { foreignKey: "member_id" });
-Member.hasOne(Shares, { foreignKey: "member_id", as: "shares" });
+MemberShare.belongsTo(Member, { foreignKey: "member_id" });
+Member.hasOne(MemberShare, { foreignKey: "member_id", as: "share" });
 
-SharesLog.belongsTo(Member, { foreignKey: "member_id" });
-Member.hasMany(SharesLog, { foreignKey: "member_id", as: "sharesLogs" });
+Share.belongsTo(Member, { foreignKey: "member_id" });
+Member.hasMany(Share, { foreignKey: "member_id", as: "shares" });
+
+Loan.belongsTo(Member, { foreignKey: "member_id" });
+Member.hasMany(Loan, { foreignKey: "member_id", as: "loans" });
