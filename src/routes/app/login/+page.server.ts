@@ -2,6 +2,7 @@
 import { redirect } from "@sveltejs/kit";
 import { Account, Session } from "$lib/models/model";
 import { compare } from "bcrypt";
+import { AppTypes } from "$lib/internal/session.js";
 
 export const actions = {
   login: async ({ request, cookies }) => {
@@ -22,16 +23,18 @@ export const actions = {
     if (!account) {
       return { message: "Invalid username or password." };
     }
-    const isPasswordSame = await compare(password, account.dataValues.password);
+    const isPasswordSame = await compare(password, account.password);
     if (!isPasswordSame) {
       return { message: "Invalid username or password." };
     }
     const expiration = new Date();
     expiration.setDate(expiration.getDate() + 1); // add 1 day expiration
     const session = await Session.create({
-      data: account.dataValues,
+      appType: AppTypes.Main,
+      data: account,
       expiresAt: expiration.toISOString(),
     });
+    delete account.password;
     cookies.set("app_sid", session.dataValues.sid, {
       path: "/",
       httpOnly: true,

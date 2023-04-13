@@ -1,8 +1,7 @@
-import { getSessionMetadata } from "$lib/internal/session";
+import { AppTypes, getSessionMetadata } from "$lib/internal/session";
 import { Session } from "$lib/models/model";
 import type { Handle } from "@sveltejs/kit";
 import { StatusCodes } from "http-status-codes";
-import { json } from "sequelize";
 export const handle: Handle = async ({ event, resolve }) => {
   /*
     app_sid set on cookies is session cookies.
@@ -18,7 +17,7 @@ export const handle: Handle = async ({ event, resolve }) => {
       return new Response("Redirect", {
         status: StatusCodes.SEE_OTHER,
         headers: {
-          Location: "/members/login",
+          Location: "/cooperatives/login",
         },
       });
     }
@@ -33,7 +32,54 @@ export const handle: Handle = async ({ event, resolve }) => {
       return new Response("Redirect", {
         status: StatusCodes.SEE_OTHER,
         headers: {
-          Location: "/members/login",
+          Location: "/cooperatives/login",
+        },
+      });
+    }
+    if (sessionMeta.appType != AppTypes.Cooperative) {
+      return new Response("Redirect", {
+        status: StatusCodes.SEE_OTHER,
+        headers: {
+          Location: "/cooperatives/login",
+        },
+      });
+    }
+    event.locals.session = sessionMeta;
+  }
+
+  if (
+    event.url.pathname.startsWith("/app") &&
+    event.url.pathname != "/app/login"
+  ) {
+    const sessionMeta = await getSessionMetadata(event);
+    if (sessionMeta.error) {
+      return new Response("Redirect", {
+        status: StatusCodes.SEE_OTHER,
+        headers: {
+          Location: "/app/login",
+        },
+      });
+    }
+    const expiration = new Date(sessionMeta.session.expiresAt).getTime();
+    if (new Date().getTime() > expiration) {
+      event.cookies.delete("app_sid");
+      await Session.destroy({
+        where: {
+          sid: sessionMeta.session.sid,
+        },
+      });
+      return new Response("Redirect", {
+        status: StatusCodes.SEE_OTHER,
+        headers: {
+          Location: "/app/login",
+        },
+      });
+    }
+    if (sessionMeta.appType != AppTypes.Main) {
+      return new Response("Redirect", {
+        status: StatusCodes.SEE_OTHER,
+        headers: {
+          Location: "/app/login",
         },
       });
     }
