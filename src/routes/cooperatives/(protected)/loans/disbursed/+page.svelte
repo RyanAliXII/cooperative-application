@@ -58,7 +58,6 @@
     isRepaymentModalOpen = true
   }
 
-  
   </script>
   <div>
       <h1 class="text-lg font-semibold mb-3 ml-1 text-gray-500">Disbursed Loans</h1>

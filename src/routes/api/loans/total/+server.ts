@@ -41,16 +41,16 @@ export const GET: RequestHandler = async ({ locals, url }) => {
         },
       }
     );
+
     const total = (result?.[0] ?? { principal: 0, interest: 0 }) as {
       principal: number;
       interest: number;
     };
-
     return json({
       data: {
         loans: {
           total: {
-            principal: Number(total.interest) ?? 0,
+            principal: Number(total.principal) ?? 0,
             interest: Number(total.interest) ?? 0,
           } ?? { principal: 0, interest: 0 },
         },

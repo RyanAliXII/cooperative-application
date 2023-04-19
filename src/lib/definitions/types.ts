@@ -104,3 +104,13 @@ export type ShareLog = {
   cooperativeId: string;
   createdAt: string;
 };
+
+export type CooperativeStats = {
+  cooperativeId: string;
+  cooperativeName: string;
+  loan: number;
+  loanInterest: number;
+  shares: number;
+  assets: number;
+  liquidity: number;
+};

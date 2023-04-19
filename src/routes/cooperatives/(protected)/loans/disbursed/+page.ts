@@ -3,20 +3,20 @@ import { LoanStatuses } from "$lib/internal/transaction";
 import type { PageLoad } from "../$types";
 
 export const load: PageLoad = async ({ fetch }) => {
-  const requestedLoansResponse = await fetch(
+  const disbursedLoansResponse = await fetch(
     `/api/loans?status=${LoanStatuses.Disbursed}`
   );
-  const { data: requestedLoansData } = await requestedLoansResponse.json();
-  const totalRequestedLoansResponse = await fetch(
+  const { data: disbursedLoansData } = await disbursedLoansResponse.json();
+  const totalDisbursedLoansResponse = await fetch(
     `/api/loans/total?status=${LoanStatuses.Disbursed}`
   );
 
-  const { data: totalRequestedLoansData } =
-    await totalRequestedLoansResponse.json();
+  const { data: totalDisbursedLoansData } =
+    await totalDisbursedLoansResponse.json();
 
   return {
-    loans: (requestedLoansData?.loans as Loan[]) ?? [],
-    total: (totalRequestedLoansData.loans.total as {
+    loans: (disbursedLoansData?.loans as Loan[]) ?? [],
+    total: (totalDisbursedLoansData.loans.total as {
       principal: number;
       interest: number;
     }) ?? { interest: 0, principal: 0 },
