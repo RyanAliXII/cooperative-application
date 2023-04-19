@@ -1,10 +1,11 @@
 
 <script lang="ts">
-    import { page } from '$app/stores'
+    import 'sweetalert2/src/sweetalert2.scss' 
     export let data;
     let sidebarState:Record<string, boolean> = {
         registration: false,
-        loan: false
+        loan: false,
+        share:false
     }
     function toggle (sidebarKey: string){
         sidebarState[sidebarKey] = !sidebarState[sidebarKey]
@@ -72,18 +73,63 @@
                         Loans
                     </button>
                     {#if sidebarState["loan"] }
-                    <div class="pl-10 mt-1 text-sm hover:bg-white">
-                        <a href="/coop/new" >
-                           Apply loan
+                    <div class="pl-10  text-sm hover:bg-white">
+                        <a href="/cooperatives/loans/requested" >
+                            Requested Loans
                           </a>
                     </div>
-             
+                 
+                      <div class="pl-10  text-sm hover:bg-white">
+                        <a href="/cooperatives/loans/approved" >
+                          Approved Loans
+                        </a>
+                        </div>
+                        <div class="pl-10  text-sm hover:bg-white">
+                          <a href="/cooperatives/loans/disbursed" >
+                            Disbursed Loans
+                           </a>
+                          </div>
+                          <div class="pl-10 text-sm hover:bg-white">
+                            <a href="/cooperatives/loans/finished" >
+                              Finished Loans
+                            </a>
+                            </div>
+                            <div class="pl-10  text-sm hover:bg-white">
+                              <a href="/cooperatives/loans/repayments" >
+                                Loan Repayments
+                               </a>
+                              </div>
+                      
              
                     {/if}
 
                     
                  
                 </li>
+
+                <li>
+                  <button type="button" on:click={()=>{toggle("share")}}>
+                          <i class="fa-solid fa-briefcase"></i>
+                      Shares
+                  </button>
+                  {#if sidebarState["share"] }
+                  <div class="pl-10  text-sm hover:bg-white">
+                      <a href="/cooperatives/shares" >
+                          Add Share
+                        </a>
+                  </div>
+               
+                    <div class="pl-10  text-sm hover:bg-white">
+                      <a href="/cooperatives/shares/withdrawal" >
+                        Share Withdrawal
+                      </a>
+                      </div>
+                 
+                  {/if}
+
+                  
+               
+              </li>
                 <li>
                   <a href="/cooperatives/settings">
                     <i class="fa-solid fa-gear"></i>
@@ -92,6 +138,8 @@
                 </li>
               </ul>
         </div>
+
+        
         <div class="w-full bg-gray-100 p-5">
             <slot/>
         </div>

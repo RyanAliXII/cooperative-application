@@ -2,20 +2,44 @@ import { json } from "@sveltejs/kit";
 import type { RequestHandler } from "../$types";
 import { sequelize } from "$lib/models/sequelize";
 import { StatusCodes } from "http-status-codes";
+import { SharesTransactionTypes } from "$lib/internal/transaction";
 
-export const GET: RequestHandler = async ({ cookies, locals }) => {
+export const GET: RequestHandler = async ({ cookies, locals, url }) => {
   try {
     const { session } = locals.session;
     const coopId = session.data?.cooperative?.id;
+
+    const shareTransactionType = url.searchParams.get("type");
+    if (!shareTransactionType) {
+      return json(
+        {
+          message: "Transaction type not defined.",
+          data: { share: { total: 0 } },
+        },
+        { status: StatusCodes.BAD_REQUEST }
+      );
+    }
+
+    if (
+      !Object.values(SharesTransactionTypes).includes(
+        shareTransactionType as SharesTransactionTypes
+      )
+    ) {
+      return json(
+        { message: "Invalid transaction type.", data: { share: { total: 0 } } },
+        { status: StatusCodes.BAD_REQUEST }
+      );
+    }
+
     const [result, _] = await sequelize.query(
-      "SELECT SUM(mshare.total) as total FROM member_share as mshare inner join member on member_id = member.id where cooperative_id = :coopId GROUP BY cooperative_id ",
+      "SELECT COALESCE(SUM(share.amount), 0) as total FROM share inner join member on member_id = member.id where share.cooperative_id = :coopId and share.type=:type and deleted_at is null",
       {
         replacements: {
           coopId,
+          type: shareTransactionType,
         },
       }
     );
-
     return json({
       message: "Shares total fetched.",
       data: {

@@ -74,12 +74,17 @@ export const GET: RequestHandler = async ({ request, cookies, locals }) => {
         SELECT member.id, given_name as "givenName", 
           surname as "surname", 
           middle_name as "middleName", 
-          json_build_object('id', ma.id, 'email', ma.email, 'memberId', ma.member_id) as account
+          json_build_object('id', ma.id, 'email', ma.email, 'memberId', ma.member_id) as account,
+          (COALESCE(SUM(ds.amount), 0) - COALESCE(SUM(ws.amount), 0))  as share
           FROM member
           INNER JOIN member_account as ma on member.id = ma.member_id
+          LEFT JOIN share as ds on member.id = ds.member_id and ds.deleted_at is null and ds.type = 'Deposit'
+		      LEFT JOIN share as ws on member.id = ws.member_id and ws.deleted_at is null and ws.type = 'Withdraw'
           where search_vector @@ (plainto_tsquery('simple', :query) :: text || ':*' ) :: tsquery
+          GROUP BY  member.id, ma.id, ma.email, ma.member_id
           ORDER BY (ts_rank(search_vector, (plainto_tsquery('simple', :query) :: text || ':*' ) :: tsquery ) 
           )  DESC
+         
         `,
           {
             replacements: {
@@ -90,7 +95,12 @@ export const GET: RequestHandler = async ({ request, cookies, locals }) => {
         return json({
           message: "Members has been fetched.",
           data: {
-            members: results ?? [],
+            members:
+              results.map((m) => {
+                const member = m as MemberType;
+                member.share = Number(member.share ?? 0);
+                return member;
+              }) ?? [],
           },
         });
       }

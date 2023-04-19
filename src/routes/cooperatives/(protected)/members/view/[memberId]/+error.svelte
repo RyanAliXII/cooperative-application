@@ -1,6 +1,6 @@
     <script>
     import { page } from '$app/stores';
-        console.log($page.status)
+
   </script>
 
 <section class="flex items-center p-16 " style="min-height: 100vh;">

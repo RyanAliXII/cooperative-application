@@ -16,7 +16,7 @@ export const ShareModel = sequelize.define(
     amount: {
       type: DataTypes.DECIMAL(10, 2),
       get() {
-        const value = this.getDataValue("amount");
+        const value: any = this.getDataValue("amount");
         return Number(value);
       },
     },

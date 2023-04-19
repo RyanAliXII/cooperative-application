@@ -33,7 +33,7 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 
   try {
     const [result, _] = await sequelize.query(
-      "SELECT COALESCE(SUM(principal), 0) as principal, COALESCE(SUM(interest), 0) as interest FROM loan inner join member on member_id = member.id where loan.cooperative_id = :coopId AND loan.status = :status AND deleted_at is NULL GROUP BY loan.cooperative_id ",
+      "SELECT COALESCE(SUM(principal), 0) as principal, COALESCE(SUM(interest), 0) as interest  FROM loan inner join member on member_id = member.id where loan.cooperative_id = :coopId AND loan.status = :status AND deleted_at is NULL GROUP BY loan.cooperative_id ",
       {
         replacements: {
           coopId,
@@ -41,11 +41,19 @@ export const GET: RequestHandler = async ({ locals, url }) => {
         },
       }
     );
-    const total = result?.[0] as { principal: number; interest: number };
+    const total = (result?.[0] ?? { principal: 0, interest: 0 }) as {
+      principal: number;
+      interest: number;
+    };
 
     return json({
       data: {
-        loans: { total: total ?? { principal: 0, interest: 0 } },
+        loans: {
+          total: {
+            principal: Number(total.interest) ?? 0,
+            interest: Number(total.interest) ?? 0,
+          } ?? { principal: 0, interest: 0 },
+        },
       },
     });
   } catch (error) {

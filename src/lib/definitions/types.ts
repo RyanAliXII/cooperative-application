@@ -46,6 +46,8 @@ export type Member = {
   dependents: Dependent[];
   approvedAt: string;
   declinedAt: string;
+  shares?: [];
+  share: number;
 };
 
 export type MemberAccount = {
@@ -82,4 +84,23 @@ export type Loan = {
   remainingBalance: number;
   member?: Member;
   tenure: number;
+  createdAt: string;
+};
+
+export type LoanRepayment = {
+  id?: string;
+  loanId: string;
+  amountPaid: number;
+  remainingBalance: number;
+  balanceBeforeRepayment: number;
+  remarks: string;
+  loan?: Loan;
+  createdAt: string;
+};
+export type ShareLog = {
+  id?: string;
+  value: number;
+  description: string;
+  cooperativeId: string;
+  createdAt: string;
 };

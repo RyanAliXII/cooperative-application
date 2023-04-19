@@ -4,12 +4,11 @@ import type { PageLoad } from "./$types";
 
 export const load: PageLoad = async ({ fetch }) => {
   const fetchSharesresponse = await fetch(
-    `/api/shares?type=${SharesTransactionTypes.Deposit}`
+    `/api/shares?type=${SharesTransactionTypes.Withdraw}`
   );
-
   const { data: sharesData } = await fetchSharesresponse.json();
   const fetchTotalSharesReponse = await fetch(
-    `/api/shares/total?type=${SharesTransactionTypes.Deposit}`
+    `/api/shares/total?type=${SharesTransactionTypes.Withdraw}`
   );
   const { data: totalData } = await fetchTotalSharesReponse.json();
   return {

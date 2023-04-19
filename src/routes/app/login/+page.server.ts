@@ -1,10 +1,10 @@
 /** @type {import('./$types').Actions} */
-import { redirect } from "@sveltejs/kit";
+import { redirect, type Actions } from "@sveltejs/kit";
 import { Account, Session } from "$lib/models/model";
 import { compare } from "bcrypt";
 import { AppTypes } from "$lib/internal/session.js";
 
-export const actions = {
+export const actions: Actions = {
   login: async ({ request, cookies }) => {
     const form = await request.formData();
     const email = form.get("email") as string;

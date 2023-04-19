@@ -6,6 +6,7 @@
     import ConfirmDialog from "$lib/components/ui/ConfirmDialog.svelte";
     import type { Loan } from "$lib/definitions/types.js";
     import { LoanStatuses } from "$lib/internal/transaction.js";
+    import { MONETARY } from "$lib/internal/config.js";
   
     export let data;
 
@@ -33,12 +34,12 @@
   
       <div class="basis-1/2 h-full  flex items-center justify-center flex-col text-success gap-2">
         <i class="fa-solid fa-briefcase text-2xl"></i>
-        <h2 class="text-3xl font-bold">PHP {data.total.principal}</h2>
+        <h2 class="text-3xl font-bold">PHP {data.total.principal.toLocaleString(undefined, MONETARY)}</h2>
        <p>Total Approved Loans</p>
       </div>
       <div class="basis-1/2 h-full  flex items-center justify-center flex-col text-secondary gap-2">
         <i class="fa-solid fa-chart-pie text-2xl"></i>
-        <h2 class="text-3xl font-bold">PHP {data.total.interest}</h2>
+        <h2 class="text-3xl font-bold">PHP {data.total.interest.toLocaleString(undefined, MONETARY)}</h2>
         <p>Total Interest</p>
       </div>
      </div>

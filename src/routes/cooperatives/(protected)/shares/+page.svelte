@@ -24,7 +24,8 @@
     initialValues:{
         memberId:0,
         amount: 0,
-        remarks:""
+        remarks:"",
+        type: SharesTransactionTypes.Deposit
     },
     extend: validator({schema: AddSharesSchemaValidation, castValues: true, level: "error"}),
     onSubmit: async(body)=>{
@@ -50,7 +51,8 @@
         id:0,
         memberId:0,
         amount: 0,
-        remarks:""
+        remarks:"",
+        type: SharesTransactionTypes.Deposit
     },
     extend:validator({schema: EditSharesSchemaValidation, castValues: true, level: "error"}),
     onSubmit: async(body)=>{
@@ -88,10 +90,8 @@
     isConfirmDialogOpen = false
   }
   const d = new Date().toDateString()
-
-
   const edit = (log: Share)=>{
-    editFormBody.update(()=>({memberId: log.member?.id ?? 0, amount: log.amount, remarks: log.remarks, id: log.id ?? 0}))
+    editFormBody.update((prev)=>({...prev, memberId: log.member?.id ?? 0, amount: log.amount, remarks: log.remarks, id: log.id ?? 0}))
     selectedMember = log.member
     isEditModalOpen = true
   }
@@ -146,7 +146,7 @@
     </div>
    </div>
     <div class="container bg-base-100 w-full  p-3 rounded">
-        <button class="btn modal-button btn-primary mb-3 text-white" on:click={()=>{isAddModalOpen = true}}> <i class="fa-solid fa-plus mr-1"></i>Add Shares</button>
+        <button class="btn modal-button btn-primary mb-3 text-white" on:click={()=>{isAddModalOpen = true}}> <i class="fa-solid fa-plus mr-1"></i>Add Share</button>
         <div class="overflow-x-auto">
             <table class="table w-full">
               <!-- head -->
@@ -154,7 +154,7 @@
                 <tr>
                   <th>Member</th>
  
-                  <th>Transaction type</th>
+             
                   <th>Amount</th>
                   <th>Remarks</th>
                   <td></td>
@@ -167,9 +167,7 @@
                   <td>
                    {share.member?.givenName} {share.member?.middleName} {share.member?.surname}
                   </td>
-                  <td>
-                    {share.type}
-                  </td>
+                
                   <td class:text-success="{share.type === SharesTransactionTypes.Deposit}">
                             +{share.amount} ₱
                   </td>

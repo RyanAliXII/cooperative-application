@@ -46,14 +46,40 @@ export const PUT: RequestHandler = async ({ request, locals }) => {
   }
 };
 
-export const GET: RequestHandler = async ({ locals, params }) => {
+export const GET: RequestHandler = async ({ locals, params, url }) => {
   const { session } = locals.session;
   const coopId = session.data?.cooperative?.id;
   const loanId = params.loanId;
+
+  const loanStatus = url.searchParams.get("status");
+
+  if (!loanStatus) {
+    return json(
+      {
+        message: "Invalid loan status.",
+        data: {
+          loans: [],
+        },
+      },
+      { status: StatusCodes.BAD_REQUEST }
+    );
+  }
+  if (!Object.values(LoanStatuses).includes(loanStatus as LoanStatuses)) {
+    return json(
+      {
+        message: "Invalid loan status.",
+        data: {
+          loans: [],
+        },
+      },
+      { status: StatusCodes.BAD_REQUEST }
+    );
+  }
   const loanModel = await Loan.findOne({
     where: {
       id: loanId,
       cooperativeId: coopId,
+      status: loanStatus,
     },
     include: [
       {
@@ -61,8 +87,12 @@ export const GET: RequestHandler = async ({ locals, params }) => {
       },
     ],
   });
-  console.log(loanModel?.get({ plain: true }));
-  return json({});
+
+  return json({
+    data: {
+      loan: loanModel?.get({ plain: true }),
+    },
+  });
 };
 
 export const DELETE: RequestHandler = async ({ locals, params }) => {

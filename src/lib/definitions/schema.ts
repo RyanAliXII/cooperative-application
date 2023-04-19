@@ -1,5 +1,6 @@
-import { array, number, object, string } from "yup";
+import { array, number, object, string, ref } from "yup";
 import validator from "validator";
+import { SharesTransactionTypes } from "$lib/internal/transaction";
 export const CreateCooperativeSchema = object({
   name: string().required("Cooperative name is required."),
   registrationNumber: string().required(
@@ -133,6 +134,12 @@ export const AddSharesSchemaValidation = object({
     .integer("Invalid member id.")
     .required("Please select a member.")
     .min(1, "Please select a member."),
+  type: string()
+    .required()
+    .oneOf(
+      [SharesTransactionTypes.Deposit, SharesTransactionTypes.Withdraw],
+      "Invalid type value"
+    ),
   amount: number()
     .required("Amount is required.")
     .min(10, "Amount should be atleast 10."),
@@ -145,9 +152,65 @@ export const EditSharesSchemaValidation = object({
     .integer("Invalid member id.")
     .required("Please select a member.")
     .min(1, "Please select a member."),
+  type: string()
+    .required()
+    .oneOf(
+      [SharesTransactionTypes.Deposit, SharesTransactionTypes.Withdraw],
+      "Invalid type value"
+    ),
   amount: number()
     .required("Amount is required.")
     .min(10, "Amount should be atleast 10."),
+  remarks: string().notRequired(),
+});
+
+export const AddShareWithdrawalSchemaValidation = object({
+  memberId: number()
+    .integer("Invalid member id.")
+    .required("Please select a member.")
+    .min(1, "Please select a member."),
+  type: string()
+    .required()
+    .oneOf(
+      [SharesTransactionTypes.Deposit, SharesTransactionTypes.Withdraw],
+      "Invalid type value"
+    ),
+  share: number().required().min(0),
+  amount: number()
+    .required("Amount is required.")
+    .min(10, "Amount should be atleast 10.")
+    .test(
+      "check-if-greater-than",
+      "Amount should less than or equal member shares.",
+      function (value) {
+        return this.parent.share >= (value ?? 0);
+      }
+    ),
+  remarks: string().notRequired(),
+});
+
+export const EditShareWithdrawalSchemaValidation = object({
+  memberId: number()
+    .integer("Invalid member id.")
+    .required("Please select a member.")
+    .min(1, "Please select a member."),
+  type: string()
+    .required()
+    .oneOf(
+      [SharesTransactionTypes.Deposit, SharesTransactionTypes.Withdraw],
+      "Invalid type value"
+    ),
+  share: number().required().min(0),
+  amount: number()
+    .required("Amount is required.")
+    .min(10, "Amount should be atleast 10.")
+    .test(
+      "check-if-greater-than",
+      "Amount should less than or equal member shares.",
+      function (value) {
+        return this.parent.share >= (value ?? 0);
+      }
+    ),
   remarks: string().notRequired(),
 });
 
@@ -186,4 +249,19 @@ export const EditLoanSchemaValidation = object({
     .required("Tenure is required.")
     .min(1, "Tenure should be atleast 1.")
     .integer("Tenure value should not be decimal."),
+});
+
+export const AddRepaymentModalSchemaValidation = object({
+  loanId: string().uuid().required(),
+  remainingBalance: number().required(),
+  amount: number()
+    .test(
+      "check-if-greater-than",
+      "Amount cannot be greater than remaining balance.",
+      function (value) {
+        return this.parent.remainingBalance >= (value ?? 0);
+      }
+    )
+    .required("Amount is required."),
+  remarks: string().notRequired(),
 });

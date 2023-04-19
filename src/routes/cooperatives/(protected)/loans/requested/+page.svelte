@@ -11,6 +11,7 @@
   import { invalidate } from "$app/navigation";
   import { LoanStatuses } from "$lib/internal/transaction.js";
   import ConfirmDialog from "$lib/components/ui/ConfirmDialog.svelte";
+  import { MONETARY } from "$lib/internal/config.js";
 
   export let data;
   let isAddLoanModalOpen = false
@@ -162,14 +163,15 @@
 
     <div class="basis-1/2 h-full  flex items-center justify-center flex-col text-success gap-2">
       <i class="fa-solid fa-briefcase text-2xl"></i>
-      <h2 class="text-3xl font-bold">PHP {data.total.principal}</h2>
+      <h2 class="text-3xl font-bold">PHP {data.total.principal.toLocaleString(undefined, MONETARY)}</h2>
      <p>Total Requested Loans</p>
     </div>
     <div class="basis-1/2 h-full  flex items-center justify-center flex-col text-secondary gap-2">
       <i class="fa-solid fa-chart-pie text-2xl"></i>
-      <h2 class="text-3xl font-bold">PHP {data.total.interest}</h2>
+      <h2 class="text-3xl font-bold">PHP {data.total.interest.toLocaleString(undefined, MONETARY)}</h2>
       <p>Total Interest</p>
     </div>
+   
    </div>
     <div class="container bg-base-100 w-full  p-3 rounded">
         <button class="btn modal-button btn-primary mb-3 text-white" on:click={()=>{isAddLoanModalOpen = true }} > <i class="fa-solid fa-plus mr-1"></i>Add Loan</button>
@@ -229,10 +231,7 @@
                 <small class="text-gray-400">{selectedMember?.id}</small>
                 </div>
                 <div class="text-error cursor-pointer flex items-center flex-1 justify-end gap-0.5" on:click={removeSelectedMember} role={"button"}>
-              
                         <i class="fa-solid fa-xmark text-lg"></i> Remove
-                 
-                 
                 </div>
             </div> 
             {:else} 
@@ -250,15 +249,15 @@
                
                     <div class="grid grid-cols-2 border-b py-2">
                         <span>Principal</span>
-                        <span class="font-bold">{$addLoanData?.amount?.toLocaleString(undefined, {minimumFractionDigits: 2}) ?? 0}</span>
+                        <span class="font-bold">{$addLoanData?.amount?.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) ?? 0}</span>
                     </div>
                     <div class="grid grid-cols-2 border-b py-2">
                         <span>Interest</span>
-                        <span class="font-bold">{interest?.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>
+                        <span class="font-bold">{interest?.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
                     </div>
                     <div class="grid grid-cols-2 border-b py-2">
                         <span>Total Due</span>
-                        <span class="font-bold">{totalDue?.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>
+                        <span class="font-bold">{totalDue?.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
                     </div>
                 </div>
 
@@ -267,16 +266,16 @@
                     <div class="px-2">
                     <div class="grid grid-cols-2 py-2 border-b">
                         <span>Principal</span>
-                        <span class="font-bold">{ isNaN(repaymentPrincipal) || !isFinite(repaymentPrincipal)  ? (0).toLocaleString(undefined, {minimumFractionDigits: 2}) : repaymentPrincipal?.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>
+                        <span class="font-bold">{ isNaN(repaymentPrincipal) || !isFinite(repaymentPrincipal)  ? (0).toLocaleString(undefined, {minimumFractionDigits: 2}) : repaymentPrincipal?.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2,})}</span>
                     </div>
                     <div class="grid grid-cols-2 py-2 border-b">
                         <span>Interest</span>
-                        <span class="font-bold">{ isNaN(repaymentInterest) || !isFinite(repaymentPrincipal) ? (0).toLocaleString(undefined, {minimumFractionDigits: 2}) : repaymentInterest?.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>
+                        <span class="font-bold">{ isNaN(repaymentInterest) || !isFinite(repaymentPrincipal) ? (0).toLocaleString(undefined, {minimumFractionDigits: 2}) : repaymentInterest?.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits:2})}</span>
                     </div>
            
                     <div class="grid grid-cols-2 py-2 border-b">
                         <span>Total Monthly Due</span>
-                        <span class="font-bold">{isNaN(repaymentTotalDue) || !isFinite(repaymentPrincipal) ? (0).toLocaleString(undefined, {minimumFractionDigits: 2}) : repaymentTotalDue.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>
+                        <span class="font-bold">{isNaN(repaymentTotalDue) || !isFinite(repaymentPrincipal) ? (0).toLocaleString(undefined, {minimumFractionDigits: 2}) : repaymentTotalDue.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
                     </div>
                 </div>
            
@@ -320,15 +319,15 @@
              
                   <div class="grid grid-cols-2 border-b py-2">
                       <span>Principal</span>
-                      <span class="font-bold">{$editLoanData?.amount?.toLocaleString(undefined, {minimumFractionDigits: 2}) ?? 0}</span>
+                      <span class="font-bold">{$editLoanData?.amount?.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) ?? 0}</span>
                   </div>
                   <div class="grid grid-cols-2 border-b py-2">
                       <span>Interest</span>
-                      <span class="font-bold">{editLoanInterest?.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>
+                      <span class="font-bold">{editLoanInterest?.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits:2})}</span>
                   </div>
                   <div class="grid grid-cols-2 border-b py-2">
                       <span>Total Due</span>
-                      <span class="font-bold">{editLoanTotalDue?.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>
+                      <span class="font-bold">{editLoanTotalDue?.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
                   </div>
               </div>
 
@@ -337,16 +336,16 @@
                   <div class="px-2">
                   <div class="grid grid-cols-2 py-2 border-b">
                       <span>Principal</span>
-                      <span class="font-bold">{ isNaN(editLoanRepaymentPrincipal) || !isFinite(editLoanRepaymentPrincipal)  ? (0).toLocaleString(undefined, {minimumFractionDigits: 2}) : editLoanRepaymentPrincipal?.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>
+                      <span class="font-bold">{ isNaN(editLoanRepaymentPrincipal) || !isFinite(editLoanRepaymentPrincipal)  ? (0).toLocaleString(undefined, {minimumFractionDigits: 2}) : editLoanRepaymentPrincipal?.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits:2})}</span>
                   </div>
                   <div class="grid grid-cols-2 py-2 border-b">
                       <span>Interest</span>
-                      <span class="font-bold">{ isNaN(editLoanRepaymentInterest) || !isFinite(editLoanRepaymentPrincipal) ? (0).toLocaleString(undefined, {minimumFractionDigits: 2}) : editLoanRepaymentInterest?.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>
+                      <span class="font-bold">{ isNaN(editLoanRepaymentInterest) || !isFinite(editLoanRepaymentPrincipal) ? (0).toLocaleString(undefined, {minimumFractionDigits: 2}) : editLoanRepaymentInterest?.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
                   </div>
          
                   <div class="grid grid-cols-2 py-2 border-b">
                       <span>Total Monthly Due</span>
-                      <span class="font-bold">{isNaN(editLoanRepaymentTotalDue) || !isFinite(editLoanRepaymentPrincipal) ? (0).toLocaleString(undefined, {minimumFractionDigits: 2}) : editLoanRepaymentTotalDue.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>
+                      <span class="font-bold">{isNaN(editLoanRepaymentTotalDue) || !isFinite(editLoanRepaymentPrincipal) ? (0).toLocaleString(undefined, {minimumFractionDigits: 2}) : editLoanRepaymentTotalDue.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
                   </div>
               </div>
          

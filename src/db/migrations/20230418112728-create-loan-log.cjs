@@ -3,26 +3,35 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable("member_share", {
+    await queryInterface.createTable("loan_log", {
       id: {
         type: Sequelize.UUID,
         defaultValue: Sequelize.UUIDV4,
         primaryKey: true,
       },
-      memberId: {
-        type: Sequelize.BIGINT,
-        field: "member_id",
-        references: {
-          model: "member",
-          key: "id",
-        },
+      description: {
+        type: Sequelize.TEXT,
+        defaultValue: "",
       },
-      total: {
+      value: {
         type: Sequelize.DECIMAL(10, 2),
+        field: "value",
+        get() {
+          const value = this.getDataValue("value");
+          return Number(value);
+        },
       },
       createdAt: {
         field: "created_at",
         type: Sequelize.DATE,
+      },
+      cooperativeId: {
+        type: Sequelize.UUID,
+        field: "cooperative_id",
+        references: {
+          model: "cooperative",
+          key: "id",
+        },
       },
       updatedAt: {
         field: "updated_at",
@@ -32,12 +41,6 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    /**
-     * Add reverting commands here.
-     *
-     * Example:
-     * await queryInterface.dropTable('users');
-     */
-    await queryInterface.dropTable("member_share");
+    await queryInterface.dropTable("loan_log");
   },
 };

@@ -33,6 +33,7 @@
   "dependencies": {
     "@felte/validator-yup": "^1.0.11",
     "@tailwindcss/typography": "^0.5.9",
+    "apexcharts": "^3.39.0",
     "axios": "^1.3.4",
     "bcrypt": "^5.1.0",
     "crypto-js": "^4.1.1",

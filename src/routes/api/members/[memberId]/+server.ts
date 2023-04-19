@@ -80,3 +80,53 @@ export const PATCH: RequestHandler = async ({ request, params }) => {
     );
   }
 };
+
+export const GET: RequestHandler = async ({ locals, params }) => {
+  try {
+    const { session } = locals.session;
+    //data from session
+    const coopId = session.data?.cooperative?.id;
+    const memberId = params?.memberId;
+
+    const [results, _] = await sequelize.query(
+      `
+        SELECT member.id, given_name as "givenName", 
+          surname as "surname", 
+          middle_name as "middleName", 
+          json_build_object('id', ma.id, 'email', ma.email, 'memberId', ma.member_id) as account,
+          (COALESCE(SUM(ds.amount), 0) - COALESCE(SUM(ws.amount), 0))  as share
+          FROM member
+          INNER JOIN member_account as ma on member.id = ma.member_id
+          LEFT JOIN share as ds on member.id = ds.member_id and ds.deleted_at is null and ds.type = 'Deposit'
+		      LEFT JOIN share as ws on member.id = ws.member_id and ws.deleted_at is null and ws.type = 'Withdraw'
+          where member.id = :memberId and member.cooperative_id = :coopId
+          GROUP BY  member.id, ma.id, ma.email, ma.member_id  
+        `,
+      {
+        replacements: {
+          memberId,
+          coopId,
+        },
+      }
+    );
+    if (!results) {
+      return json(
+        { message: "member not fond" },
+        { status: StatusCodes.NOT_FOUND }
+      );
+    }
+    const member = results?.[0] as MemberType;
+    return json({
+      message: "Member has been fetched.",
+      data: {
+        member,
+      },
+    });
+  } catch (error) {
+    console.error(error);
+    return json(
+      { message: "Unknown error occured." },
+      { status: StatusCodes.INTERNAL_SERVER_ERROR }
+    );
+  }
+};
