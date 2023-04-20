@@ -67,6 +67,7 @@
         toast.error("Unkwown error occured, Please try again later.")
       }
       finally{
+        resetEditForm()
         closeEditSharesModal()
       }
        

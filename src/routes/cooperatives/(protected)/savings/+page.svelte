@@ -2,19 +2,16 @@
     import TextAreaField from "$lib/components/form/TextAreaField.svelte";
     import TextField from "$lib/components/form/TextField.svelte";
     import Modal from "$lib/components/ui/Modal.svelte";
-    import type { Member, Share } from "$lib/definitions/types";
+    import type { Member, Saving, Share } from "$lib/definitions/types";
     import {createForm} from "felte"
     import axios from "axios";
     import {validator} from "@felte/validator-yup"
-    import { AddShareWithdrawalSchemaValidation, AddSharesSchemaValidation, EditShareWithdrawalSchemaValidation, EditSharesSchemaValidation } from "$lib/definitions/schema";
+    import { AddSavingSchemaValidation,  EditSavingSchemaValidation } from "$lib/definitions/schema";
     import toast, { Toaster } from "svelte-french-toast";
-    import { SharesTransactionTypes } from "$lib/internal/transaction.js";
+    import { SavingsTransactionTypes, SharesTransactionTypes } from "$lib/internal/transaction.js";
     import Time from "svelte-time";
     import AccountSelector from "$lib/components/account-selector/AccountSelector.svelte";
     import { invalidate } from "$app/navigation";
-  import { MONETARY } from "$lib/internal/config.js";
-  import { StatusCodes } from "http-status-codes";
-
    
     let isAddModalOpen = false;
     let isEditModalOpen = false;
@@ -27,17 +24,16 @@
       initialValues:{
           memberId:0,
           amount: 0,
-          share:0,
           remarks:"",
-          type: SharesTransactionTypes.Withdraw
+          type: SavingsTransactionTypes.Deposit,
       },
-      extend: validator({schema: AddShareWithdrawalSchemaValidation, castValues: true, level: "error"}),
+      extend: validator({schema: AddSavingSchemaValidation, castValues: true, level: "error"}),
       onSubmit: async(body)=>{
           try{
-               await axios.post("/api/shares", body)
-               toast.success("Shares withdrawal has been added.")
-               invalidate((url)=>url.pathname === "/api/shares")
-               invalidate((url)=>url.pathname === "/api/shares/total")
+               await axios.post("/api/savings", body)
+               toast.success("Saving has been added.")
+               invalidate((url)=>url.pathname === "/api/savings")
+               invalidate((url)=>url.pathname === "/api/savings/total")
           }
           catch{
             toast.error("Unkwown error occured, Please try again later.")
@@ -56,24 +52,24 @@
           memberId:0,
           amount: 0,
           remarks:"",
-          share: 0,
-          type: SharesTransactionTypes.Withdraw
+          type: SavingsTransactionTypes.Deposit
       },
-      extend:validator({schema: EditShareWithdrawalSchemaValidation, castValues: true, level: "error"}),
+      extend:validator({schema: EditSavingSchemaValidation
+        , castValues: true, level: "error"}),
       onSubmit: async(body)=>{
         try{
-          await axios.put(`/api/shares/${body.id}`, body)
-          toast.success("Shares withdrawal has been updated.")
-          invalidate((url)=>url.pathname === "/api/shares")
-          invalidate((url)=>url.pathname === "/api/shares/total")
+          await axios.put(`/api/savings/${body.id}`, body)
+          toast.success("Saving has been updated.")
+          invalidate((url)=>url.pathname === "/api/savings")
+          invalidate((url)=>url.pathname === "/api/savings/total")
       
         }
         catch{
           toast.error("Unkwown error occured, Please try again later.")
         }
         finally{
-          closeEditSharesModal()
           resetEditForm()
+          closeEditSavingModal()
         }
          
       }
@@ -85,10 +81,10 @@
           return prev
       })
     }
-    const closeAddSharesModal = ()=>{
+    const closeAddSavingModal = ()=>{
         isAddModalOpen = false
     }
-    const closeEditSharesModal = ()=>{
+    const closeEditSavingModal = ()=>{
       selectedMember = null
       isEditModalOpen = false
     }
@@ -96,38 +92,24 @@
       isConfirmDialogOpen = false
     }
     const d = new Date().toDateString()
-  
-  
-    const edit = async(log: Share)=>{
-      const response = await fetch(`/api/members/${log.member?.id}`)
-      if(response.status >= 400){
-        toast.error("Unkwown error occured, Please try again later.")
-        return 
-      }
-      const {data} = await response.json()
-   
-      editFormBody.update((prev)=>({...prev, memberId: log.member?.id ?? 0, amount: log.amount, remarks: log.remarks, id: log.id ?? 0, share: data?.member.share + log.amount,}))
-    
+    const edit = (log: Saving)=>{
+      editFormBody.update((prev)=>({...prev, memberId: log.member?.id ?? 0, amount: log.amount, remarks: log.remarks, id: log.id ?? 0}))
       selectedMember = log.member
-      if(selectedMember){
-        selectedMember.share = (data?.member?.share ?? 0 ) + log.amount
-      }
-
       isEditModalOpen = true
     }
   
-    let sharesToDelete:Share;
-    const confirmDelete = (share: Share)=>{
+    let savingToDelete:Saving;
+    const confirmDelete = (saving: Saving)=>{
          isConfirmDialogOpen = true
-         sharesToDelete = share
+         savingToDelete = saving
     }
   
-    const deleteShares = async()=>{
+    const deleteSaving = async()=>{
       try{
-      await axios.delete(`/api/shares/${sharesToDelete.id}`)
-      invalidate((url)=>url.pathname === "/api/shares")
-      invalidate((url)=>url.pathname === "/api/shares/total")
-      toast.success("Shares has been deleted.")
+      await axios.delete(`/api/savings/${savingToDelete.id}`)
+      invalidate((url)=>url.pathname === "/api/savings")
+      invalidate((url)=>url.pathname === "/api/savings/total")
+      toast.success("Saving has been deleted.")
       }catch(error){
         toast.error("Unknown error occured, Please try again later.")
       }
@@ -139,7 +121,6 @@
       selectedMember = member
       formBody.update((prev)=>{
         prev.memberId = member.id ?? 0
-        prev.share = member?.share ?? 0
         return prev
       })
    }
@@ -152,30 +133,28 @@
    }
     </script>
     <div>
-      <h1 class="text-lg font-semibold mb-3 ml-1 text-gray-500">Shares Withdrawal</h1>
+      <h1 class="text-lg font-semibold mb-3 ml-1 text-gray-500">Savings</h1>
      <div class="container bg-base-100 w-full  p-3 rounded mb-8 h-56 flex">
   
       <div class="basis-1/2 h-full  flex items-center justify-center flex-col text-success gap-2">
         <i class="fa-solid fa-signal text-2xl "></i>
         <h2 class="text-3xl font-bold">PHP {data?.total}</h2>
-       <p>Total Withdrawal</p>
+       <p>Total Savings</p>
       </div>
       <div class="basis-1/2 h-full  flex items-center justify-center flex-col text-secondary gap-2">
         <i class="fa-solid fa-chart-pie text-2xl"></i>
         <h2 class="text-3xl font-bold">PHP {data?.total ?? 0}</h2>
-        <p>{d} Withdrawal</p>
+        <p>{d} Savings</p>
       </div>
      </div>
       <div class="container bg-base-100 w-full  p-3 rounded">
-          <button class="btn modal-button btn-primary mb-3 text-white" on:click={()=>{isAddModalOpen = true}}> <i class="fa-solid fa-plus mr-1"></i>Add Withdrawal</button>
+          <button class="btn modal-button btn-primary mb-3 text-white" on:click={()=>{isAddModalOpen = true}}> <i class="fa-solid fa-plus mr-1"></i>Add Savings</button>
           <div class="overflow-x-auto">
               <table class="table w-full">
                 <!-- head -->
                 <thead>
                   <tr>
-                    <th>Member</th>
-   
-              
+                    <th>Member</th>            
                     <th>Amount</th>
                     <th>Remarks</th>
                     <td></td>
@@ -188,8 +167,9 @@
                     <td>
                      {share.member?.givenName} {share.member?.middleName} {share.member?.surname}
                     </td>
+                  
                     <td class:text-success="{share.type === SharesTransactionTypes.Deposit}">
-                              -{share.amount} ₱
+                              +{share.amount} ₱
                     </td>
                     <td>
                       {share.remarks}
@@ -218,8 +198,8 @@
   </div>
   
   
-  <Modal  isOpen={isAddModalOpen} modalBoxClass={"w-11/12 max-w-5xl"} close={closeAddSharesModal}>
-      <h3 class="font-bold text-lg">Add Withdrawal</h3>
+  <Modal  isOpen={isAddModalOpen} modalBoxClass={"w-11/12 max-w-5xl"} close={closeAddSavingModal}>
+      <h3 class="font-bold text-lg">Add Savings</h3>
           <form use:form>
               {#if  selectedMember}
               <div class="flex mt-3 gap-2 w-full bg-white shadow-sm p-5 border">
@@ -229,7 +209,7 @@
                   </div>
                   <div class="flex flex-col justify-center">
                   <span class="font-bold">{selectedMember?.givenName} {selectedMember?.surname}</span>
-                  <span class="text-gray-400">Current shares: {selectedMember?.share?.toLocaleString(undefined, MONETARY)}</span>
+                  <small class="text-gray-400">{selectedMember?.id}</small>
                   </div>
                   <div class="text-error cursor-pointer flex items-center flex-1 justify-end gap-0.5" on:click={removeSelectedMember} role={"button"}>
                           <i class="fa-solid fa-xmark text-lg"></i> Remove
@@ -245,12 +225,12 @@
                   <TextField label="Amount" name="amount" type="number" step="{.01}" error={$errors?.amount?.[0]} />
                   <TextAreaField label="Remarks" name="remarks"   error={$errors?.remarks?.[0]}/>
                   <button type="submit" class="btn btn-primary mt-5 text-white">Save</button>
-                  <button type="button" class="btn btn-secondary btn-outline" on:click={closeAddSharesModal}>Cancel</button>
+                  <button type="button" class="btn btn-secondary btn-outline" on:click={closeAddSavingModal}>Cancel</button>
           </form>
   </Modal>
   
-  <Modal isOpen={isEditModalOpen}  modalBoxClass={"w-11/12 max-w-5xl"}  close={closeEditSharesModal}>
-    <h3 class="font-bold text-lg">Edit Withdrawal</h3>
+  <Modal isOpen={isEditModalOpen}  modalBoxClass={"w-11/12 max-w-5xl"}  close={closeEditSavingModal}>
+    <h3 class="font-bold text-lg">Edit Savings</h3>
     <form use:editForm>
         {#if  selectedMember}
         <div class="flex mt-3 gap-2 w-full bg-white shadow-sm p-5 border">
@@ -260,7 +240,7 @@
             </div>
             <div class="flex flex-col justify-center">
             <span class="font-bold">{selectedMember?.givenName} {selectedMember?.surname}</span>
-            <span class="text-gray-400">Current shares: {selectedMember?.share?.toLocaleString(undefined, MONETARY)}</span>
+            <small class="text-gray-400">{selectedMember?.id}</small>
             </div>
             <div class="text-error cursor-pointer flex items-center flex-1 justify-end gap-0.5" on:click={removeSelectedMember} role={"button"}>
           
@@ -274,18 +254,18 @@
         {/if}
          
          
-            <TextField value={$editFormBody.amount} label="Amount" name="amount" type="number" step="{.01}" error={$editFormErrors?.amount?.[0]} />
+            <TextField value={$editFormBody.amount} label="Amount" name="amount" type="number" step="{.01}" error={$errors?.amount?.[0]} />
             <TextAreaField value={$editFormBody.remarks} label="Remarks" name="remarks"   error={$editFormErrors?.remarks?.[0]}/>
             <button type="submit" class="btn btn-primary mt-5 text-white">Save</button>
-            <button type="button" class="btn btn-secondary btn-outline" on:click={closeEditSharesModal}>Cancel</button>
+            <button type="button" class="btn btn-secondary btn-outline" on:click={closeEditSavingModal}>Cancel</button>
     </form>
   </Modal>
   <Modal isOpen={isConfirmDialogOpen} close={closeConfirmDialog} >
-    <h3 class="font-bold text-xl"><i class="fa-solid fa-circle-exclamation text-error"></i> Delete Shares?</h3>
-    <p class="py-4">Are you sure that you want to delete this shares?</p>
+    <h3 class="font-bold text-xl"><i class="fa-solid fa-circle-exclamation text-error"></i> Delete Saving?</h3>
+    <p class="py-4">Are you sure that you want to delete this saving?</p>
     <div class="modal-action">
       <button class="btn btn-outline" type="button" on:click={closeConfirmDialog}>Cancel</button>
-      <button class="btn btn-error" type="button" on:click={deleteShares}>Yes, Delete It!</button>
+      <button class="btn btn-error" type="button" on:click={deleteSaving}>Yes, Delete It!</button>
     </div>
   
   </Modal>

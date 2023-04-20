@@ -1,8 +1,8 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "./sequelize";
 
-export const ShareLogModel = sequelize.define(
-  "share_log",
+export const SavingLogModel = sequelize.define(
+  "saving_log",
   {
     id: {
       type: DataTypes.UUID,

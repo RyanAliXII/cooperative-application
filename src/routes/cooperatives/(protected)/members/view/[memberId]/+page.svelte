@@ -107,7 +107,7 @@
                   <TextField  label="Email" labelFor="email"  name="account.email" type="email" error={$errors?.account?.email?.[0]} disabled={isViewMode}/>
                   <TextField   label="Phone number" labelFor="mobileNumber"  name="account.mobileNumber" error={$errors?.account?.mobileNumber?.[0]}  disabled={isViewMode}/>
                   <TextField   label="Office Phone Number" labelFor="officePhoneNumber"  name="officePhoneNumber" error={$errors?.officePhoneNumber?.[0]} disabled={isViewMode}/>
-                
+                  <TextField  label="Registration Fee" labelFor="registrationFee"  name="registrationFee" type="number" error={$errors?.registrationFee?.[0]} disabled={isViewMode}/>
               </div>
               <div class="bg-base-200 w-full h-10 rounded flex items-center px-2 text-gray-600 font-semibold gap-2 mt-5">
                   <i class="fa-regular fa-address-card"></i>  DEPENDENTS

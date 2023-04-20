@@ -19,6 +19,22 @@ export const POST: RequestHandler = async (event) => {
     const coopId = session.data?.cooperative?.id;
     const body = await request.json();
     const parsedShare = await AddSharesSchemaValidation.validate(body);
+
+    if (
+      !Object.values(SharesTransactionTypes).includes(
+        parsedShare.type as SharesTransactionTypes
+      )
+    ) {
+      return json(
+        {
+          message: "Invalid transaction type.",
+          data: {
+            shares: [],
+          },
+        },
+        { status: StatusCodes.BAD_REQUEST }
+      );
+    }
     await Share.create(
       {
         type: parsedShare.type,
@@ -36,7 +52,6 @@ export const POST: RequestHandler = async (event) => {
       {
         replacements: {
           coopId,
-          type: SharesTransactionTypes.Deposit,
         },
         transaction,
       }

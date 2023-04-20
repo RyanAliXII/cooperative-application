@@ -97,7 +97,7 @@
                 <TextField  label="Email" labelFor="email"  name="account.email" type="email" error={$errors?.account?.email?.[0]}/>
                 <TextField   label="Phone number" labelFor="mobileNumber"  name="account.mobileNumber" error={$errors?.account?.mobileNumber?.[0]} />
                 <TextField   label="Office Phone Number" labelFor="officePhoneNumber"  name="officePhoneNumber" error={$errors?.officePhoneNumber?.[0]}/>
-              
+                <TextField  label="Registration Fee" labelFor="registrationFee"  name="registrationFee" type="number" error={$errors?.registrationFee?.[0]}/>
             </div>
             <div class="bg-base-200 w-full h-10 rounded flex items-center px-2 text-gray-600 font-semibold gap-2 mt-5">
                 <i class="fa-regular fa-address-card"></i>  DEPENDENTS
@@ -149,7 +149,7 @@
               </div>
           </div>
           <div class="mt-5 w-full flex justify-end">
-        <button class="btn btn-primary mt-10" type="submit">
+        <button class="btn btn-primary text-white mt-10" type="submit">
           <i class="fa-regular fa-floppy-disk mr-2 text-lg"></i>
           Save</button>
           </div>

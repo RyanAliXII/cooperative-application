@@ -6,6 +6,7 @@ import { NewMemberValidationSchema } from "$lib/definitions/schema";
 import { sequelize } from "$lib/models/sequelize";
 import generator from "generate-password";
 import { hash } from "bcrypt";
+import { QueryTypes } from "sequelize";
 
 export const POST: RequestHandler = async ({ request, locals }) => {
   const transaction = await sequelize.transaction();
@@ -69,26 +70,39 @@ export const GET: RequestHandler = async ({ request, cookies, locals }) => {
     */
     if (query) {
       if (query.length > 0) {
-        const [results, _] = await sequelize.query(
+        const results = await sequelize.query(
           `
-        SELECT member.id, given_name as "givenName", 
+          SELECT member.id, given_name as "givenName", 
           surname as "surname", 
           middle_name as "middleName", 
           json_build_object('id', ma.id, 'email', ma.email, 'memberId', ma.member_id) as account,
-          (COALESCE(SUM(ds.amount), 0) - COALESCE(SUM(ws.amount), 0))  as share
+          (COALESCE(COALESCE(d_share.share, 0) - COALESCE(w_share.share,0), 0))  as share,
+  		    (COALESCE(COALESCE(d_saving.saving, 0) - COALESCE(w_saving.saving, 0), 0))  as saving
           FROM member
           INNER JOIN member_account as ma on member.id = ma.member_id
-          LEFT JOIN share as ds on member.id = ds.member_id and ds.deleted_at is null and ds.type = 'Deposit'
-		      LEFT JOIN share as ws on member.id = ws.member_id and ws.deleted_at is null and ws.type = 'Withdraw'
-          where search_vector @@ (plainto_tsquery('simple', :query) :: text || ':*' ) :: tsquery
-          GROUP BY  member.id, ma.id, ma.email, ma.member_id
+          LEFT JOIN (
+            SELECT member_id ,SUM(amount) as share from share where deleted_at is null and type = 'Deposit' group by member_id
+          ) as d_share on member.id = d_share.member_id
+          LEFT JOIN (
+            SELECT member_id ,SUM(amount) as share from share where deleted_at is null and type = 'Withdraw' group by member_id
+          ) as w_share on member.id = w_share.member_id
+          LEFT JOIN (
+            SELECT member_id ,SUM(amount) as saving from saving where deleted_at is null and type = 'Deposit' group by member_id
+          ) as d_saving on member.id = d_saving.member_id
+          LEFT JOIN (
+            SELECT member_id ,SUM(amount) as saving from saving where deleted_at is null and type = 'Withdraw' group by member_id
+          ) as w_saving on member.id = w_saving.member_id
+          where search_vector @@ (plainto_tsquery('simple', :query) :: text || ':*' ) :: tsquery AND cooperative_id = :coopId
+
           ORDER BY (ts_rank(search_vector, (plainto_tsquery('simple', :query) :: text || ':*' ) :: tsquery ) 
           )  DESC
          
         `,
           {
+            type: QueryTypes.SELECT,
             replacements: {
               query,
+              coopId,
             },
           }
         );
@@ -98,7 +112,7 @@ export const GET: RequestHandler = async ({ request, cookies, locals }) => {
             members:
               results.map((m) => {
                 const member = m as MemberType;
-                member.share = Number(member.share ?? 0);
+
                 return member;
               }) ?? [],
           },

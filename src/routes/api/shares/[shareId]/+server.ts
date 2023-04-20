@@ -21,7 +21,21 @@ export const PUT: RequestHandler = async ({ request, params, locals }) => {
   const transaction = await sequelize.transaction();
   try {
     const parsedBody = await EditSharesSchemaValidation.validate(body);
-
+    if (
+      !Object.values(SharesTransactionTypes).includes(
+        parsedBody.type as SharesTransactionTypes
+      )
+    ) {
+      return json(
+        {
+          message: "Invalid transaction type.",
+          data: {
+            shares: [],
+          },
+        },
+        { status: StatusCodes.BAD_REQUEST }
+      );
+    }
     const shareModel = await Share.findOne({
       where: {
         id: shareId,

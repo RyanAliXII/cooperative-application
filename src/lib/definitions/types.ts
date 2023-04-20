@@ -48,6 +48,8 @@ export type Member = {
   declinedAt: string;
   shares?: [];
   share: number;
+  saving: number;
+  registrationFee: number;
 };
 
 export type MemberAccount = {
@@ -112,5 +114,25 @@ export type CooperativeStats = {
   loanInterest: number;
   shares: number;
   assets: number;
+  savings: number;
   liquidity: number;
+  registrationFees: number;
+};
+
+export type Saving = {
+  id?: number;
+  memberId: number;
+  remarks: string;
+  amount: number;
+  member?: Member;
+  type: string;
+  createdAt: string;
+};
+
+export type SavingLog = {
+  id?: string;
+  value: number;
+  description: string;
+  cooperativeId: string;
+  createdAt: string;
 };

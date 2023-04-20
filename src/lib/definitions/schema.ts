@@ -1,6 +1,9 @@
 import { array, number, object, string, ref } from "yup";
 import validator from "validator";
-import { SharesTransactionTypes } from "$lib/internal/transaction";
+import {
+  SavingsTransactionTypes,
+  SharesTransactionTypes,
+} from "$lib/internal/transaction";
 export const CreateCooperativeSchema = object({
   name: string().required("Cooperative name is required."),
   registrationNumber: string().required(
@@ -102,6 +105,7 @@ export const EditMemberValidationSchema = object({
         validator.isMobilePhone(value ?? "", "en-PH")
       ),
   }),
+  registrationFee: number().notRequired().typeError("Invalid fee value."),
   officePhoneNumber: string().notRequired(),
   dependents: array()
     .of(
@@ -181,7 +185,7 @@ export const AddShareWithdrawalSchemaValidation = object({
     .min(10, "Amount should be atleast 10.")
     .test(
       "check-if-greater-than",
-      "Amount should less than or equal member shares.",
+      "Insufficient share balance.",
       function (value) {
         return this.parent.share >= (value ?? 0);
       }
@@ -206,7 +210,7 @@ export const EditShareWithdrawalSchemaValidation = object({
     .min(10, "Amount should be atleast 10.")
     .test(
       "check-if-greater-than",
-      "Amount should less than or equal member shares.",
+      "Insufficient share balance.",
       function (value) {
         return this.parent.share >= (value ?? 0);
       }
@@ -263,5 +267,90 @@ export const AddRepaymentModalSchemaValidation = object({
       }
     )
     .required("Amount is required."),
+  remarks: string().notRequired(),
+});
+
+export const AddSavingSchemaValidation = object({
+  memberId: number()
+    .integer("Invalid member id.")
+    .required("Please select a member.")
+    .min(1, "Please select a member."),
+  type: string()
+    .required()
+    .oneOf(
+      [SavingsTransactionTypes.Deposit, SavingsTransactionTypes.Withdraw],
+      "Invalid type value"
+    ),
+  amount: number()
+    .required("Amount is required.")
+    .min(10, "Amount should be atleast 10."),
+  remarks: string().notRequired(),
+});
+
+export const EditSavingSchemaValidation = object({
+  id: number().integer().min(1).required(),
+  memberId: number()
+    .integer("Invalid member id.")
+    .required("Please select a member.")
+    .min(1, "Please select a member."),
+  type: string()
+    .required()
+    .oneOf(
+      [SavingsTransactionTypes.Deposit, SavingsTransactionTypes.Withdraw],
+      "Invalid type value"
+    ),
+  amount: number()
+    .required("Amount is required.")
+    .min(10, "Amount should be atleast 10."),
+  remarks: string().notRequired(),
+});
+
+export const AddSavingWithdrawalSchemaValidation = object({
+  memberId: number()
+    .integer("Invalid member id.")
+    .required("Please select a member.")
+    .min(1, "Please select a member."),
+  type: string()
+    .required()
+    .oneOf(
+      [SharesTransactionTypes.Deposit, SharesTransactionTypes.Withdraw],
+      "Invalid type value"
+    ),
+  saving: number().required().min(0),
+  amount: number()
+    .required("Amount is required.")
+    .min(10, "Amount should be atleast 10.")
+    .test(
+      "check-if-greater-than",
+      "Insufficient saving balance.",
+      function (value) {
+        return this.parent.saving >= (value ?? 0);
+      }
+    ),
+  remarks: string().notRequired(),
+});
+
+export const EditSavingWithdrawalSchemaValidation = object({
+  memberId: number()
+    .integer("Invalid member id.")
+    .required("Please select a member.")
+    .min(1, "Please select a member."),
+  type: string()
+    .required()
+    .oneOf(
+      [SharesTransactionTypes.Deposit, SharesTransactionTypes.Withdraw],
+      "Invalid type value"
+    ),
+  saving: number().required().min(0),
+  amount: number()
+    .required("Amount is required.")
+    .min(10, "Amount should be atleast 10.")
+    .test(
+      "check-if-greater-than",
+      "Insufficient saving balance.",
+      function (value) {
+        return this.parent.saving >= (value ?? 0);
+      }
+    ),
   remarks: string().notRequired(),
 });

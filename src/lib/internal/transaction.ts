@@ -3,6 +3,11 @@ export enum SharesTransactionTypes {
   Withdraw = "Withdraw",
 }
 
+export enum SavingsTransactionTypes {
+  Deposit = "Deposit",
+  Withdraw = "Withdraw",
+}
+
 export enum LoanStatuses {
   Requested = "Requested",
   Approved = "Approved",
@@ -23,4 +28,10 @@ export enum ShareLogDescription {
   Edit = "Share has been updated.",
   Delete = "Share has been removed.",
   Withdraw = "Share has been withdrawn.",
+}
+export enum SavingLogDescription {
+  New = "Saving has been added.",
+  Edit = "Saving has been updated.",
+  Delete = "Saving has been removed.",
+  Withdraw = "Saving has been withdrawn.",
 }

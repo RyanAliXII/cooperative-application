@@ -10,7 +10,8 @@ export const GET: RequestHandler = async ({ locals }) => {
 
   try {
     const result = await sequelize.query(
-      `SELECT  cooperative_id as "cooperativeId", cooperative_name as "cooperativeName", loan_interest as "loanInterest", shares, loan, liquidity, assets from stats_view where cooperative_id = :coopId LIMIT 1`,
+      `SELECT  cooperative_id as "cooperativeId", cooperative_name as "cooperativeName", loan_interest as "loanInterest", shares, loan, liquidity, 
+      assets, savings, registration_fees as "registrationFees" from stats_view where cooperative_id = :coopId LIMIT 1`,
       {
         type: QueryTypes.SELECT,
         replacements: {
@@ -27,6 +28,8 @@ export const GET: RequestHandler = async ({ locals }) => {
     stat.loanInterest = Number(stat.loanInterest);
     stat.shares = Number(stat.shares);
     stat.assets = Number(stat.assets);
+    stat.registrationFees = Number(stat.registrationFees);
+
     return json({
       message: "Cooperative stats have been fetched.",
       data: {

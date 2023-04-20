@@ -5,7 +5,8 @@
     let sidebarState:Record<string, boolean> = {
         registration: false,
         loan: false,
-        share:false
+        share:false,
+        saving:false
     }
     function toggle (sidebarKey: string){
         sidebarState[sidebarKey] = !sidebarState[sidebarKey]
@@ -57,7 +58,7 @@
                     </div>
                     <div class="pl-10 mt-1 text-sm hover:bg-white">
                       <a href="/cooperatives/members/approval" >
-                        Approval
+                        Pending Members
                         </a>
                    </div>
              
@@ -69,7 +70,7 @@
 
                 <li>
                     <button type="button" on:click={()=>{toggle("loan")}}>
-                            <i class="fa-solid fa-briefcase"></i>
+                      <i class="fa-solid fa-landmark"></i>
                         Loans
                     </button>
                     {#if sidebarState["loan"] }
@@ -109,7 +110,7 @@
 
                 <li>
                   <button type="button" on:click={()=>{toggle("share")}}>
-                          <i class="fa-solid fa-briefcase"></i>
+                    <i class="fa-solid fa-money-bill-transfer"></i>
                       Shares
                   </button>
                   {#if sidebarState["share"] }
@@ -130,6 +131,31 @@
                   
                
               </li>
+
+
+              <li>
+                <button type="button" on:click={()=>{toggle("saving")}}>
+                  <i class="fa-solid fa-piggy-bank"></i>
+                    Savings
+                </button>
+                {#if sidebarState["saving"] }
+                <div class="pl-10  text-sm hover:bg-white">
+                    <a href="/cooperatives/savings" >
+                        Add Saving
+                      </a>
+                </div>
+             
+                  <div class="pl-10  text-sm hover:bg-white">
+                    <a href="/cooperatives/savings/withdrawal" >
+                      Saving Withdrawal
+                    </a>
+                    </div>
+               
+                {/if}
+
+                
+             
+            </li>
                 <li>
                   <a href="/cooperatives/settings">
                     <i class="fa-solid fa-gear"></i>

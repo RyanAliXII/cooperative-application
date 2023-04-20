@@ -40,7 +40,7 @@
     }
     let registrationURL = ''
     onMount(()=>{
-      registrationURL = `${window.location.host}/cooperative/registration/${data.cooperative?.id}`
+      registrationURL = `${window.location.host}/cooperatives/registration/${data.cooperative?.id}`
     })
 
     

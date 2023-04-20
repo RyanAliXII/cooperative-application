@@ -2,20 +2,17 @@
     import TextAreaField from "$lib/components/form/TextAreaField.svelte";
     import TextField from "$lib/components/form/TextField.svelte";
     import Modal from "$lib/components/ui/Modal.svelte";
-    import type { Member, Share } from "$lib/definitions/types";
+    import type { Member, Saving, Share } from "$lib/definitions/types";
     import {createForm} from "felte"
     import axios from "axios";
     import {validator} from "@felte/validator-yup"
-    import { AddShareWithdrawalSchemaValidation, AddSharesSchemaValidation, EditShareWithdrawalSchemaValidation, EditSharesSchemaValidation } from "$lib/definitions/schema";
+    import { AddSavingWithdrawalSchemaValidation,  EditSavingWithdrawalSchemaValidation,  EditShareWithdrawalSchemaValidation,  } from "$lib/definitions/schema";
     import toast, { Toaster } from "svelte-french-toast";
-    import { SharesTransactionTypes } from "$lib/internal/transaction.js";
+    import { SavingsTransactionTypes, SharesTransactionTypes } from "$lib/internal/transaction.js";
     import Time from "svelte-time";
     import AccountSelector from "$lib/components/account-selector/AccountSelector.svelte";
     import { invalidate } from "$app/navigation";
-  import { MONETARY } from "$lib/internal/config.js";
-  import { StatusCodes } from "http-status-codes";
-
-   
+    import { MONETARY } from "$lib/internal/config.js";
     let isAddModalOpen = false;
     let isEditModalOpen = false;
     let isConfirmDialogOpen = false
@@ -27,17 +24,17 @@
       initialValues:{
           memberId:0,
           amount: 0,
-          share:0,
+          saving:0,
           remarks:"",
-          type: SharesTransactionTypes.Withdraw
+          type: SavingsTransactionTypes.Withdraw
       },
-      extend: validator({schema: AddShareWithdrawalSchemaValidation, castValues: true, level: "error"}),
+      extend: validator({schema: AddSavingWithdrawalSchemaValidation, castValues: true, level: "error"}),
       onSubmit: async(body)=>{
           try{
-               await axios.post("/api/shares", body)
-               toast.success("Shares withdrawal has been added.")
-               invalidate((url)=>url.pathname === "/api/shares")
-               invalidate((url)=>url.pathname === "/api/shares/total")
+               await axios.post("/api/savings", body)
+               toast.success("Saving withdrawal has been added.")
+               invalidate((url)=>url.pathname === "/api/savings")
+               invalidate((url)=>url.pathname === "/api/savings/total")
           }
           catch{
             toast.error("Unkwown error occured, Please try again later.")
@@ -56,16 +53,17 @@
           memberId:0,
           amount: 0,
           remarks:"",
-          share: 0,
+          saving:0,
           type: SharesTransactionTypes.Withdraw
       },
-      extend:validator({schema: EditShareWithdrawalSchemaValidation, castValues: true, level: "error"}),
+      extend:validator({schema: EditSavingWithdrawalSchemaValidation, castValues: true, level: "error"}),
       onSubmit: async(body)=>{
         try{
-          await axios.put(`/api/shares/${body.id}`, body)
-          toast.success("Shares withdrawal has been updated.")
-          invalidate((url)=>url.pathname === "/api/shares")
-          invalidate((url)=>url.pathname === "/api/shares/total")
+          await axios.put(`/api/savings/${body.id}`, body)
+          
+          toast.success("Saving withdrawal has been updated.")
+          invalidate((url)=>url.pathname === "/api/savings")
+          invalidate((url)=>url.pathname === "/api/savings/total")
       
         }
         catch{
@@ -96,38 +94,36 @@
       isConfirmDialogOpen = false
     }
     const d = new Date().toDateString()
-  
-  
-    const edit = async(log: Share)=>{
-      const response = await fetch(`/api/members/${log.member?.id}`)
+    const edit = async(saving: Saving)=>{
+      const response = await fetch(`/api/members/${saving.member?.id}`)
       if(response.status >= 400){
         toast.error("Unkwown error occured, Please try again later.")
         return 
       }
+
       const {data} = await response.json()
-   
-      editFormBody.update((prev)=>({...prev, memberId: log.member?.id ?? 0, amount: log.amount, remarks: log.remarks, id: log.id ?? 0, share: data?.member.share + log.amount,}))
+      editFormBody.update((prev)=>({...prev, memberId: saving.member?.id ?? 0, amount: saving.amount, remarks: saving.remarks, id: saving.id ?? 0, saving: data?.member.saving + saving.amount,}))
     
-      selectedMember = log.member
+      selectedMember = saving.member
       if(selectedMember){
-        selectedMember.share = (data?.member?.share ?? 0 ) + log.amount
+        selectedMember.saving = (data?.member?.saving ?? 0) + saving.amount
       }
 
       isEditModalOpen = true
     }
   
-    let sharesToDelete:Share;
-    const confirmDelete = (share: Share)=>{
+    let savingToDelete:Saving;
+    const confirmDelete = (saving: Saving)=>{
          isConfirmDialogOpen = true
-         sharesToDelete = share
+         savingToDelete = saving
     }
   
-    const deleteShares = async()=>{
+    const deleteSaving = async()=>{
       try{
-      await axios.delete(`/api/shares/${sharesToDelete.id}`)
-      invalidate((url)=>url.pathname === "/api/shares")
-      invalidate((url)=>url.pathname === "/api/shares/total")
-      toast.success("Shares has been deleted.")
+      await axios.delete(`/api/savings/${savingToDelete.id}`)
+      invalidate((url)=>url.pathname === "/api/savings")
+      invalidate((url)=>url.pathname === "/api/savings/total")
+      toast.success("Withdrawal has been deleted.")
       }catch(error){
         toast.error("Unknown error occured, Please try again later.")
       }
@@ -135,15 +131,15 @@
         closeConfirmDialog()
       }
     }
-   const selectMemberForAddShareForm = (member:Member)=>{
+   const selectMemberForSavingWithdrawalForm = (member:Member)=>{
       selectedMember = member
       formBody.update((prev)=>{
         prev.memberId = member.id ?? 0
-        prev.share = member?.share ?? 0
+        prev.saving = member?.saving ?? 0
         return prev
       })
    }
-   const selectMemberForEditShareForm = (member:Member)=>{
+   const selectMemberForEditWithdrawalForm = (member:Member)=>{
     selectedMember = member;
     editFormBody.update((prev)=>{
         prev.memberId = member.id ?? 0
@@ -152,7 +148,7 @@
    }
     </script>
     <div>
-      <h1 class="text-lg font-semibold mb-3 ml-1 text-gray-500">Shares Withdrawal</h1>
+      <h1 class="text-lg font-semibold mb-3 ml-1 text-gray-500">Savings Withdrawal</h1>
      <div class="container bg-base-100 w-full  p-3 rounded mb-8 h-56 flex">
   
       <div class="basis-1/2 h-full  flex items-center justify-center flex-col text-success gap-2">
@@ -174,8 +170,6 @@
                 <thead>
                   <tr>
                     <th>Member</th>
-   
-              
                     <th>Amount</th>
                     <th>Remarks</th>
                     <td></td>
@@ -183,28 +177,27 @@
                   </tr>
                 </thead>
                 <tbody>
-                  {#each data.shares as share }
+                  {#each data.withdrawals as withdrawal }
                   <tr>
                     <td>
-                     {share.member?.givenName} {share.member?.middleName} {share.member?.surname}
+                     {withdrawal.member?.givenName} {withdrawal.member?.middleName} {withdrawal.member?.surname}
                     </td>
-                    <td class:text-success="{share.type === SharesTransactionTypes.Deposit}">
-                              -{share.amount} ₱
+                    <td class:text-success="{withdrawal.type === SharesTransactionTypes.Deposit}">
+                              -{withdrawal.amount} ₱
                     </td>
                     <td>
-                      {share.remarks}
+                      {withdrawal.remarks}
                     </td>
                     <td>
                   
-                      <Time  relative timestamp={share.createdAt}/>
+                      <Time  relative timestamp={withdrawal.createdAt}/>
                     </td>
                       <td>
-                        <a href="/cooperatives/members/view/{share.member?.id}" class="btn btn-outline btn-info"><i class="fa-regular fa-eye"></i></a>
-                        <button class="btn btn-secondary btn-outline" on:click={()=>{edit(share)}}><i class="fa-regular fa-pen-to-square"></i></button>
-                        <button class="btn btn-error btn-outline" on:click={()=>confirmDelete(share)}><i class="fa-solid fa-trash"></i></button>
+                        <a href="/cooperatives/members/view/{withdrawal.member?.id}" class="btn btn-outline btn-info"><i class="fa-regular fa-eye"></i></a>
+                        <button class="btn btn-secondary btn-outline" on:click={()=>{edit(withdrawal
+                          )}}><i class="fa-regular fa-pen-to-square"></i></button>
+                        <button class="btn btn-error btn-outline" on:click={()=>confirmDelete(withdrawal)}><i class="fa-solid fa-trash"></i></button>
                       </td> 
-                      
-                     
                    </tr>
                  {/each}
                 
@@ -229,7 +222,7 @@
                   </div>
                   <div class="flex flex-col justify-center">
                   <span class="font-bold">{selectedMember?.givenName} {selectedMember?.surname}</span>
-                  <span class="text-gray-400">Current shares: {selectedMember?.share?.toLocaleString(undefined, MONETARY)}</span>
+                  <span class="text-gray-400">Current savings: {selectedMember?.saving?.toLocaleString(undefined, MONETARY)}</span>
                   </div>
                   <div class="text-error cursor-pointer flex items-center flex-1 justify-end gap-0.5" on:click={removeSelectedMember} role={"button"}>
                           <i class="fa-solid fa-xmark text-lg"></i> Remove
@@ -237,11 +230,9 @@
               </div> 
               {:else} 
   
-              <AccountSelector handleSelect={selectMemberForAddShareForm} error={$errors?.memberId?.[0]}/>
+              <AccountSelector handleSelect={selectMemberForSavingWithdrawalForm} error={$errors?.memberId?.[0]}/>
   
               {/if}
-               
-                
                   <TextField label="Amount" name="amount" type="number" step="{.01}" error={$errors?.amount?.[0]} />
                   <TextAreaField label="Remarks" name="remarks"   error={$errors?.remarks?.[0]}/>
                   <button type="submit" class="btn btn-primary mt-5 text-white">Save</button>
@@ -260,20 +251,15 @@
             </div>
             <div class="flex flex-col justify-center">
             <span class="font-bold">{selectedMember?.givenName} {selectedMember?.surname}</span>
-            <span class="text-gray-400">Current shares: {selectedMember?.share?.toLocaleString(undefined, MONETARY)}</span>
+            <span class="text-gray-400">Current savings: {selectedMember?.saving?.toLocaleString(undefined, MONETARY)}</span>
             </div>
             <div class="text-error cursor-pointer flex items-center flex-1 justify-end gap-0.5" on:click={removeSelectedMember} role={"button"}>
-          
                     <i class="fa-solid fa-xmark text-lg"></i> Remove
-             
-             
             </div>
         </div> 
         {:else} 
-          <AccountSelector  handleSelect={selectMemberForEditShareForm} error={$editFormErrors?.memberId?.[0]}/>
+          <AccountSelector  handleSelect={selectMemberForEditWithdrawalForm} error={$editFormErrors?.memberId?.[0]}/>
         {/if}
-         
-         
             <TextField value={$editFormBody.amount} label="Amount" name="amount" type="number" step="{.01}" error={$editFormErrors?.amount?.[0]} />
             <TextAreaField value={$editFormBody.remarks} label="Remarks" name="remarks"   error={$editFormErrors?.remarks?.[0]}/>
             <button type="submit" class="btn btn-primary mt-5 text-white">Save</button>
@@ -281,11 +267,11 @@
     </form>
   </Modal>
   <Modal isOpen={isConfirmDialogOpen} close={closeConfirmDialog} >
-    <h3 class="font-bold text-xl"><i class="fa-solid fa-circle-exclamation text-error"></i> Delete Shares?</h3>
-    <p class="py-4">Are you sure that you want to delete this shares?</p>
+    <h3 class="font-bold text-xl"><i class="fa-solid fa-circle-exclamation text-error"></i> Delete Withdrawal?</h3>
+    <p class="py-4">Are you sure that you want to delete this withdrawal?</p>
     <div class="modal-action">
       <button class="btn btn-outline" type="button" on:click={closeConfirmDialog}>Cancel</button>
-      <button class="btn btn-error" type="button" on:click={deleteShares}>Yes, Delete It!</button>
+      <button class="btn btn-error" type="button" on:click={deleteSaving}>Yes, Delete It!</button>
     </div>
   
   </Modal>

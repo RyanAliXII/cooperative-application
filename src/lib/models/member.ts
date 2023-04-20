@@ -63,6 +63,14 @@ export const MemberModel = sequelize.define(
       type: DataTypes.DATE,
       field: "declined_at",
     },
+    registrationFee: {
+      type: DataTypes.DECIMAL(10, 2),
+      defaultValue: 0,
+      get() {
+        const value = this.getDataValue("registrationFee");
+        return Number(value);
+      },
+    },
     cooperativeId: {
       type: DataTypes.UUID,
       field: "cooperative_id",

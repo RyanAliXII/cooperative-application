@@ -1,16 +1,14 @@
 <script lang="ts">
 
-
     export let data;
       import {onMount} from "svelte"
-     
-
+    
         onMount(async()=>{
             let ApexCharts = (await import("apexcharts")).default
                 const comparisonChartOptions = {
                 
                     chart: {
-                        height:"300px",
+                        height:"450px",
                         type: 'line',
                   
                     },
@@ -21,6 +19,10 @@
                         name: 'Shares',
                         data: data.shares.logs.map((s)=>[new Date(s.createdAt).getTime(), s.value])
                     },
+                    {
+                        name:'Savings',
+                        data: data?.savings?.logs.map((l)=>[new Date(l.createdAt).getTime(), l.value])
+                    }
                   
                 ],
                     xaxis:{
@@ -34,8 +36,6 @@
   
              const comparisonChart = new ApexCharts(document.querySelector("#comparisonChart"), comparisonChartOptions);
              comparisonChart.render()
-
-
              
              const assets = data.stat.assets
            
@@ -51,17 +51,27 @@
                 {
                     value: data.stat.loanInterest,
                     valueInPercentage: (data.stat.loanInterest/ assets) * 100
+                },
+                {
+                    value: data.stat.savings,
+                    valueInPercentage: (data.stat.savings/ assets) * 100
+                },
+                {
+                    value: data.stat.registrationFees,
+                    valueInPercentage: (data.stat.registrationFees/ assets) * 100
                 }
              ] 
              const overviewChartOptions = {
                     series: overviewCharSeriesData.map((d)=>d.valueInPercentage),
-                    labels:["Loan", "Shares", "Loan Interest"],
+                    labels:["Loan", "Shares", "Loan Interest", "Savings", "Registration Fees"],
                     chart: {
                     type: 'donut',
-                    height:"300px",
-                    width:"400px"
+                    height:"500px",
+                    width:"450px"
                     },
+                   
                     tooltip: {
+                        
                         y: {
                             formatter: function(value:any, data:any, dataIndex:any) {
                                 return  overviewCharSeriesData[data.seriesIndex].value
@@ -74,11 +84,6 @@
                     overviewChart.render();
                 
             })
-
-
-      
-       
-      
 </script>
 
 <div class="container  w-full  p-3 rounded">
