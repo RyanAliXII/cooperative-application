@@ -1,17 +1,24 @@
 <script>
+
+    import logo from "$lib/assets/images/ccdco-logo.png"
+
     export let form;
  
 </script>
 
-<div class="w-full h-screen flex items-center flex-col justify-center gap-2">
+<div class="  w-full h-screen flex items-center flex-col justify-center gap-2 bg-gray-50">
 
-  <div class="h-96 w-96 border border-1px rounded flex justify-center items-center">
+  <div class="bg-base-100 shadow w-11/12 lg:w-3/12  rounded flex justify-center items-center " style=" height: 40rem;">
+
+    <div class="basis-full  flex justify-center px-5 ">
+      <form class="w-full" method="POST" action="?/login">
+       <div class="flex justify-center">
+        <img class="w-28 h-28 lg:w-32 lg:h-32" src={logo} alt="ccdco-logo">
+      </div>
+      <h1 class="text-3xl lg:text-4xl  mb-2 text-center font-semibold mt-2">Sign In</h1>
+      <p class="text-gray-400 text-center ">Sign in and manage cooperatives in the Caloocan City</p>
       
-      <form class="w-full px-3" method="POST" action="?/login">
-      <h1 class="text-3xl text-center mb-2">Sign In</h1>
-
-  
-      <div class="form-control w-full">
+      <div class="form-control w-full mt-4">
           <label class="label" for="email">
             <span class="label-text">Email</span>
           </label>
@@ -33,10 +40,11 @@
         </div>  
         {/if}
         <!-- <a href="/cooperative/password" class="text-sm mt-1 block text-secondary">Forgot password?</a> -->
-      <button type="submit"  class="btn btn-primary mt-5">
+      <button type="submit"  class="btn btn-primary mt-5 w-full text-white">
              Sign In
   </button>
   </form>
+</div>
   </div>
 
 </div>

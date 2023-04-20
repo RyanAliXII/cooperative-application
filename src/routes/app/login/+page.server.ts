@@ -1,9 +1,10 @@
 /** @type {import('./$types').Actions} */
-import { redirect } from "@sveltejs/kit";
+import { redirect, type Actions } from "@sveltejs/kit";
 import { Account, Session } from "$lib/models/model";
 import { compare } from "bcrypt";
+import { AppTypes } from "$lib/internal/session.js";
 
-export const actions = {
+export const actions: Actions = {
   login: async ({ request, cookies }) => {
     const form = await request.formData();
     const email = form.get("email") as string;
@@ -11,25 +12,29 @@ export const actions = {
     if (!email || !password) {
       return { message: "Invalid username or password." };
     }
-    const account = await Account.findOne({
-      where: {
-        email: email,
-      },
-    });
+    const account = (
+      await Account.findOne({
+        where: {
+          email: email,
+        },
+      })
+    )?.get({ plain: true });
 
     if (!account) {
-      throw redirect(303, "/app/login");
+      return { message: "Invalid username or password." };
     }
-    const isPasswordSame = await compare(password, account.dataValues.password);
+    const isPasswordSame = await compare(password, account.password);
     if (!isPasswordSame) {
       return { message: "Invalid username or password." };
     }
     const expiration = new Date();
     expiration.setDate(expiration.getDate() + 1); // add 1 day expiration
     const session = await Session.create({
-      data: account.dataValues,
+      appType: AppTypes.Main,
+      data: account,
       expiresAt: expiration.toISOString(),
     });
+    delete account.password;
     cookies.set("app_sid", session.dataValues.sid, {
       path: "/",
       httpOnly: true,

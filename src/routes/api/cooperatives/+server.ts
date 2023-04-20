@@ -16,6 +16,7 @@ export const POST: RequestHandler = async ({ request }) => {
       ...body.account,
       cooperativeId: coop.dataValues.id,
       password: hashedPassword,
+      isOwner: true,
     };
     await CooperativeAccount.create(account, { transaction });
     await transaction.commit();

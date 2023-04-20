@@ -31,6 +31,14 @@ module.exports = {
         allowNull: false,
         field: "surname",
       },
+      gender: {
+        type: Sequelize.DataTypes.STRING,
+        field: "gender",
+      },
+      educationalAttainment: {
+        type: Sequelize.DataTypes.STRING,
+        field: "educational_attainment",
+      },
       birthday: {
         type: Sequelize.DataTypes.DATEONLY,
         allowNull: false,
@@ -38,7 +46,6 @@ module.exports = {
       },
       civilStatus: {
         type: Sequelize.DataTypes.STRING,
-        allowNull: false,
         field: "civil_status",
       },
       spouseName: {
@@ -47,17 +54,7 @@ module.exports = {
       },
       presentAddress: {
         type: Sequelize.DataTypes.TEXT,
-        allowNull: false,
         field: "present_address",
-      },
-      email: {
-        type: Sequelize.DataTypes.STRING,
-        allowNull: false,
-      },
-      mobileNumber: {
-        type: Sequelize.DataTypes.STRING,
-        allowNull: false,
-        field: "mobile_number",
       },
       officePhoneNumber: {
         type: Sequelize.DataTypes.STRING,
@@ -65,10 +62,7 @@ module.exports = {
       },
       dependents: {
         type: Sequelize.DataTypes.JSONB,
-      },
-      cooperativeId: {
-        type: Sequelize.DataTypes.UUID,
-        field: "cooperative_id",
+        defaultValue: [],
       },
       createdAt: {
         type: Sequelize.DataTypes.DATE,
@@ -77,6 +71,18 @@ module.exports = {
       updatedAt: {
         type: Sequelize.DataTypes.DATE,
         field: "updated_at",
+      },
+      filledAt: {
+        type: Sequelize.DataTypes.DATE,
+        field: "filled_at",
+      },
+      approvedAt: {
+        type: Sequelize.DataTypes.DATE,
+        field: "approved_at",
+      },
+      declinedAt: {
+        type: Sequelize.DataTypes.DATE,
+        field: "declined_at",
       },
       cooperativeId: {
         type: Sequelize.DataTypes.UUID,

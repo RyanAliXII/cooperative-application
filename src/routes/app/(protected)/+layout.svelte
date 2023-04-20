@@ -43,13 +43,13 @@
                     </button>
                     {#if sidebarState["registration"] }
                     <div class="pl-10 mt-1 text-sm hover:bg-white">
-                        <a href="/app/cooperative/register" >
+                        <a href="/app/cooperatives/register" >
                             Add Cooperative
                           </a>
                     </div>
            
                     <div class="pl-10 text-sm hover:bg-white">
-                        <a href="/app/cooperative/" >
+                        <a href="/app/cooperatives/" >
                             Cooperative
                           </a>
                     </div>
