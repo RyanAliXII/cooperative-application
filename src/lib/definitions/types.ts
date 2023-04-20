@@ -116,6 +116,11 @@ export type CooperativeStats = {
   assets: number;
   savings: number;
   liquidity: number;
+  members: number;
+  sharesPrincipal: number;
+  savingPrincipal: number;
+  withdrawnShares: number;
+  withdrawnSavings: number;
   registrationFees: number;
 };
 
@@ -130,6 +135,13 @@ export type Saving = {
 };
 
 export type SavingLog = {
+  id?: string;
+  value: number;
+  description: string;
+  cooperativeId: string;
+  createdAt: string;
+};
+export type LiquidityLog = {
   id?: string;
   value: number;
   description: string;

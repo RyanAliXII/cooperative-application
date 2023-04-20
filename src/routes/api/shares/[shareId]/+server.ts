@@ -1,11 +1,17 @@
 import { json } from "@sveltejs/kit";
 import type { RequestHandler } from "@sveltejs/kit";
 import type {
+  CooperativeStats,
   MemberShare as MemberShareType,
   Share as ShareType,
 } from "$lib/definitions/types";
 import { sequelize } from "$lib/models/sequelize";
-import { Share, ShareLog } from "$lib/models/model";
+import {
+  CooperativeStat,
+  LiquidityLog,
+  Share,
+  ShareLog,
+} from "$lib/models/model";
 import { StatusCodes } from "http-status-codes";
 import { EditSharesSchemaValidation } from "$lib/definitions/schema";
 import {
@@ -54,26 +60,34 @@ export const PUT: RequestHandler = async ({ request, params, locals }) => {
       );
     }
 
-    await shareModel.update({
-      remarks: parsedBody.remarks,
-      amount: parsedBody.amount,
-      memberId: parsedBody.memberId,
-    });
-
-    const [result, _] = await sequelize.query(
-      `SELECT (SELECT COALESCE(SUM(share.amount), 0)  FROM share where type = 'Deposit' and cooperative_id = :coopId and deleted_at is null ) 
-      - (SELECT COALESCE(SUM(share.amount), 0)  FROM share where type = 'Withdraw' and cooperative_id = :coopId and deleted_at is null)  as total`,
+    await shareModel.update(
       {
-        replacements: {
-          coopId,
-        },
-        transaction,
-      }
+        remarks: parsedBody.remarks,
+        amount: parsedBody.amount,
+        memberId: parsedBody.memberId,
+      },
+      { transaction }
     );
-    const overallShare = result[0] as { total: number };
+
+    const statModel = await CooperativeStat.findOne({
+      where: { cooperativeId: coopId },
+      transaction,
+    });
+    if (!statModel) {
+      return json({ message: "Cooperative has no stats" });
+    }
+    const stat = statModel.get({ plain: true }) as CooperativeStats;
     await ShareLog.create(
       {
-        value: overallShare.total,
+        value: stat.shares,
+        description: ShareLogDescription.Edit,
+        cooperativeId: coopId,
+      },
+      { transaction }
+    );
+    await LiquidityLog.create(
+      {
+        value: stat.liquidity,
         description: ShareLogDescription.Edit,
         cooperativeId: coopId,
       },
@@ -117,20 +131,25 @@ export const DELETE: RequestHandler = async (event) => {
 
     await shareModel.destroy({ transaction });
 
-    const [result, _] = await sequelize.query(
-      `SELECT (SELECT COALESCE(SUM(share.amount), 0)  FROM share where type = 'Deposit' and cooperative_id = :coopId and deleted_at is null ) 
-      - (SELECT COALESCE(SUM(share.amount), 0)  FROM share where type = 'Withdraw' and cooperative_id = :coopId and deleted_at is null)  as total`,
-      {
-        replacements: {
-          coopId,
-        },
-        transaction,
-      }
-    );
-    const overallShare = result[0] as { total: number };
+    const statModel = await CooperativeStat.findOne({
+      where: { cooperativeId: coopId },
+      transaction,
+    });
+    if (!statModel) {
+      return json({ message: "Cooperative has no stats" });
+    }
+    const stat = statModel.get({ plain: true }) as CooperativeStats;
     await ShareLog.create(
       {
-        value: overallShare.total,
+        value: stat.shares,
+        description: ShareLogDescription.Delete,
+        cooperativeId: coopId,
+      },
+      { transaction }
+    );
+    await LiquidityLog.create(
+      {
+        value: stat.liquidity,
         description: ShareLogDescription.Delete,
         cooperativeId: coopId,
       },

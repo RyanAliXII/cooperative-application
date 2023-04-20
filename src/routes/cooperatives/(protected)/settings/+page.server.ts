@@ -1,5 +1,4 @@
 import { Cooperative, CooperativeAccount } from "$lib/models/model";
-
 export async function load({ cookies, locals }) {
   const { session } = locals.session;
   const cooperativeModel = await Cooperative.findOne({

@@ -1,10 +1,18 @@
 import { EditSavingSchemaValidation } from "$lib/definitions/schema";
-import type { Saving as SavingType } from "$lib/definitions/types";
+import type {
+  CooperativeStats,
+  Saving as SavingType,
+} from "$lib/definitions/types";
 import {
   SavingLogDescription,
   SavingsTransactionTypes,
 } from "$lib/internal/transaction";
-import { Saving, SavingLog } from "$lib/models/model";
+import {
+  CooperativeStat,
+  LiquidityLog,
+  Saving,
+  SavingLog,
+} from "$lib/models/model";
 import { SavingModel } from "$lib/models/saving";
 import { sequelize } from "$lib/models/sequelize";
 import { json, type RequestHandler } from "@sveltejs/kit";
@@ -44,21 +52,25 @@ export const PUT: RequestHandler = async ({ params, locals, request }) => {
       { transaction }
     );
 
-    const result = await sequelize.query(
-      "SELECT COALESCE(SUM(saving.amount), 0) as total FROM saving where saving.cooperative_id = :coopId and saving.type=:type and deleted_at is null",
-      {
-        transaction,
-        replacements: {
-          coopId,
-          type: SavingsTransactionTypes.Deposit,
-        },
-        type: QueryTypes.SELECT,
-      }
-    );
-    const overallSaving = result[0] as { total: number };
+    const statModel = await CooperativeStat.findOne({
+      where: { cooperativeId: coopId },
+      transaction,
+    });
+    if (!statModel) {
+      return json({ message: "Cooperative has no stats" });
+    }
+    const stat = statModel.get({ plain: true }) as CooperativeStats;
     await SavingLog.create(
       {
-        value: overallSaving.total,
+        value: stat.savings,
+        description: SavingLogDescription.Edit,
+        cooperativeId: coopId,
+      },
+      { transaction }
+    );
+    await LiquidityLog.create(
+      {
+        value: stat.liquidity,
         description: SavingLogDescription.Edit,
         cooperativeId: coopId,
       },
@@ -100,21 +112,25 @@ export const DELETE: RequestHandler = async ({ params, locals }) => {
 
     await savingModel.destroy({ transaction });
 
-    const result = await sequelize.query(
-      "SELECT COALESCE(SUM(saving.amount), 0) as total FROM saving where saving.cooperative_id = :coopId and saving.type=:type and deleted_at is null",
-      {
-        transaction,
-        replacements: {
-          coopId,
-          type: SavingsTransactionTypes.Deposit,
-        },
-        type: QueryTypes.SELECT,
-      }
-    );
-    const overallSaving = result[0] as { total: number };
+    const statModel = await CooperativeStat.findOne({
+      where: { cooperativeId: coopId },
+      transaction,
+    });
+    if (!statModel) {
+      return json({ message: "Cooperative has no stats" });
+    }
+    const stat = statModel.get({ plain: true }) as CooperativeStats;
     await SavingLog.create(
       {
-        value: overallSaving.total,
+        value: stat.savings,
+        description: SavingLogDescription.Delete,
+        cooperativeId: coopId,
+      },
+      { transaction }
+    );
+    await LiquidityLog.create(
+      {
+        value: stat.liquidity,
         description: SavingLogDescription.Delete,
         cooperativeId: coopId,
       },

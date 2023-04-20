@@ -12,6 +12,8 @@ import { ShareLogModel } from "./share_log";
 import { LoanLogModel } from "./loan_log";
 import { SavingModel } from "./saving";
 import { SavingLogModel } from "./saving_log";
+import { CooperativeStatModel } from "./cooperative_stats";
+import { LiquidityLogModel } from "./liquidity_log";
 
 export const Member = MemberModel;
 export const Cooperative = CooperativeModel;
@@ -27,6 +29,8 @@ export const ShareLog = ShareLogModel;
 export const LoanLog = LoanLogModel;
 export const Saving = SavingModel;
 export const SavingLog = SavingLogModel;
+export const CooperativeStat = CooperativeStatModel;
+export const LiquidityLog = LiquidityLogModel;
 CooperativeAccount.belongsTo(Cooperative, {
   foreignKey: "cooperative_id",
 });

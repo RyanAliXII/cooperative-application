@@ -1,5 +1,5 @@
 import { AppTypes, getSessionMetadata } from "$lib/internal/session";
-import { Session } from "$lib/models/model";
+import { Cooperative, CooperativeStat, Session } from "$lib/models/model";
 import type { Handle } from "@sveltejs/kit";
 import { StatusCodes } from "http-status-codes";
 export const handle: Handle = async ({ event, resolve }) => {

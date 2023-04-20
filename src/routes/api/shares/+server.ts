@@ -4,12 +4,19 @@ import { json } from "@sveltejs/kit";
 import type { RequestHandler } from "./$types";
 import { StatusCodes } from "http-status-codes";
 
-import { Member, Share, ShareLog } from "$lib/models/model";
+import {
+  CooperativeStat,
+  LiquidityLog,
+  Member,
+  Share,
+  ShareLog,
+} from "$lib/models/model";
 import { AddSharesSchemaValidation } from "$lib/definitions/schema";
 import {
   ShareLogDescription,
   SharesTransactionTypes,
 } from "$lib/internal/transaction";
+import type { CooperativeStats } from "$lib/definitions/types";
 
 export const POST: RequestHandler = async (event) => {
   const transaction = await sequelize.transaction();
@@ -46,20 +53,28 @@ export const POST: RequestHandler = async (event) => {
       { transaction }
     );
 
-    const [result, _] = await sequelize.query(
-      `SELECT (SELECT COALESCE(SUM(share.amount), 0)  FROM share where type = 'Deposit' and cooperative_id = :coopId and deleted_at is null ) 
-      - (SELECT COALESCE(SUM(share.amount), 0)  FROM share where type = 'Withdraw' and cooperative_id = :coopId and deleted_at is null)  as total`,
-      {
-        replacements: {
-          coopId,
-        },
-        transaction,
-      }
-    );
-    const overallShare = result[0] as { total: number };
+    const statModel = await CooperativeStat.findOne({
+      where: { cooperativeId: coopId },
+      transaction,
+    });
+    if (!statModel) {
+      return json({ message: "Cooperative has no stats" });
+    }
+    const stat = statModel.get({ plain: true }) as CooperativeStats;
     await ShareLog.create(
       {
-        value: overallShare.total,
+        value: stat.shares,
+        description:
+          parsedShare.type === SharesTransactionTypes.Deposit
+            ? ShareLogDescription.New
+            : ShareLogDescription.Withdraw,
+        cooperativeId: coopId,
+      },
+      { transaction }
+    );
+    await LiquidityLog.create(
+      {
+        value: stat.liquidity,
         description:
           parsedShare.type === SharesTransactionTypes.Deposit
             ? ShareLogDescription.New

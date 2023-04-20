@@ -3,12 +3,19 @@ import { StatusCodes } from "http-status-codes";
 import { json } from "@sveltejs/kit";
 import { sequelize } from "$lib/models/sequelize";
 import { AddSavingSchemaValidation } from "$lib/definitions/schema";
-import { Member, Saving, SavingLog } from "$lib/models/model";
+import {
+  CooperativeStat,
+  LiquidityLog,
+  Member,
+  Saving,
+  SavingLog,
+} from "$lib/models/model";
 import {
   SavingLogDescription,
   SavingsTransactionTypes,
 } from "$lib/internal/transaction";
 import { QueryTypes } from "sequelize";
+import type { CooperativeStats } from "$lib/definitions/types";
 
 export const POST: RequestHandler = async ({ request, locals }) => {
   const transaction = await sequelize.transaction();
@@ -17,28 +24,39 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     const coopId = session.data?.cooperative?.id;
     const body = await request.json();
     const parsedBody = await AddSavingSchemaValidation.validate(body);
-    await Saving.create({
-      type: parsedBody.type,
-      remarks: parsedBody.remarks,
-      memberId: parsedBody.memberId,
-      amount: parsedBody.amount,
-      cooperativeId: coopId,
-    });
-    const result = await sequelize.query(
-      "SELECT COALESCE(SUM(saving.amount), 0) as total FROM saving where saving.cooperative_id = :coopId and saving.type=:type and deleted_at is null",
+    await Saving.create(
       {
-        transaction,
-        replacements: {
-          coopId,
-          type: SavingsTransactionTypes.Deposit,
-        },
-        type: QueryTypes.SELECT,
-      }
+        type: parsedBody.type,
+        remarks: parsedBody.remarks,
+        memberId: parsedBody.memberId,
+        amount: parsedBody.amount,
+        cooperativeId: coopId,
+      },
+      { transaction }
     );
-    const overallSaving = result[0] as { total: number };
+
+    const statModel = await CooperativeStat.findOne({
+      where: { cooperativeId: coopId },
+      transaction,
+    });
+    if (!statModel) {
+      return json({ message: "Cooperative has no stats" });
+    }
+    const stat = statModel.get({ plain: true }) as CooperativeStats;
     await SavingLog.create(
       {
-        value: overallSaving.total,
+        value: stat.savings,
+        description:
+          parsedBody.type === SavingsTransactionTypes.Deposit
+            ? SavingLogDescription.New
+            : SavingLogDescription.Withdraw,
+        cooperativeId: coopId,
+      },
+      { transaction }
+    );
+    await LiquidityLog.create(
+      {
+        value: stat.liquidity,
         description:
           parsedBody.type === SavingsTransactionTypes.Deposit
             ? SavingLogDescription.New
