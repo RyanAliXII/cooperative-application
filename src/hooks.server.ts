@@ -1,12 +1,11 @@
 import { AppTypes, getSessionMetadata } from "$lib/internal/session";
-import { Cooperative, CooperativeStat, Session } from "$lib/models/model";
+import { MemberStat, Session } from "$lib/models/model";
 import type { Handle } from "@sveltejs/kit";
 import { StatusCodes } from "http-status-codes";
 export const handle: Handle = async ({ event, resolve }) => {
   /*
     app_sid set on cookies is session cookies.
   */
-
   if (
     event.url.pathname.startsWith("/cooperatives") &&
     event.url.pathname != "/cooperatives/login" &&

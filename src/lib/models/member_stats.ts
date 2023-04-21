@@ -1,39 +1,34 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "./sequelize";
 
-export const CooperativeStatModel = sequelize.define(
-  "stats_view",
+export const MemberStatModel = sequelize.define(
+  "member_stats_view",
   {
+    memberId: {
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+      field: "member_id",
+      primaryKey: true,
+    },
+    givenName: {
+      type: DataTypes.STRING,
+
+      field: "given_name",
+    },
+    surname: {
+      type: DataTypes.STRING,
+
+      field: "surname",
+    },
     cooperativeId: {
       field: "cooperative_id",
       type: DataTypes.UUID,
-      primaryKey: true,
-    },
-    cooperativeName: {
-      field: "cooperative_name",
-      type: DataTypes.STRING,
-    },
-    loanInterest: {
-      type: DataTypes.DECIMAL(10, 2),
-      field: "loan_interest",
-      get() {
-        const value = this.getDataValue("loanInterest");
-        return Number(value);
-      },
     },
     shares: {
       type: DataTypes.DECIMAL(10, 2),
       field: "shares",
       get() {
         const value = this.getDataValue("shares");
-        return Number(value);
-      },
-    },
-    withdrawnShares: {
-      type: DataTypes.DECIMAL(10, 2),
-      field: "withdrawn_shares",
-      get() {
-        const value = this.getDataValue("withdrawnShares");
         return Number(value);
       },
     },
@@ -45,19 +40,20 @@ export const CooperativeStatModel = sequelize.define(
         return Number(value);
       },
     },
+    sharesWithdrawal: {
+      type: DataTypes.DECIMAL(10, 2),
+      field: "shares_withdrawal",
+      get() {
+        const value = this.getDataValue("sharesWithdrawal");
+        return Number(value);
+      },
+    },
+
     savings: {
       type: DataTypes.DECIMAL(10, 2),
       field: "savings",
       get() {
         const value = this.getDataValue("savings");
-        return Number(value);
-      },
-    },
-    withdrawnSavings: {
-      type: DataTypes.DECIMAL(10, 2),
-      field: "withdrawn_savings",
-      get() {
-        const value = this.getDataValue("withdrawnSavings");
         return Number(value);
       },
     },
@@ -69,44 +65,43 @@ export const CooperativeStatModel = sequelize.define(
         return Number(value);
       },
     },
-    loan: {
+    savingsWithdrawal: {
       type: DataTypes.DECIMAL(10, 2),
-      field: "loan",
+      field: "savings_withdrawal",
       get() {
-        const value = this.getDataValue("loan");
+        const value = this.getDataValue("savingsWithdrawal");
         return Number(value);
       },
     },
-    assets: {
+    disbursedLoan: {
       type: DataTypes.DECIMAL(10, 2),
-      field: "assets",
+      field: "disbursed_loan",
       get() {
-        const value = this.getDataValue("assets");
+        const value = this.getDataValue("disbursedLoan");
         return Number(value);
       },
     },
-    registrationFees: {
+    finishedLoan: {
       type: DataTypes.DECIMAL(10, 2),
-      field: "registration_fees",
+      field: "finished_loan",
       get() {
-        const value = this.getDataValue("registrationFees");
+        const value = this.getDataValue("finishedLoan");
         return Number(value);
       },
     },
-    members: {
+    requestedLoan: {
       type: DataTypes.DECIMAL(10, 2),
-      field: "members",
+      field: "requested_loan",
       get() {
-        const value = this.getDataValue("members");
+        const value = this.getDataValue("requestedLoan");
         return Number(value);
       },
     },
-
-    liquidity: {
+    approvedLoan: {
       type: DataTypes.DECIMAL(10, 2),
-      field: "liquidity",
+      field: "approved_loan",
       get() {
-        const value = this.getDataValue("liquidity");
+        const value = this.getDataValue("approvedLoan");
         return Number(value);
       },
     },

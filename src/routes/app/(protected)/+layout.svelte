@@ -60,25 +60,32 @@
                     
                  
                 </li>
-
                 <li>
-                    <button type="button" on:click={()=>{toggle("loan")}}>
-                            <i class="fa-solid fa-briefcase"></i>
-                        Loans
-                    </button>
-                    {#if sidebarState["loan"] }
-                    <div class="pl-10 mt-1 text-sm hover:bg-white">
-                        <a href="/coop/new" >
-                           Apply loan
-                          </a>
-                    </div>
+          
+                  <button type="button" on:click={()=>{toggle("registration")}}>
+                          <i class="fa-solid fa-briefcase"></i>
+                          Rewards and Recognition
+                  </button>
+                  {#if sidebarState["registration"] }
+                  <div class="pl-10 mt-1 text-sm hover:bg-white">
+                      <a href="/app/cooperatives/register" >
+                          Add Cooperative
+                        </a>
+                  </div>
+         
+                  <div class="pl-10 text-sm hover:bg-white">
+                      <a href="/app/cooperatives/" >
+                          Cooperative
+                        </a>
+                  </div>
              
-             
-                    {/if}
+           
+                  {/if}
 
-                    
-                 
-                </li>
+                  
+               
+              </li>
+
               </ul>
         </div>
         <div class="w-full bg-gray-100 p-5">
