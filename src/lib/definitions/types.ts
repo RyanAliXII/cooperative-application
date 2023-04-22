@@ -118,7 +118,7 @@ export type CooperativeStats = {
   liquidity: number;
   members: number;
   sharesPrincipal: number;
-  savingPrincipal: number;
+  savingsPrincipal: number;
   withdrawnShares: number;
   withdrawnSavings: number;
   registrationFees: number;
@@ -164,4 +164,11 @@ export type MemberStats = {
   finishedLoan: number;
   approvedLoan: number;
   disbursedLoan: number;
+};
+export type Reward = {
+  id?: string;
+  name: string;
+  description: string;
+  certificateType: string;
+  certificateDescription: string;
 };

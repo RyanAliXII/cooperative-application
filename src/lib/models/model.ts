@@ -15,6 +15,7 @@ import { SavingLogModel } from "./saving_log";
 import { CooperativeStatModel } from "./cooperative_stats";
 import { LiquidityLogModel } from "./liquidity_log";
 import { MemberStatModel } from "./member_stats";
+import { RewardModel } from "./reward";
 
 export const Member = MemberModel;
 export const Cooperative = CooperativeModel;
@@ -33,7 +34,7 @@ export const SavingLog = SavingLogModel;
 export const CooperativeStat = CooperativeStatModel;
 export const LiquidityLog = LiquidityLogModel;
 export const MemberStat = MemberStatModel;
-
+export const Reward = RewardModel;
 CooperativeAccount.belongsTo(Cooperative, {
   foreignKey: "cooperative_id",
 });

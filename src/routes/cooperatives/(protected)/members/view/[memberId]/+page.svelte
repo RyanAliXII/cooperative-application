@@ -15,7 +15,6 @@
   
     let isViewMode = true
     export let data;
-   console.log(data)
     const {form, data: body, errors} = createForm<Member>({
       initialValues: data?.member,
       extend: [validator({schema: EditMemberValidationSchema, castValues:  true })],
@@ -176,7 +175,7 @@
             </div>
 
             <div class="mt-5 w-full flex justify-end">
-          <button class="btn btn-primary mr-2" type="submit" disabled={isViewMode}>
+          <button class="btn btn-primary mr-2 text-base-100" type="submit" disabled={isViewMode}>
             <i class="fa-regular fa-floppy-disk mr-2 text-lg"></i>
             Save</button>
             </div>
@@ -271,12 +270,12 @@
           <tbody>
           {#each data.savingsTransactions as savingsTransaction }
             <tr>
-                <td>{new Date(savingsTransaction.createdAt).toLocaleString()}</td>
-                <td>{savingsTransaction.type === SharesTransactionTypes.Deposit ? "Deposit" : "Withdrawal"}</td>
-                <td class:text-success={savingsTransaction.type === SavingsTransactionTypes.Deposit}  class:text-error={savingsTransaction.type === SavingsTransactionTypes.Withdraw}>
-                  {savingsTransaction.type === SharesTransactionTypes.Deposit ? `+ ${savingsTransaction.amount}` : `- ${savingsTransaction.amount}` }</td>
-                  <td>{savingsTransaction.remarks.length === 0 ? "No Remarks" : savingsTransaction.remarks}</td>
-                <td></td>
+              <td>{new Date(savingsTransaction.createdAt).toLocaleString()}</td>
+              <td>{savingsTransaction.type === SavingsTransactionTypes.Deposit ? "Deposit" : "Withdrawal"}</td>
+              <td class:text-success={savingsTransaction.type === SavingsTransactionTypes.Deposit}  class:text-error={savingsTransaction.type === SavingsTransactionTypes.Withdraw}>
+                {savingsTransaction.type === SavingsTransactionTypes.Deposit ? `+ ${savingsTransaction.amount}` : `- ${savingsTransaction.amount}` }</td>
+                <td>{savingsTransaction.remarks.length === 0 ? "No Remarks" : savingsTransaction.remarks}</td>
+              <td></td>
             </tr>
           {/each
 

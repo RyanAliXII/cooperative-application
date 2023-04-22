@@ -1,5 +1,5 @@
-import { StatusCodes } from "http-status-codes";
-import { error, redirect } from "@sveltejs/kit";
+
+import { error } from "@sveltejs/kit";
 import {
   Loan,
   LoanRepayment,
@@ -16,8 +16,8 @@ import type {
   Share as ShareType,
   Saving as SavingType,
 } from "$lib/definitions/types.js";
-
-export async function load({ cookies, params, locals }) {
+import type { PageServerLoad } from "./$types";
+export const load:PageServerLoad  = async({ cookies, params, locals }) {
   const id = params?.memberId;
   const { session } = locals.session;
   const coopId = session.data?.cooperative?.id;

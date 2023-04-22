@@ -1,9 +1,10 @@
 <script lang="ts">
-  import { MONETARY } from "$lib/internal/config.js";
+     import { MONETARY } from "$lib/internal/config.js";
 
       export let data;
-      import {onMount} from "svelte"
-        
+      import {onDestroy, onMount} from "svelte"
+      let comparisonChart:any
+      let overviewChart:any 
         onMount(async()=>{
             let ApexCharts = (await import("apexcharts")).default
                 const comparisonChartOptions = {
@@ -13,6 +14,7 @@
                         type: 'line',
                   
                     },
+                    colors:["#1483d5", "#f59e0b", "#6366f1"],
                     legend: {
                         show: true
                     },
@@ -39,7 +41,7 @@
               
              }
   
-             const comparisonChart = new ApexCharts(document.querySelector("#comparisonChart"), comparisonChartOptions);
+             comparisonChart = new ApexCharts(document.querySelector("#comparisonChart"), comparisonChartOptions);
              comparisonChart.render()
              
              const assets = data.stat.assets
@@ -88,15 +90,18 @@
                    
                 
                     };
-                    const overviewChart = new ApexCharts(document.querySelector("#overviewChart"), overviewChartOptions);
+                     overviewChart = new ApexCharts(document.querySelector("#overviewChart"), overviewChartOptions);
                     overviewChart.render();
                 
             })
-           
+           onDestroy(()=>{
+             comparisonChart?.destroy()
+              overviewChart?.destroy() 
+           })
 </script>
 
 <div class="container  w-full  rounded mt-5  ">
-    <div class="container w-full md:h-52 rounded mb-8 flex flex-col gap-5 md:flex-row">
+    <div class="container w-full  rounded mb-8 flex flex-col gap-5 lg:flex-row">
   
         <div class="basis-4/12 h-full bg-base-100 flex items-center justify-center flex-col text-success gap-3 p-3 rounded">
             <i class="fa-solid fa-users text-2xl"></i>
@@ -108,10 +113,15 @@
           <h2 class="text-3xl font-bold">PHP {data.stat.savings.toLocaleString(undefined, MONETARY)}</h2>
           <p>Savings</p>
         </div>
-        <div class="basis-4/12 h-full bg-base-100  flex items-center justify-center flex-col text-neutral gap-3 p-3 rounded">
+        <div class="basis-4/12 h-full bg-base-100  flex items-center justify-center flex-col text-amber-500 gap-3 p-3 rounded">
+            <i class="fa-solid fa-piggy-bank text-2xl"></i>
+          <h2 class="text-3xl font-bold">PHP {data.stat.savings.toLocaleString(undefined, MONETARY)}</h2>
+          <p>Shares</p>
+        </div>
+        <div class="basis-4/12 h-full bg-base-100  flex items-center justify-center flex-col text-indigo-500 gap-3 p-3 rounded">
             <i class="fa-solid fa-money-bill-transfer"></i>
-            <h2 class="text-3xl font-bold">PHP {data.stat.shares.toLocaleString(undefined, MONETARY)}</h2>
-            <p>Shares</p>
+            <h2 class="text-3xl font-bold">PHP {data.stat.liquidity.toLocaleString(undefined, MONETARY)}</h2>
+            <p>Liquidity</p>
         </div>
     </div>
 

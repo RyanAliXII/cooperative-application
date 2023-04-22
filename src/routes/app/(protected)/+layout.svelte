@@ -3,7 +3,8 @@
    import 'sweetalert2/src/sweetalert2.scss' 
     let sidebarState:Record<string, boolean> = {
         registration: false,
-        loan: false
+        loan: false,
+        rewards: false
     }
     function toggle (sidebarKey: string){
         sidebarState[sidebarKey] = !sidebarState[sidebarKey]
@@ -26,7 +27,7 @@
         </div>
       </header>
 
-      <div class="h-screen w-full flex">
+      <div class="w-full flex" style="min-height: 100vh;">
         <div class="h-full  bg-white hidden lg:block">
             <ul class="menu bg-base-100 w-64 p-2 rounded-box">
                 <li>
@@ -62,22 +63,28 @@
                 </li>
                 <li>
           
-                  <button type="button" on:click={()=>{toggle("registration")}}>
+                  <button type="button" on:click={()=>{toggle("rewards")}}>
                           <i class="fa-solid fa-briefcase"></i>
                           Rewards and Recognition
                   </button>
-                  {#if sidebarState["registration"] }
+                  {#if sidebarState["rewards"] }
                   <div class="pl-10 mt-1 text-sm hover:bg-white">
-                      <a href="/app/cooperatives/register" >
-                          Add Cooperative
+                      <a href="/app/rewards" >
+                          Rewards
                         </a>
                   </div>
-         
                   <div class="pl-10 text-sm hover:bg-white">
-                      <a href="/app/cooperatives/" >
-                          Cooperative
-                        </a>
-                  </div>
+                    <a href="/app/rewards/assign" >
+                        Assign Rewards
+                      </a>
+                </div>
+                  <div class="pl-10 mt-1 text-sm hover:bg-white">
+                    <a href="/app/recognitions" >
+                        Recognitions
+                      </a>
+                </div>
+         
+                  
              
            
                   {/if}

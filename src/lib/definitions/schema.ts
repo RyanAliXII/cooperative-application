@@ -354,3 +354,21 @@ export const EditSavingWithdrawalSchemaValidation = object({
     ),
   remarks: string().notRequired(),
 });
+
+export const CreateRewardValidation = object({
+  name: string().required("Name is required."),
+  description: string().required("Description is required."),
+  certificateType: string().required("Certificate name is required."),
+  certificateDescription: string().required(
+    "Certificate description is required."
+  ),
+});
+export const EditRewardValidation = object({
+  id: string().uuid().required("Id is required."),
+  name: string().required("Name is required."),
+  description: string().required("Description is required."),
+  certificateType: string().required("Certificate name is required."),
+  certificateDescription: string().required(
+    "Certificate description is required."
+  ),
+});
