@@ -148,3 +148,20 @@ export type LiquidityLog = {
   cooperativeId: string;
   createdAt: string;
 };
+
+export type MemberStats = {
+  cooperativeId: string;
+  memberId: number;
+  givenName: string;
+  surname: string;
+  shares: number;
+  sharesPrincipal: number;
+  sharesWithdrawal: number;
+  savings: number;
+  savingPrincipal: number;
+  savingsWithdrawal: number;
+  requestedLoan: number;
+  finishedLoan: number;
+  approvedLoan: number;
+  disbursedLoan: number;
+};

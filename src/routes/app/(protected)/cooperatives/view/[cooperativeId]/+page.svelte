@@ -3,7 +3,6 @@
 
     import TextField from "$lib/components/form/TextField.svelte";
     import TextAreaField from "$lib/components/form/TextAreaField.svelte";
-    import SelectField from "$lib/components/form/SelectField.svelte";
     import toast, { Toaster } from 'svelte-french-toast';
     import  axios from "axios"
     import { EditCooperativeSchema } from "$lib/definitions/schema";
@@ -61,11 +60,19 @@
 
       }
     }
+    type Tab = "details" | "account" | "transactions"
+    let activeTab:Tab = "details"
     </script>
     
     <div>
       
         <h1 class="text-lg font-semibold mb-3 text-gray-500">Cooperative</h1>
+        <div class="tabs w-full">
+          <button  class="tab tab-lifted" class:tab-active={activeTab === "details"} on:click={()=>{activeTab = "details"}}>Cooperative Details</button> 
+          <button  class="tab tab-lifted" class:tab-active={activeTab === "account"}  on:click={()=>{activeTab = "account"}}>Account</button> 
+          <button  class="tab tab-lifted" class:tab-active={activeTab === "transactions"}  on:click={()=>{activeTab = "transactions"}}>Transactions</button> 
+        </div>
+        {#if activeTab === "details"}
         <div class="container bg-base-100 w-full  p-3 rounded">
 
           {#if isViewMode }
@@ -111,7 +118,7 @@
     
                   </TextField>
                   <div class="mt-9 ml-3">
-                  <button type="button" class="btn btn-secondary" on:click={recreatePassword} disabled={ isViewMode ? true : false}><i class="fa-solid fa-rotate mr-2"></i>Re-create Password</button>
+                  <button type="button" class="btn btn-secondary" on:click={recreatePassword} disabled={ isViewMode ? true : false}><i class="fa-solid fa-rotate mr-2"></i>Reset Password</button>
                 </div>
                 
             </div>
@@ -122,5 +129,23 @@
                 </div>
             </form>
         </div>
+        {/if}
+
+        {#if activeTab === "account"}
+        <div class="container bg-base-100 w-full  p-3 rounded">
+
+
+        </div>
+        {/if}
+     
+        {#if activeTab === "transactions"}
+        <div class="container bg-base-100 w-full  p-3 rounded">
+
+
+          
+        </div>
+        {/if}
+     
+      
        </div>
        <Toaster/>

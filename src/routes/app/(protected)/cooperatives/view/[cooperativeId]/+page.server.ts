@@ -2,9 +2,10 @@ import { Cooperative, CooperativeAccount } from "$lib/models/model";
 import { error } from "@sveltejs/kit";
 import { StatusCodes } from "http-status-codes";
 import { validate } from "uuid";
-/** @type {import('./$types').PageServerLoad} */
-export async function load({ params }) {
-  const coopId = params.slug;
+import type { PageServerLoad } from "./$types";
+
+export const load: PageServerLoad = async ({ params }) => {
+  const coopId = params.cooperativeId;
   const isIdValid = validate(coopId);
   if (!isIdValid) {
     throw error(StatusCodes.NOT_FOUND, { message: "Not Found" });
@@ -33,6 +34,7 @@ export async function load({ params }) {
       throw error(StatusCodes.NOT_FOUND, { message: "Not Found" });
     }
     delete coop?.dataValues?.accounts;
+
     return {
       cooperative: {
         ...coop?.dataValues,
@@ -45,4 +47,4 @@ export async function load({ params }) {
     console.log(err);
     return { status: StatusCodes.INTERNAL_SERVER_ERROR };
   }
-}
+};
