@@ -111,5 +111,8 @@ export const CooperativeStatModel = sequelize.define(
       },
     },
   },
-  { timestamps: false }
+  {
+    underscored: true,
+    timestamps: false,
+  }
 );

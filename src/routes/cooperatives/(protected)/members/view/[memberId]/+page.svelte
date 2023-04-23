@@ -9,10 +9,12 @@
     import axios from "axios";
     import toast,{ Toaster} from "svelte-french-toast";
     import type { Member } from "$lib/definitions/types";
+  import { MONETARY } from "$lib/internal/config.js";
+  import { SavingsTransactionTypes, SharesTransactionTypes } from "$lib/internal/transaction.js";
+
   
     let isViewMode = true
     export let data;
-
     const {form, data: body, errors} = createForm<Member>({
       initialValues: data?.member,
       extend: [validator({schema: EditMemberValidationSchema, castValues:  true })],
@@ -49,13 +51,26 @@
     const toggleMode = ()=>{
       isViewMode = !isViewMode
     }
-   
+    type Tab = "details" | "account" | "transactions"
+    let activeTab:Tab = "details"
   </script>
   <div>
     
-      <h1 class="text-lg font-semibold mb-3 text-gray-500">Member</h1>
+      <h1 class="text-lg font-semibold mb-3 text-gray-500">Member Profile</h1>
+      <div class="tabs w-full">
+        <button  class="tab tab-lifted" class:tab-active={activeTab === "details"} on:click={()=>{activeTab = "details"}}>Member Details</button> 
+        <button  class="tab tab-lifted" class:tab-active={activeTab === "account"}  on:click={()=>{activeTab = "account"}}>Account</button> 
+        <button  class="tab tab-lifted" class:tab-active={activeTab === "transactions"}  on:click={()=>{activeTab = "transactions"}}>Transactions</button> 
+      </div>
+      {#if activeTab === "details"}
       <div class="container bg-base-100 w-full  p-3 rounded">
-
+        <div class="mb-10 mt-10 flex items-center gap-5 ml-3">
+          <img src="https://api.dicebear.com/6.x/initials/svg?seed={data?.member.givenName} {data?.member?.surname}&backgroundColor=EB7C2A" alt="avatar" class="w-12 rounded-full">
+          <div>
+            <h1 class="text-lg font-bold">{data?.member?.givenName} {data?.member.surname}</h1>
+            <small class="text-gray-500">Member ID: {data?.member?.id}</small>
+          </div>
+        </div>
         {#if isViewMode }
         <button class="btn btn-secondary btn-outline my-3 mx-1" on:click={toggleMode}><i class="fa-regular fa-pen-to-square mr-2" ></i> Switch to Edit Mode</button>
         {:else}
@@ -160,11 +175,152 @@
             </div>
 
             <div class="mt-5 w-full flex justify-end">
-          <button class="btn btn-primary mr-2" type="submit" disabled={isViewMode}>
+          <button class="btn btn-primary mr-2 text-base-100" type="submit" disabled={isViewMode}>
             <i class="fa-regular fa-floppy-disk mr-2 text-lg"></i>
             Save</button>
             </div>
         </form>
         </div>
-        <Toaster/>
+      {/if}
+
+      {#if activeTab === "account"}
+      
+      <div class="container bg-base-100 w-full  p-5 rounded ">
+        <div class="grid grid-cols-2 border-b py-3 mt-5">
+          <span>Savings</span>
+          <span class="font-bold">PHP {data?.stat?.savings.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) ?? 0}</span>
+       </div>
+       <div class="grid grid-cols-2 border-b py-3">
+        <span>Shares</span>
+        <span class="font-bold">PHP {data?.stat?.shares.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) ?? 0}</span>
+       </div>
+
+       <div class="bg-base-200 w-full h-10 rounded flex items-center px-2 text-gray-600 font-semibold gap-2 mt-5">
+        <i class="fa-regular fa-address-card"></i>  LOAN
+      </div>
+
+      <div class="grid grid-cols-2 border-b py-3">
+        <span>Requested Loan</span>
+        <span class="font-bold">PHP {data?.stat?.requestedLoan.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) ?? 0}</span>
+     </div>
+     <div class="grid grid-cols-2 border-b py-3">
+      <span>Approved Loan</span>
+      <span class="font-bold">PHP {data?.stat?.approvedLoan.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) ?? 0}</span>
+     </div>
+     <div class="grid grid-cols-2 border-b py-3">
+      <span>Disbursed Loan</span>
+      <span class="font-bold">PHP {data?.stat?.disbursedLoan.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) ?? 0}</span>
+     </div>
+     <div class="grid grid-cols-2 border-b py-3">
+      <span>Finished Loan</span>
+      <span class="font-bold">PHP {data?.stat?.finishedLoan.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) ?? 0}</span>
+     </div>
+      </div>
+      {/if}
+      {#if activeTab === "transactions"}
+      <div class="container bg-base-100 w-full  p-5 rounded ">
+        <div class="w-full h-10 rounded flex items-center px-2 text-gray-600 font-semibold gap-2">
+          <i class="fa-regular fa-address-card"></i> SHARES TRANSACTIONS
+      </div>
+
+        <div class="overflow-x-auto w-full mt-5">
+          <table class="table w-full">
+            <!-- head -->
+            <thead>
+              <tr>
+                <th>Created On</th>
+                <th>Transaction Type</th>
+                <th>Amount</th>
+                <th>Remarks</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+            {#each data.sharesTransactions as shareTransaction }
+              <tr>
+                  <td>{new Date(shareTransaction.createdAt).toLocaleString()}</td>
+                  <td>{shareTransaction.type === SharesTransactionTypes.Deposit ? "Deposit" : "Withdrawal"}</td>
+                  <td class:text-success={shareTransaction.type === SharesTransactionTypes.Deposit}  class:text-error={shareTransaction.type === SharesTransactionTypes.Withdraw}>
+                    {shareTransaction.type === SharesTransactionTypes.Deposit ? `+ ${shareTransaction.amount}` : `- ${shareTransaction.amount}` }</td>
+                    <td>{shareTransaction.remarks.length === 0 ? "No Remarks" : shareTransaction.remarks}</td>
+                  <td></td>
+              </tr>
+            {/each
+
+            }
+            </tbody>
+          </table>
+      </div>
+      <div class="w-full h-10 rounded flex items-center px-2 text-gray-600 font-semibold gap-2">
+        <i class="fa-regular fa-address-card"></i> SAVINGS TRANSACTIONS
+    </div>
+
+      <div class="overflow-x-auto w-full mt-5">
+        <table class="table w-full">
+          <!-- head -->
+          <thead>
+            <tr>
+              <th>Created On</th>
+              <th>Transaction Type</th>
+              <th>Amount</th>
+              <th>Remarks</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+          {#each data.savingsTransactions as savingsTransaction }
+            <tr>
+              <td>{new Date(savingsTransaction.createdAt).toLocaleString()}</td>
+              <td>{savingsTransaction.type === SavingsTransactionTypes.Deposit ? "Deposit" : "Withdrawal"}</td>
+              <td class:text-success={savingsTransaction.type === SavingsTransactionTypes.Deposit}  class:text-error={savingsTransaction.type === SavingsTransactionTypes.Withdraw}>
+                {savingsTransaction.type === SavingsTransactionTypes.Deposit ? `+ ${savingsTransaction.amount}` : `- ${savingsTransaction.amount}` }</td>
+                <td>{savingsTransaction.remarks.length === 0 ? "No Remarks" : savingsTransaction.remarks}</td>
+              <td></td>
+            </tr>
+          {/each
+
+          }
+          </tbody>
+        </table>
+    </div>
+       <div class="w-full h-10 rounded flex items-center px-2 text-gray-600 font-semibold gap-2">
+          <i class="fa-regular fa-address-card"></i> LOAN REPAYMENTS
+      </div>
+
+        <div class="overflow-x-auto w-full mt-5">
+          <table class="table w-full">
+            <!-- head -->
+            <thead>
+              <tr>
+                <th>Created On</th>
+                <th>Loan Interest</th>
+                <th>Amount Paid</th>
+                <th>Remaining Balance</th>
+                <th>Balance Before Repayment</th>
+                <th>Remarks</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+            {#each data.repayments as repayment }
+              <tr>
+                  <td>{new Date(repayment.createdAt).toLocaleString()}</td>
+                  <td>{ (((repayment?.loan?.interest ?? 0) / (repayment?.loan?.principal ?? 0)) * 100)}%</td>
+                  <td>{repayment.amountPaid.toLocaleString(undefined, MONETARY)}</td>
+                  <td>{repayment.loan?.remainingBalance.toLocaleString(undefined, MONETARY)}</td>
+                  <td>{repayment.balanceBeforeRepayment.toLocaleString(undefined, MONETARY)}</td>
+                  <td>{repayment.remarks.length === 0 ? "No Remarks" : repayment.remarks}</td>
+                  <td></td> 
+              </tr>
+            {/each
+
+            }
+            </tbody>
+          </table>
+      </div>
+
+      </div>
+      {/if}
   </div>
+
+  <Toaster/>

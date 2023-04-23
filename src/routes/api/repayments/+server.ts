@@ -103,10 +103,12 @@ export const GET: RequestHandler = async ({ request, locals }) => {
             model: Member,
           },
         ],
+
         where: {
           cooperativeId: coopId,
         },
       },
+      order: [["created_at", "desc"]],
     });
 
     if (!loanRepaymentModel) {

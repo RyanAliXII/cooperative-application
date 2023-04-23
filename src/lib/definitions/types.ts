@@ -8,6 +8,7 @@ export type Cooperative = {
   address: string;
   province: string;
   city: string;
+  stats?: CooperativeStats;
   account: CooperativeAccount;
 };
 
@@ -118,7 +119,7 @@ export type CooperativeStats = {
   liquidity: number;
   members: number;
   sharesPrincipal: number;
-  savingPrincipal: number;
+  savingsPrincipal: number;
   withdrawnShares: number;
   withdrawnSavings: number;
   registrationFees: number;
@@ -147,4 +148,37 @@ export type LiquidityLog = {
   description: string;
   cooperativeId: string;
   createdAt: string;
+};
+
+export type MemberStats = {
+  cooperativeId: string;
+  memberId: number;
+  givenName: string;
+  surname: string;
+  shares: number;
+  sharesPrincipal: number;
+  sharesWithdrawal: number;
+  savings: number;
+  savingPrincipal: number;
+  savingsWithdrawal: number;
+  requestedLoan: number;
+  finishedLoan: number;
+  approvedLoan: number;
+  disbursedLoan: number;
+};
+export type Reward = {
+  id?: string;
+  name: string;
+  description: string;
+  certificateType: string;
+  certificateDescription: string;
+};
+
+export type Recognition = {
+  id?: string;
+  rewardId: string;
+  date: string;
+  cooperativeId: string;
+  cooperative?: Cooperative;
+  reward?: Reward;
 };

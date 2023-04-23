@@ -14,6 +14,10 @@ import { SavingModel } from "./saving";
 import { SavingLogModel } from "./saving_log";
 import { CooperativeStatModel } from "./cooperative_stats";
 import { LiquidityLogModel } from "./liquidity_log";
+import { MemberStatModel } from "./member_stats";
+import { RewardModel } from "./reward";
+import { SelectedCooperativeModel } from "./selected_cooperative";
+import { RecognitionModel } from "./recognition";
 
 export const Member = MemberModel;
 export const Cooperative = CooperativeModel;
@@ -31,6 +35,10 @@ export const Saving = SavingModel;
 export const SavingLog = SavingLogModel;
 export const CooperativeStat = CooperativeStatModel;
 export const LiquidityLog = LiquidityLogModel;
+export const MemberStat = MemberStatModel;
+export const Reward = RewardModel;
+export const SelectedCooperative = SelectedCooperativeModel;
+export const Recognition = RecognitionModel;
 CooperativeAccount.belongsTo(Cooperative, {
   foreignKey: "cooperative_id",
 });
@@ -54,3 +62,19 @@ Loan.hasMany(LoanRepayment, { foreignKey: "loan_id", as: "repayments" });
 
 Saving.belongsTo(Member, { foreignKey: "member_id" });
 Member.hasMany(Saving, { foreignKey: "member_id", as: "savings" });
+
+CooperativeStat.belongsTo(Cooperative, { foreignKey: "cooperative_id" });
+SelectedCooperative.belongsTo(Cooperative, { foreignKey: "cooperative_id" });
+Cooperative.hasOne(CooperativeStat, {
+  foreignKey: "cooperative_id",
+  as: "stats",
+});
+
+Recognition.belongsTo(Reward, { foreignKey: "reward_id" });
+Recognition.belongsTo(Cooperative, { foreignKey: "cooperative_id" });
+
+Reward.hasMany(Recognition, { foreignKey: "reward_id", as: "recognitions" });
+Cooperative.hasMany(Recognition, {
+  foreignKey: "cooperative_id",
+  as: "recognitions",
+});

@@ -1,12 +1,18 @@
 
 <script lang="ts">
+  import axios from 'axios';
    import 'sweetalert2/src/sweetalert2.scss' 
     let sidebarState:Record<string, boolean> = {
         registration: false,
-        loan: false
+        loan: false,
+        rewards: false
     }
     function toggle (sidebarKey: string){
         sidebarState[sidebarKey] = !sidebarState[sidebarKey]
+    }
+    const logout = async()=>{
+      await axios.delete("/api/logout")
+      location.reload()
     }
 </script>
   <main>
@@ -26,7 +32,7 @@
         </div>
       </header>
 
-      <div class="h-screen w-full flex">
+      <div class="w-full flex" style="min-height: 100vh;">
         <div class="h-full  bg-white hidden lg:block">
             <ul class="menu bg-base-100 w-64 p-2 rounded-box">
                 <li>
@@ -60,25 +66,46 @@
                     
                  
                 </li>
-
                 <li>
-                    <button type="button" on:click={()=>{toggle("loan")}}>
-                            <i class="fa-solid fa-briefcase"></i>
-                        Loans
-                    </button>
-                    {#if sidebarState["loan"] }
-                    <div class="pl-10 mt-1 text-sm hover:bg-white">
-                        <a href="/coop/new" >
-                           Apply loan
-                          </a>
-                    </div>
+          
+                  <button type="button" on:click={()=>{toggle("rewards")}}>
+                          <i class="fa-solid fa-briefcase"></i>
+                          Rewards and Recognition
+                  </button>
+                  {#if sidebarState["rewards"] }
+                  <div class="pl-10 mt-1 text-sm hover:bg-white">
+                      <a href="/app/rewards" >
+                          Rewards
+                        </a>
+                  </div>
+                  <div class="pl-10 text-sm hover:bg-white">
+                    <a href="/app/rewards/assign" >
+                        Assign Rewards
+                      </a>
+                </div>
+                  <div class="pl-10 mt-1 text-sm hover:bg-white">
+                    <a href="/app/recognitions" >
+                        Recognitions
+                      </a>
+                </div>
+         
+                  
              
-             
-                    {/if}
+           
+                  {/if}
 
-                    
-                 
-                </li>
+                  
+               
+              </li>
+              <li>
+              
+                <button type="submit" on:click={()=>{logout()}}>
+                  <i class="fa-solid fa-right-from-bracket"></i>
+                  Sign Out
+                </button>
+  
+              </li>
+
               </ul>
         </div>
         <div class="w-full bg-gray-100 p-5">
@@ -86,3 +113,5 @@
         </div>
       </div>
   </main>
+
+  
