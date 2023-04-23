@@ -58,7 +58,6 @@ export const GET: RequestHandler = async ({ request, params, url }) => {
           where search_vector @@ (plainto_tsquery('simple', :query) :: text || ':*' ) :: tsquery 
           ORDER BY (ts_rank(search_vector, (plainto_tsquery('simple', :query) :: text || ':*' ) :: tsquery ) 
           )  DESC
-         
         `,
           {
             type: QueryTypes.SELECT,
