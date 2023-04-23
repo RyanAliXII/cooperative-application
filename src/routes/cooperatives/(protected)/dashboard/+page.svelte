@@ -115,11 +115,11 @@
         </div>
         <div class="basis-4/12 h-full bg-base-100  flex items-center justify-center flex-col text-amber-500 gap-3 p-3 rounded">
             <i class="fa-solid fa-piggy-bank text-2xl"></i>
-          <h2 class="text-3xl font-bold">PHP {data.stat.savings.toLocaleString(undefined, MONETARY)}</h2>
+          <h2 class="text-3xl font-bold">PHP {data.stat.shares.toLocaleString(undefined, MONETARY)}</h2>
           <p>Shares</p>
         </div>
         <div class="basis-4/12 h-full bg-base-100  flex items-center justify-center flex-col text-indigo-500 gap-3 p-3 rounded">
-            <i class="fa-solid fa-money-bill-transfer"></i>
+            <i class="fa-solid fa-money-bill-transfer text-2xl"></i>
             <h2 class="text-3xl font-bold">PHP {data.stat.liquidity.toLocaleString(undefined, MONETARY)}</h2>
             <p>Liquidity</p>
         </div>

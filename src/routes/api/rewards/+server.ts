@@ -19,7 +19,7 @@ export const POST: RequestHandler = async ({ request }) => {
 };
 export const GET: RequestHandler = async () => {
   try {
-    const rewards = await Reward.findAll();
+    const rewards = await Reward.findAll({ order: [["created_at", "desc"]] });
     return json({
       message: "Rewards fetched successfully.",
       data: {

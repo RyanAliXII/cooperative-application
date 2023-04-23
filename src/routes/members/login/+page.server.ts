@@ -1,10 +1,11 @@
 import { Member, MemberAccount, Session } from "$lib/models/model";
 import { compare } from "bcrypt";
-import { redirect } from "@sveltejs/kit";
+import { redirect, type Actions } from "@sveltejs/kit";
 import { StatusCodes } from "http-status-codes";
 import type { MemberAccount as MemberAccountType } from "$lib/definitions/types.js";
+import { AppTypes } from "$lib/internal/session";
 
-export const actions = {
+export const actions: Actions = {
   login: async ({ request, cookies }) => {
     const formData = await request.formData();
     const email = formData.get("email");
@@ -62,6 +63,7 @@ export const actions = {
       expiration.setDate(expiration.getDate() + 1); // add 1 day expiration
       const session = await Session.create({
         data: account,
+        appType: AppTypes.Member,
         expiresAt: expiration.toISOString(),
       });
 

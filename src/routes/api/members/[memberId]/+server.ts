@@ -123,7 +123,7 @@ export const GET: RequestHandler = async ({ locals, params }) => {
     );
     if (!results) {
       return json(
-        { message: "member not fond" },
+        { message: "Member not fond" },
         { status: StatusCodes.NOT_FOUND }
       );
     }

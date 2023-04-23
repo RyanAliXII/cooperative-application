@@ -30,7 +30,7 @@
 const {data:addAwardData, form:addAwardForm, errors: addAwardError, reset: resetAddAwardForm, } = createForm({
     onSubmit:async(body)=>{
       try {
-        const response = await axios.post("/api/rewards", body)
+        await axios.post("/api/rewards", body)
         invalidate((url)=>url.pathname === "/api/rewards")
        toast.success("Reward has been created successfully.")
       } catch {
@@ -55,15 +55,15 @@ const {data:editAwardData, form:editAwardForm, errors: editAwardError, reset: re
   },
     onSubmit:async(body)=>{
       try {
-        const response = await axios.put(`/api/rewards/${body?.id}`, body)
+        await axios.put(`/api/rewards/${body?.id}`, body)
         invalidate((url)=>url.pathname === "/api/rewards")
-        toast.success("Reward has been created successfully.")
+        toast.success("Reward has been updated successfully.")
       } catch {
         toast.error("Unknown error occurred, please try again.")
       } 
       finally{
-        resetAddAwardForm();
-        closeAddModal()
+        resetEditAwardForm();
+        closeEditModal()
       }
        
     },
@@ -119,8 +119,8 @@ const edit = (reward: Reward)=>{
   </form>
 </Modal>
 
-<Modal isOpen={isEditModalOpen} close={closeEditModal} >
-  <form use:addAwardForm>
+<Modal isOpen={isEditModalOpen}  close={closeEditModal}  >
+  <form use:editAwardForm>
       <h1 class="text-lg font-bold">Edit Reward</h1>
       <TextField value={$editAwardData.name} label="Name" labelFor="name" name="name" error={$editAwardError.name?.[0]}/>
       <TextAreaField value={$editAwardData.description}  label="Description" name="description" labelFor="description"  error={$editAwardError.description?.[0]}/>

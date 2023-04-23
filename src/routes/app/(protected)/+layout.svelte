@@ -1,5 +1,6 @@
 
 <script lang="ts">
+  import axios from 'axios';
    import 'sweetalert2/src/sweetalert2.scss' 
     let sidebarState:Record<string, boolean> = {
         registration: false,
@@ -8,6 +9,10 @@
     }
     function toggle (sidebarKey: string){
         sidebarState[sidebarKey] = !sidebarState[sidebarKey]
+    }
+    const logout = async()=>{
+      await axios.delete("/api/logout")
+      location.reload()
     }
 </script>
   <main>
@@ -92,6 +97,14 @@
                   
                
               </li>
+              <li>
+              
+                <button type="submit" on:click={()=>{logout()}}>
+                  <i class="fa-solid fa-right-from-bracket"></i>
+                  Sign Out
+                </button>
+  
+              </li>
 
               </ul>
         </div>
@@ -100,3 +113,5 @@
         </div>
       </div>
   </main>
+
+  

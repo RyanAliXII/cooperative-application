@@ -84,6 +84,45 @@ export const handle: Handle = async ({ event, resolve }) => {
     }
     event.locals.session = sessionMeta;
   }
+  if (
+    event.url.pathname.startsWith("/members") &&
+    event.url.pathname != "/members/login"
+  ) {
+    const sessionMeta = await getSessionMetadata(event);
+    if (sessionMeta.error) {
+      return new Response("Redirect", {
+        status: StatusCodes.SEE_OTHER,
+        headers: {
+          Location: "/members/login",
+        },
+      });
+    }
+    const expiration = new Date(sessionMeta.session.expiresAt).getTime();
+    if (new Date().getTime() > expiration) {
+      event.cookies.delete("app_sid");
+      await Session.destroy({
+        where: {
+          sid: sessionMeta.session.sid,
+        },
+      });
+      return new Response("Redirect", {
+        status: StatusCodes.SEE_OTHER,
+        headers: {
+          Location: "/members/login",
+        },
+      });
+    }
+    if (sessionMeta.appType != AppTypes.Member) {
+      return new Response("Redirect", {
+        status: StatusCodes.SEE_OTHER,
+        headers: {
+          Location: "/members/login",
+        },
+      });
+    }
+    event.locals.session = sessionMeta;
+  }
+
   //api session validation
   if (event.url.pathname.startsWith("/api")) {
     const sessionMeta = await getSessionMetadata(event);

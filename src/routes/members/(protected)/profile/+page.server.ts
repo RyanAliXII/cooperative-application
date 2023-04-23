@@ -17,13 +17,11 @@ import type {
 } from "$lib/definitions/types.js";
 import type { PageServerLoad } from "./$types";
 export const load: PageServerLoad = async ({ cookies, params, locals }) => {
-  const id = params?.memberId;
   const { session } = locals.session;
-  const coopId = session.data?.cooperative?.id;
+  const id = session.data.member?.id;
   const member = await Member.findOne({
     where: {
       id: id,
-      cooperativeId: coopId,
     },
 
     include: [
@@ -39,7 +37,6 @@ export const load: PageServerLoad = async ({ cookies, params, locals }) => {
   const memberStatModel = await MemberStat.findOne({
     where: {
       memberId: id,
-      cooperativeId: coopId,
     },
   });
   const repaymentModel = await LoanRepayment.findAll({
@@ -53,7 +50,6 @@ export const load: PageServerLoad = async ({ cookies, params, locals }) => {
             required: true,
             model: Member,
             where: {
-              cooperativeId: coopId,
               id: id,
             },
           },
@@ -66,14 +62,12 @@ export const load: PageServerLoad = async ({ cookies, params, locals }) => {
     order: [["created_at", "desc"]],
     where: {
       memberId: id,
-      cooperativeId: coopId,
     },
   });
   const savingsModel = await Saving.findAll({
     order: [["created_at", "desc"]],
     where: {
       memberId: id,
-      cooperativeId: coopId,
     },
   });
 

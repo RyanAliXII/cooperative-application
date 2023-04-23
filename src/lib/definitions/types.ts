@@ -8,6 +8,7 @@ export type Cooperative = {
   address: string;
   province: string;
   city: string;
+  stats?: CooperativeStats;
   account: CooperativeAccount;
 };
 
@@ -171,4 +172,13 @@ export type Reward = {
   description: string;
   certificateType: string;
   certificateDescription: string;
+};
+
+export type Recognition = {
+  id?: string;
+  rewardId: string;
+  date: string;
+  cooperativeId: string;
+  cooperative?: Cooperative;
+  reward?: Reward;
 };
