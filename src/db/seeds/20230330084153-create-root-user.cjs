@@ -12,13 +12,19 @@ const SURNAME = process.env.ROOT_USER_SURNAME;
 module.exports = {
   async up(queryInterface, Sequelize) {
     const password = await bcrypt.hash(PASSWORD, 5);
-    return queryInterface.insert(null, "account", {
-      id: uuidv4(),
-      given_name: GIVEN_NAME,
-      surname: SURNAME,
-      email: EMAIL,
-      password: password,
-    });
+    const id = uuidv4();
+    return queryInterface.sequelize.query(
+      `INSERT INTO account(id, given_name, surname,email, password)VALUES(:id, :givenName, :surname, :email, :password) ON CONFLICT DO NOTHING`,
+      {
+        replacements: {
+          id: id,
+          givenName: GIVEN_NAME,
+          surname: SURNAME,
+          email: EMAIL,
+          password: password,
+        },
+      }
+    );
   },
 
   async down(queryInterface, Sequelize) {},
