@@ -9,7 +9,6 @@ import { StatusCodes } from "http-status-codes";
 import { validate } from "uuid";
 import { hash } from "bcrypt";
 import { ENCRYPTION_KEY } from "$env/static/private";
-import { AES } from "crypto-js";
 
 //endpoint for online registration
 export const POST: RequestHandler = async ({ request, cookies, params }) => {
@@ -81,20 +80,13 @@ export const POST: RequestHandler = async ({ request, cookies, params }) => {
       create token for successfull registration message
       this token expires in 5 minutes after registration.
     */
-    const now = new Date();
-    now.setMinutes(now.getMinutes() + 5);
-    const token = AES.encrypt(
-      JSON.stringify({
-        expire: now.getTime(),
-      }),
-      ENCRYPTION_KEY
-    );
+
     transaction.commit();
     return json(
       {
         message: "Account has been registered.",
         data: {
-          token: token.toString(),
+          token: "RANDOM_TOKEN",
         },
       },
       {
