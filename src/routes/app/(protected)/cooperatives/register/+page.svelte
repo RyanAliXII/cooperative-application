@@ -1,90 +1,132 @@
 <script lang="ts">
- 
+  import TextField from "$lib/components/form/TextField.svelte";
+  import TextAreaField from "$lib/components/form/TextAreaField.svelte";
+  import SelectField from "$lib/components/form/SelectField.svelte";
+  import toast, { Toaster } from "svelte-french-toast";
+  import axios from "axios";
+  import { CreateCooperativeSchema } from "$lib/definitions/schema";
+  import { createForm } from "felte";
+  import { validator } from "@felte/validator-yup";
+  import Swal from "sweetalert2";
 
-import TextField from "$lib/components/form/TextField.svelte";
-import TextAreaField from "$lib/components/form/TextAreaField.svelte";
-import SelectField from "$lib/components/form/SelectField.svelte";
-import toast, { Toaster } from 'svelte-french-toast';
-import  axios from "axios"
-import { CreateCooperativeSchema } from "$lib/definitions/schema";
-import {createForm} from "felte"
-import { validator } from '@felte/validator-yup';
-import Swal from 'sweetalert2'
+  const { form, errors } = createForm({
+    onSubmit: async (body) => {
+      try {
+        const response = await axios.post("/api/cooperatives", body);
+        const { data } = response.data;
+        const account = data?.account;
 
-const {form, errors, } = createForm({
-    
-
-    onSubmit:async(body)=>{
-      try{
-        const response = await axios.post("/api/cooperatives", body)
-        const {data} = response.data
-        const account = data?.account
-    
-        Swal.fire("Cooperative registered",`The password for <strong>${account?.email}</strong> is <br><strong>${account.password}</strong>. 
-          Copy the password, since this will be the only time it will be shown.` ,"success")
+        Swal.fire(
+          "Cooperative registered",
+          `The password for <strong>${account?.email}</strong> is <br><strong>${account.password}</strong>. 
+          Copy the password, since this will be the only time it will be shown.`,
+          "success"
+        );
+      } catch {
+        toast.error("Unknown error occured, while creating resource.");
       }
-      catch{
-        toast.error("Unknown error occured, while creating resource.")
-      }
-   
-     
     },
-    onError:(er)=>{
-        console.log(er)
+    onError: (er) => {
+      console.log(er);
     },
-    extend: validator({schema: CreateCooperativeSchema, castValues: true, level:"error"}),  
-})
-
+    extend: validator({
+      schema: CreateCooperativeSchema,
+      castValues: true,
+      level: "error",
+    }),
+  });
 </script>
 
 <div>
-  
-    <h1 class="text-lg font-semibold mb-3 text-gray-500">Register Cooperative</h1>
-    <div class="container bg-base-100 w-full  p-3 rounded">
-
-        <form use:form >
-          <form use:form >
-            <div class="w-full h-10 rounded flex items-center px-2 text-gray-600 font-semibold gap-2">
-                <i class="fa-regular fa-address-card"></i>  COOPERATIVE INFO
-            </div>
-            <div class="grid grid-cols-1 gap-2 md:grid-cols-3">
-                <TextField  label="Cooperative name" labelFor="name" error={$errors?.name?.[0]}  name="name" ></TextField>
-                <TextField   label="Registration No" labelFor="registrationNumber" error={$errors?.registrationNumber?.[0]} name="registrationNumber"></TextField>
-                <TextField   label="Cooperative Initials" labelFor="initials" error={$errors?.initials?.[0]} name="initials"></TextField>  
-            </div>
-    
-
-        <TextAreaField  label="Address" labelFor="address" error={$errors?.address?.[0]} name="address">
-
-        </TextAreaField>
-
-
-     
-        <div class="bg-base-200 w-full h-10 rounded flex items-center px-2 text-gray-600 font-semibold gap-2 mt-5">
-            <i class="fa-regular fa-address-card"></i>  COOPERATIVE ACC. INFO
+  <h1 class="text-lg font-semibold mb-3 text-gray-500">Register Cooperative</h1>
+  <div class="container bg-base-100 w-full p-3 rounded">
+    <form use:form>
+      <form use:form>
+        <div
+          class="w-full h-10 rounded flex items-center px-2 text-gray-600 font-semibold gap-2"
+        >
+          <i class="fa-regular fa-address-card" /> COOPERATIVE INFO
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-3  gap-2">
-              <TextField label="Given name" labelFor="givenName" name="account.givenName" error={$errors?.account?.givenName?.[0]} >
+        <div class="grid grid-cols-1 gap-2 md:grid-cols-3">
+          <TextField
+            label="Cooperative name"
+            labelFor="name"
+            error={$errors?.name?.[0]}
+            name="name"
+          />
+          <TextField
+            label="Registration No"
+            labelFor="registrationNumber"
+            error={$errors?.registrationNumber?.[0]}
+            name="registrationNumber"
+          />
+          <TextField
+            label="Cooperative Initials"
+            labelFor="initials"
+            error={$errors?.initials?.[0]}
+            name="initials"
+          />
+          <TextField
+            name="registrationDate"
+            label="Registration Date"
+            labelFor="registrationDate"
+            type="date"
+          />
+          <SelectField
+            name="registrationDate"
+            label="Registration Date"
+            labelFor="registrationDate"
+            type="date"
+          />
+        </div>
 
-              </TextField>
-              <TextField  label="Middlename" labelFor="middleName" name="account.middleName" error={$errors?.account?.middleName?.[0]}>
+        <TextAreaField
+          label="Address"
+          labelFor="address"
+          error={$errors?.address?.[0]}
+          name="address"
+        />
 
-              </TextField>
-              <TextField  label="Surname" labelFor="surname" name="account.surname"  error={$errors?.account?.surname?.[0]}>
-
-              </TextField>
-              <TextField label="Email" labelFor="email" name="account.email" type="email"  error={$errors?.account?.email?.[0]}>
-
-              </TextField>
-          
-            
+        <div
+          class="bg-base-200 w-full h-10 rounded flex items-center px-2 text-gray-600 font-semibold gap-2 mt-5"
+        >
+          <i class="fa-regular fa-address-card" /> COOPERATIVE ACC. INFO
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+          <TextField
+            label="Given name"
+            labelFor="givenName"
+            name="account.givenName"
+            error={$errors?.account?.givenName?.[0]}
+          />
+          <TextField
+            label="Middlename"
+            labelFor="middleName"
+            name="account.middleName"
+            error={$errors?.account?.middleName?.[0]}
+          />
+          <TextField
+            label="Surname"
+            labelFor="surname"
+            name="account.surname"
+            error={$errors?.account?.surname?.[0]}
+          />
+          <TextField
+            label="Email"
+            labelFor="email"
+            name="account.email"
+            type="email"
+            error={$errors?.account?.email?.[0]}
+          />
         </div>
         <div class="mt-5 w-full flex justify-end">
-             <button class=" btn btn-primary px-8 py-2 mr-2 mb-2">
-                <i class="fa-regular fa-floppy-disk mr-2 text-lg"></i>
-                Save</button>
-            </div>
-        </form>
-    </div>
-   </div>
-   <Toaster/>
+          <button class=" btn btn-primary px-8 py-2 mr-2 mb-2">
+            <i class="fa-regular fa-floppy-disk mr-2 text-lg" />
+            Save</button
+          >
+        </div>
+      </form>
+    </form>
+  </div>
+</div>
+<Toaster />

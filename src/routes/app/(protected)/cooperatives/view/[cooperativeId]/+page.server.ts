@@ -15,7 +15,7 @@ import { error } from "@sveltejs/kit";
 import { StatusCodes } from "http-status-codes";
 import { validate } from "uuid";
 import type { PageServerLoad } from "./$types";
-import { CooperativeStatModel } from "$lib/models/cooperative_stats";
+
 import type {
   CooperativeStats,
   ShareLog as ShareLogType,

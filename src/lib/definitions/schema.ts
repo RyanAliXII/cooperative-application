@@ -385,3 +385,14 @@ export const EditGivenRewardValidation = object({
   rewardId: string().uuid().required("Id is required."),
   date: string().required("Date is required"),
 });
+
+export const CreateCooperativeCategoryValidation = object({
+  name: string().required("Name is required."),
+  requiredAssets: number().required("Required assets is required."),
+});
+
+export const EditCooperativeCategoryValidation = object({
+  id: string().required().uuid(),
+  name: string().required("Name is required."),
+  requiredAssets: number().required("Required assets is required."),
+});

@@ -18,6 +18,7 @@ import { MemberStatModel } from "./member_stats";
 import { RewardModel } from "./reward";
 import { SelectedCooperativeModel } from "./selected_cooperative";
 import { RecognitionModel } from "./recognition";
+import { CooperativeCategoryModel } from "./cooperative_category";
 
 export const Member = MemberModel;
 export const Cooperative = CooperativeModel;
@@ -39,6 +40,8 @@ export const MemberStat = MemberStatModel;
 export const Reward = RewardModel;
 export const SelectedCooperative = SelectedCooperativeModel;
 export const Recognition = RecognitionModel;
+export const CooperativeCategory = CooperativeCategoryModel;
+
 CooperativeAccount.belongsTo(Cooperative, {
   foreignKey: "cooperative_id",
 });

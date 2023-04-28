@@ -1,115 +1,218 @@
 <script lang="ts">
- 
+  import TextField from "$lib/components/form/TextField.svelte";
+  import TextAreaField from "$lib/components/form/TextAreaField.svelte";
 
-    import TextField from "$lib/components/form/TextField.svelte";
-    import TextAreaField from "$lib/components/form/TextAreaField.svelte";
-  
-    import toast, { Toaster } from 'svelte-french-toast';
-    import { EditCooperativeSchema } from "$lib/definitions/schema";
-    import {createForm} from "felte"
-    import { validator } from '@felte/validator-yup';
-    import {onMount} from "svelte"
+  import toast, { Toaster } from "svelte-french-toast";
+  import { EditCooperativeSchema } from "$lib/definitions/schema";
+  import { createForm } from "felte";
+  import { validator } from "@felte/validator-yup";
+  import { onMount } from "svelte";
   import axios from "axios";
 
-    export let data;
-    let isViewMode = true
-    
-    const {form, errors, } = createForm({
-        initialValues: data?.cooperative,
-        onSubmit:async(body)=>{
-          if(isViewMode) return
-          try{
-            const response = await axios.put(`/api/cooperatives/${body?.id}`, body)
-            const {data} = response.data
-            toast.success("Cooperative has been updated.")
-            isViewMode = true
-          }
-          catch{
-            toast.error("Unknown error occured, while updating resource.")
-          }
-          
-         
-        },
-        onError:(er)=>{
-            console.log(er)
-        },
-        extend: validator({schema: EditCooperativeSchema, castValues: true, level:"error"}),  
-    })
-    const toggleMode = ()=>{
-      isViewMode = !isViewMode
-    }
-    let registrationURL = ''
-    onMount(()=>{
-      registrationURL = `${window.location.host}/cooperatives/registration/${data.cooperative?.id}`
-    })
+  export let data;
+  export let form;
+  const session = data?.session.data;
+  let registrationURL = "";
+  onMount(() => {
+    registrationURL = `${window.location.host}/cooperatives/registration/${data.cooperative?.id}`;
+  });
 
-    
-    const copyUrl = ()=>{
-      navigator.clipboard.writeText(registrationURL)
-      toast.success("Registration URL copied to clipboard.")
-    }
-    </script>
-    
-    <div>
-      
-        <h1 class="text-lg font-semibold mb-3 text-gray-500">Cooperative</h1>
-        <div class="container bg-base-100 w-full  p-3 rounded">
+  const copyUrl = () => {
+    navigator.clipboard.writeText(registrationURL);
+    toast.success("Registration URL copied to clipboard.");
+  };
 
-          {#if isViewMode }
-          <button class="btn btn-secondary btn-outline my-3 mx-1" type="button" on:click={toggleMode}><i class="fa-regular fa-pen-to-square mr-2"  ></i> Switch to Edit Mode</button>
-          {:else}
-          <button class="btn btn-secondary btn-outline my-3 mx-1" type="button" on:click={toggleMode}><i class="fa-regular fa-eye mr-2"></i> Switch to View Mode</button> 
-          
-          {/if}
-          
-         
-            <form use:form >
-              <form use:form >
-                <div class="w-full h-10 rounded flex items-center px-2 text-gray-600 font-semibold gap-2">
-                    <i class="fa-regular fa-address-card"></i>  COOPERATIVE INFO
-                </div>
-                <div class="grid grid-cols-1 gap-2 md:grid-cols-3">
-                    <TextField   label="Cooperative name" labelFor="name" error={$errors?.name?.[0]}  name="name" disabled={isViewMode}></TextField>
-                    <TextField   label="Registration No" labelFor="registrationNumber" error={$errors?.registrationNumber?.[0]} name="registrationNumber" disabled={isViewMode}></TextField>
-                    <TextField   label="Cooperative Initials" labelFor="initials" error={$errors?.initials?.[0]} name="initials" disabled={isViewMode}></TextField>  
-                </div>
-        
-    
-            <TextAreaField  label="Address" labelFor="address" error={$errors?.address?.[0]} name="address" disabled={isViewMode}>
-    
-            </TextAreaField>
-            <div class="grid gap-2 md:grid-cols-2 mt-5">
-            <div class="flex items-center">
-            <input class="input input-bordered w-full" readonly={true} value={registrationURL}/>
-            </div>
-            <div class="flex items-center  w-full">
-            <button class="btn btn-secondary btn-outline w-full md:w-fit" on:click={copyUrl}>Copy Registration URL</button>
-          </div>
-            </div>
-         
-            <div class="bg-base-200 w-full h-10 rounded flex items-center px-2 text-gray-600 font-semibold gap-2 mt-5">
-                <i class="fa-regular fa-address-card"></i>  COOPERATIVE ACC. INFO
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-3  gap-2">
-                  <TextField label="Given name" labelFor="givenName" name="account.givenName" error={$errors?.account?.givenName?.[0]} disabled={isViewMode}>
-    
-                  </TextField>
-                  <TextField  label="Middlename" labelFor="middleName" name="account.middleName" error={$errors?.account?.middleName?.[0]} disabled={isViewMode}>
-    
-                  </TextField>
-                  <TextField  label="Surname" labelFor="surname" name="account.surname"  error={$errors?.account?.surname?.[0]} disabled={isViewMode}>
-    
-                  </TextField>
-                  <TextField label="Email" labelFor="email" name="account.email" type="email"  error={$errors?.account?.email?.[0]} disabled={isViewMode}>
-    
-                  </TextField>     
-            </div>
-            <div class="mt-5 w-full flex justify-end">
-                 <button class=" btn btn-primary px-8 py-2 mr-2 mb-2" disabled={ isViewMode ? true : false} >
-                    <i class="fa-regular fa-floppy-disk mr-2 text-lg "></i>
-                    Save</button>
-                </div>
-            </form>
+  type Tab = "details" | "account";
+  let activeTab: Tab = form?.error || form?.success ? "account" : "details";
+</script>
+
+<div>
+  <h1 class="text-lg font-semibold mb-3 text-gray-500">Cooperative</h1>
+  <div class="tabs w-full">
+    <button
+      class="tab tab-lifted"
+      class:tab-active={activeTab === "details"}
+      on:click={() => {
+        activeTab = "details";
+      }}>Cooperative Details</button
+    >
+    <button
+      class="tab tab-lifted"
+      class:tab-active={activeTab === "account"}
+      on:click={() => {
+        activeTab = "account";
+      }}>Your Account</button
+    >
+  </div>
+  <div class="container bg-base-100 w-full p-3 rounded">
+    {#if activeTab === "details"}
+      <form>
+        <div
+          class="w-full h-10 rounded flex items-center px-2 text-gray-600 font-semibold gap-2"
+        >
+          <i class="fa-regular fa-address-card" /> COOPERATIVE INFO
         </div>
-       </div>
-       <Toaster/>
+        <div class="grid grid-cols-1 gap-2 md:grid-cols-3">
+          <TextField
+            value={data.cooperative?.name}
+            label="Cooperative name"
+            labelFor="name"
+            name="name"
+            disabled={true}
+          />
+          <TextField
+            value={data?.cooperative?.registrationNumber}
+            label="Registration No"
+            labelFor="registrationNumber"
+            name="registrationNumber"
+            disabled={true}
+          />
+          <TextField
+            value={data?.cooperative.initials}
+            label="Cooperative Initials"
+            labelFor="initials"
+            name="initials"
+            disabled={true}
+          />
+        </div>
+
+        <TextAreaField
+          label="Address"
+          value={data?.cooperative?.address}
+          labelFor="address"
+          name="address"
+          disabled={true}
+        />
+        <div class="grid gap-2 md:grid-cols-2 mt-5">
+          <div class="flex items-center">
+            <input
+              class="input input-bordered w-full"
+              value={registrationURL}
+              readonly={true}
+            />
+          </div>
+          <div class="flex items-center w-full">
+            <button
+              class="btn btn-secondary btn-outline w-full md:w-fit"
+              on:click={copyUrl}>Copy Registration URL</button
+            >
+          </div>
+        </div>
+
+        <div
+          class="bg-base-200 w-full h-10 rounded flex items-center px-2 text-gray-600 font-semibold gap-2 mt-5"
+        >
+          <i class="fa-regular fa-address-card" /> OWNER ACC. INFO
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+          <TextField
+            value={data.cooperative?.account.givenName}
+            label="Given name"
+            labelFor="givenName"
+            name="account.givenName"
+            disabled={true}
+          />
+          <TextField
+            value={data?.cooperative?.account?.middleName}
+            label="Middlename"
+            labelFor="middleName"
+            name="account.middleName"
+            disabled={true}
+          />
+          <TextField
+            value={data?.cooperative?.account?.surname}
+            label="Surname"
+            labelFor="surname"
+            name="account.surname"
+            disabled={true}
+          />
+          <TextField
+            value={data?.cooperative?.account.email}
+            label="Email"
+            labelFor="email"
+            name="account.email"
+            type="email"
+            disabled={true}
+          />
+        </div>
+      </form>
+    {/if}
+    {#if activeTab === "account"}
+      <div class="mb-10 mt-10 flex items-center gap-5 ml-3">
+        <img
+          src="https://api.dicebear.com/6.x/initials/svg?seed={session?.givenName} {session?.surname}&backgroundColor=EB7C2A"
+          alt="avatar"
+          class="w-12 rounded-full"
+        />
+        <div>
+          <h1 class="text-lg font-bold">
+            {session?.givenName}
+            {session?.surname}
+          </h1>
+          <small class="text-gray-500">Account ID: {session.id}</small>
+        </div>
+      </div>
+
+      <div
+        class="bg-base-200 w-full h-10 rounded flex items-center px-2 text-gray-600 font-semibold gap-2 mt-5"
+      >
+        <i class="fa-regular fa-address-card" /> CHANGE PASSWORD
+      </div>
+      {#if form?.error === true}
+        <div class="alert alert-error shadow-lg text-white mb-3 mt-3">
+          <div>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="stroke-current flex-shrink-0 h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              ><path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+              /></svg
+            >
+            <span>{form?.message}</span>
+          </div>
+        </div>
+      {/if}
+
+      {#if form?.success === true}
+        <div class="alert alert-success shadow-lg text-white mb-3 mt-3">
+          <div>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="stroke-current flex-shrink-0 h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              ><path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+              /></svg
+            >
+            <span>Password has been changed successfully.</span>
+          </div>
+        </div>
+      {/if}
+      <div>
+        <form method="POST" action="?/changePassword">
+          <TextField name="oldPassword" label="Old Password" type="password" />
+          <TextField name="newPassword" label="New Password" type="password" />
+          <TextField
+            name="confirmPassword"
+            label="Confirm New Password"
+            type="password"
+          />
+          <button class="btn btn-primary text-base-100 mt-5">
+            <i class="fa-regular fa-floppy-disk mr-2 text-lg" />
+            Save</button
+          >
+        </form>
+      </div>
+    {/if}
+  </div>
+</div>
+<Toaster />

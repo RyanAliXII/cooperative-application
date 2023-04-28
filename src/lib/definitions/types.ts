@@ -18,6 +18,7 @@ export type CooperativeAccount = {
   middleName: string;
   surname: string;
   email: string;
+  password?: string;
   isOwner: boolean;
 };
 
@@ -158,7 +159,7 @@ export type MemberStats = {
   shares: number;
   sharesPrincipal: number;
   sharesWithdrawal: number;
-  savings: number;
+  name: string;
   savingPrincipal: number;
   savingsWithdrawal: number;
   requestedLoan: number;
@@ -181,4 +182,10 @@ export type Recognition = {
   cooperativeId: string;
   cooperative?: Cooperative;
   reward?: Reward;
+};
+
+export type CooperativeCategory = {
+  id?: string;
+  name: string;
+  requiredAssets: number;
 };
