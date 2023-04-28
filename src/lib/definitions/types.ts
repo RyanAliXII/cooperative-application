@@ -6,8 +6,8 @@ export type Cooperative = {
   registrationNumber: string;
   initials: string;
   address: string;
-  province: string;
-  city: string;
+  registrationDate: string;
+  categoryId: string;
   stats?: CooperativeStats;
   account: CooperativeAccount;
 };

@@ -100,7 +100,13 @@
               <a href="/cooperatives/members"> Members </a>
             </div>
             <div class="pl-10 mt-1 text-sm hover:bg-white">
-              <a href="/cooperatives/members/approval"> Pending Members </a>
+              <a href="/cooperatives/members/pending"> Pending Members </a>
+            </div>
+            <div class="pl-10 mt-1 text-sm hover:bg-white">
+              <a href="/cooperatives/members/declined"> Declined Members </a>
+            </div>
+            <div class="pl-10 mt-1 text-sm hover:bg-white">
+              <a href="/cooperatives/members/exited"> Exited Members </a>
             </div>
           {/if}
         </li>
@@ -234,7 +240,7 @@
               <a href="/cooperatives/members"> Members </a>
             </div>
             <div class="pl-10 mt-1 text-sm hover:bg-white">
-              <a href="/cooperatives/members/approval"> Pending Members </a>
+              <a href="/cooperatives/members/pending"> Pending Members </a>
             </div>
           {/if}
         </li>

@@ -33,7 +33,6 @@ export const MemberModel = sequelize.define(
     },
     civilStatus: {
       type: DataTypes.STRING,
-
       field: "civil_status",
     },
     spouseName: {
@@ -58,6 +57,10 @@ export const MemberModel = sequelize.define(
     approvedAt: {
       type: DataTypes.DATE,
       field: "approved_at",
+    },
+    exitedAt: {
+      type: DataTypes.DATE,
+      field: "exited_at",
     },
     declinedAt: {
       type: DataTypes.DATE,

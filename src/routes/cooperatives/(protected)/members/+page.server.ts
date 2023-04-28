@@ -1,11 +1,11 @@
-import { StatusCodes } from "http-status-codes";
-import { redirect } from "@sveltejs/kit";
-import { Member, Session } from "$lib/models/model";
+import { Member } from "$lib/models/model";
 import { Op } from "sequelize";
-import { getSessionMetadata } from "$lib/internal/session.js";
-/** @type {import('./$types').PageServerLoad} */
-export async function load(event) {
-  const { session } = await getSessionMetadata(event);
+import type { PageServerLoad } from "./$types";
+import type { Actions } from "@sveltejs/kit";
+import { sequelize } from "$lib/models/sequelize";
+
+export const load: PageServerLoad = async ({ locals }) => {
+  const { session } = locals.session;
   const coopId = session.data?.cooperative?.id;
   try {
     const members = await Member.findAll({
@@ -14,6 +14,7 @@ export async function load(event) {
         approvedAt: {
           [Op.not]: null,
         },
+        exitedAt: null,
       },
     });
     return {
@@ -25,4 +26,32 @@ export async function load(event) {
       members: [],
     };
   }
-}
+};
+
+export const actions: Actions = {
+  exit: async ({ locals, request }) => {
+    const formData = await request.formData();
+    const { session } = locals.session;
+    const memberId = formData.get("memberId");
+    const coopId = session.data?.cooperativeId;
+
+    await Member.update(
+      {
+        exitedAt: sequelize.fn("NOW"),
+        approvedAt: null,
+      },
+      {
+        where: {
+          cooperativeId: coopId,
+          id: memberId,
+        },
+      }
+    );
+
+    return {
+      error: false,
+      success: true,
+      message: "Membership has been approved.",
+    };
+  },
+};

@@ -23,6 +23,16 @@ export const CooperativeModel = sequelize.define(
     address: {
       type: DataTypes.STRING,
     },
+    registrationDate: {
+      type: DataTypes.DATEONLY,
+    },
+    categoryId: {
+      type: DataTypes.UUID,
+      references: {
+        model: "cooperative_category",
+        key: "id",
+      },
+    },
   },
   {
     underscored: true,

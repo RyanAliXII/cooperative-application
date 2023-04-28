@@ -14,12 +14,21 @@
     SharesTransactionTypes,
   } from "$lib/internal/transaction";
   import { MONETARY } from "$lib/internal/config";
+  import SelectField from "$lib/components/form/SelectField.svelte";
 
   export let data;
   let isViewMode = true;
   const id = data?.cooperative?.id;
-  const { form, errors } = createForm({
-    initialValues: data?.cooperative,
+  const {
+    form,
+    errors,
+    data: formData,
+  } = createForm({
+    initialValues: {
+      ...data.cooperative,
+      categoryId: data.cooperative?.categoryId ?? "",
+      registrationDate: data.cooperative?.registrationDate ?? "",
+    },
     onSubmit: async (body) => {
       if (isViewMode) return;
       try {
@@ -44,7 +53,7 @@
     isViewMode = !isViewMode;
   };
 
-  const recreatePassword = async () => {
+  const resetPassword = async () => {
     const result = await Swal.fire({
       title: "Reset Password",
       icon: "warning",
@@ -87,10 +96,6 @@
     withdrawnSavings: 0,
     withdrawnShares: 0,
   };
-
-  const switchTab = (tab: Tab) => {
-    activeTab = tab;
-  };
 </script>
 
 <div>
@@ -131,14 +136,14 @@
       <div class="mb-10 mt-10 flex items-center gap-5 ml-3">
         <img
           src="https://api.dicebear.com/6.x/initials/svg?seed={data?.cooperative
-            .name}&backgroundColor=EB7C2A"
+            ?.name}&backgroundColor=EB7C2A"
           alt="avatar"
           class="w-12 rounded-full"
         />
         <div>
           <h1 class="text-lg font-bold">{data?.cooperative?.name}</h1>
           <small class="text-gray-500"
-            >Cooperative ID: {data?.cooperative.id}</small
+            >Cooperative ID: {data?.cooperative?.id}</small
           >
         </div>
       </div>
@@ -185,6 +190,25 @@
               name="initials"
               disabled={isViewMode}
             />
+            <TextField
+              error={$errors?.registrationDate?.[0]}
+              name="registrationDate"
+              label="Registration Date"
+              labelFor="registrationDate"
+              type="date"
+              disabled={isViewMode}
+            />
+            <SelectField
+              error={$errors?.categoryId?.[0]}
+              name="categoryId"
+              label="Category"
+              labelFor="category"
+              disabled={isViewMode}
+            >
+              {#each data?.categories ?? [] as category}
+                <option value={category.id}>{category.name}</option>
+              {/each}
+            </SelectField>
           </div>
 
           <TextAreaField
@@ -230,11 +254,12 @@
               error={$errors?.account?.email?.[0]}
               disabled={isViewMode}
             />
+
             <div class="mt-9 ml-3">
               <button
                 type="button"
                 class="btn btn-secondary"
-                on:click={recreatePassword}
+                on:click={resetPassword}
                 disabled={isViewMode ? true : false}
                 ><i class="fa-solid fa-rotate mr-2" />Reset Password</button
               >

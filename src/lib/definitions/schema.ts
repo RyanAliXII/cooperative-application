@@ -9,6 +9,8 @@ export const CreateCooperativeSchema = object({
   registrationNumber: string().required(
     "Cooperative registraion number is required."
   ),
+  registrationDate: string().required("Registration date is required"),
+  categoryId: string().uuid().required("Category is required"),
   initials: string().required("Cooperative initials is required."),
   address: string().required("Address is required."),
   account: object().shape({
@@ -27,6 +29,8 @@ export const EditCooperativeSchema = object({
   registrationNumber: string().required(
     "Cooperative registraion number is required."
   ),
+  registrationDate: string().required("Registration date is required"),
+  categoryId: string().uuid().required("Category is required"),
   initials: string().required("Cooperative initials is required."),
   address: string().required("Address is required."),
   account: object().shape({

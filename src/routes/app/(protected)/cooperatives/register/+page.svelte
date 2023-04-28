@@ -8,7 +8,7 @@
   import { createForm } from "felte";
   import { validator } from "@felte/validator-yup";
   import Swal from "sweetalert2";
-
+  export let data;
   const { form, errors } = createForm({
     onSubmit: async (body) => {
       try {
@@ -67,17 +67,22 @@
             name="initials"
           />
           <TextField
+            error={$errors?.registrationDate?.[0]}
             name="registrationDate"
             label="Registration Date"
             labelFor="registrationDate"
             type="date"
           />
           <SelectField
-            name="registrationDate"
-            label="Registration Date"
-            labelFor="registrationDate"
-            type="date"
-          />
+            error={$errors?.categoryId?.[0]}
+            name="categoryId"
+            label="Category"
+            labelFor="category"
+          >
+            {#each data.categories as category}
+              <option value={category.id}>{category.name}</option>
+            {/each}
+          </SelectField>
         </div>
 
         <TextAreaField
