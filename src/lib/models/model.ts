@@ -19,6 +19,7 @@ import { RewardModel } from "./reward";
 import { SelectedCooperativeModel } from "./selected_cooperative";
 import { RecognitionModel } from "./recognition";
 import { CooperativeCategoryModel } from "./cooperative_category";
+import { CooperativeCriteriaModel } from "./cooperative_criteria";
 
 export const Member = MemberModel;
 export const Cooperative = CooperativeModel;
@@ -41,7 +42,7 @@ export const Reward = RewardModel;
 export const SelectedCooperative = SelectedCooperativeModel;
 export const Recognition = RecognitionModel;
 export const CooperativeCategory = CooperativeCategoryModel;
-
+export const CooperativeCriteria = CooperativeCriteriaModel;
 CooperativeAccount.belongsTo(Cooperative, {
   foreignKey: "cooperative_id",
 });
@@ -80,4 +81,19 @@ Reward.hasMany(Recognition, { foreignKey: "reward_id", as: "recognitions" });
 Cooperative.hasMany(Recognition, {
   foreignKey: "cooperative_id",
   as: "recognitions",
+});
+
+Cooperative.belongsTo(CooperativeCategory, { foreignKey: "category_id" });
+CooperativeCategory.hasMany(Cooperative, {
+  foreignKey: "category_id",
+  as: "cooperatives",
+});
+
+CooperativeCategory.belongsTo(CooperativeCriteria, {
+  foreignKey: "criteria_id",
+});
+
+CooperativeCriteria.hasMany(CooperativeCategory, {
+  foreignKey: "criteria_id",
+  as: "categories",
 });

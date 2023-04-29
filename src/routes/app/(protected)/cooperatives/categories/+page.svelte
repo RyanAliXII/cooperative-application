@@ -12,6 +12,7 @@
   import axios from "axios";
   import { invalidate } from "$app/navigation";
   import ConfirmDialog from "$lib/components/ui/ConfirmDialog.svelte";
+  import SelectField from "$lib/components/form/SelectField.svelte";
 
   let isAddCategoryModalOpen = false;
   let isEditCategoryModalOpen = false;
@@ -73,6 +74,7 @@
       id: category.id,
       name: category.name,
       requiredAssets: category.requiredAssets,
+      criteriaId: category.criteriaId ?? "",
     });
     isEditCategoryModalOpen = true;
   };
@@ -171,6 +173,16 @@
       error={$addCategoryErrors?.requiredAssets}
       step=".01"
     />
+    <div
+      class="bg-base-200 w-full h-10 rounded flex items-center px-2 text-gray-600 font-semibold gap-2 mt-5"
+    >
+      <i class="fa-regular fa-address-card" /> REWARD SCORING CRITERIA
+    </div>
+    <SelectField name="criteriaId" error={$addCategoryErrors?.criteriaId?.[0]}>
+      {#each data.criterias as criteria}
+        <option value={criteria.id}> {criteria.name}</option>
+      {/each}
+    </SelectField>
     <button class="btn btn-primary text-base-100 mt-5" type="submit">
       <i class="fa-regular fa-floppy-disk mr-2 text-lg" />
       Save</button
@@ -200,6 +212,20 @@
       error={$editCategoryErrors?.requiredAssets}
       step=".01"
     />
+    <div
+      class="bg-base-200 w-full h-10 rounded flex items-center px-2 text-gray-600 font-semibold gap-2 mt-5"
+    >
+      <i class="fa-regular fa-address-card" /> REWARD SCORING CRITERIA
+    </div>
+    <SelectField
+      value={$editCategoryData?.criteriaId}
+      name="criteriaId"
+      error={$editCategoryErrors.criteriaId?.[0]}
+    >
+      {#each data.criterias as criteria}
+        <option value={criteria.id}> {criteria.name}</option>
+      {/each}
+    </SelectField>
     <button class="btn btn-primary text-base-100 mt-5" type="submit">
       <i class="fa-regular fa-floppy-disk mr-2 text-lg" />
       Save</button

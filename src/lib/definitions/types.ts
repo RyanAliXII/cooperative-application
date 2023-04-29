@@ -188,4 +188,11 @@ export type CooperativeCategory = {
   id?: string;
   name: string;
   requiredAssets: number;
+  criteriaId: string;
+};
+export type CooperativeCriteria = {
+  id?: string;
+  name: string;
+  financialPerformancePoints: number;
+  organizationManagementPoints: number;
 };

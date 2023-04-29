@@ -51,7 +51,7 @@ export const actions: Actions = {
     return {
       error: false,
       success: true,
-      message: "Membership has been approved.",
+      message: "Member has been exited.",
     };
   },
 };

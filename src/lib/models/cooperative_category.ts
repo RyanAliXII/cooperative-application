@@ -20,6 +20,14 @@ export const CooperativeCategoryModel = sequelize.define(
         return Number(value);
       },
     },
+    criteriaId: {
+      type: DataTypes.UUID,
+      field: "criteria_id",
+      references: {
+        model: "cooperative_criteria",
+        key: "id",
+      },
+    },
     createdAt: {
       field: "created_at",
       type: DataTypes.DATE,

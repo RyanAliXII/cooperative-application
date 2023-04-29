@@ -74,7 +74,7 @@
 
   <div class=" w-full flex" style="min-height:100vh;">
     <div class="h-full bg-white hidden lg:block">
-      <ul class="menu bg-base-100 w-64 p-2 rounded-box">
+      <ul class="menu bg-base-100 w-64 rounded-box">
         <li>
           <a href="/cooperatives/dashboard">
             <i class="fa-solid fa-chart-line" />

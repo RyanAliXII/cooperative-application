@@ -393,10 +393,37 @@ export const EditGivenRewardValidation = object({
 export const CreateCooperativeCategoryValidation = object({
   name: string().required("Name is required."),
   requiredAssets: number().required("Required assets is required."),
+  criteriaId: string().uuid().required("Criteria is required."),
 });
 
 export const EditCooperativeCategoryValidation = object({
   id: string().required().uuid(),
   name: string().required("Name is required."),
   requiredAssets: number().required("Required assets is required."),
+  criteriaId: string().uuid().required("Criteria is required."),
+});
+
+export const CreateCriteriaValidation = object({
+  name: string().required("Criteria name is required."),
+  financialPerformancePoints: number()
+    .integer("Value should not be decimal value.")
+    .required("Financial Performance Points is required.")
+    .min(1, "Value should be greater than zero."),
+  organizationManagementPoints: number()
+    .integer("Value should not be decimal value.")
+    .required("Organization Management Points is required.")
+    .min(1, "Value should be greater than zero."),
+});
+
+export const EditCriteriaValidation = object({
+  id: string().required().uuid(),
+  name: string().required("Criteria name is required."),
+  financialPerformancePoints: number()
+    .integer("Value should not be decimal value.")
+    .required("Financial Performance Points is required.")
+    .min(1, "Value should be greater than zero."),
+  organizationManagementPoints: number()
+    .integer("Value should not be decimal value.")
+    .required("Organization Management Points is required.")
+    .min(1, "Value should be greater than zero."),
 });
