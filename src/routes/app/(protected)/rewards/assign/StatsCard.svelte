@@ -10,6 +10,7 @@
   export let cooperative: Cooperative;
   export let editDefaultCriteriaPoints: (point: DefaultPoint) => void;
   export let clearDefaultCriteriaPoints: (point: DefaultPoint) => void;
+  export let clearCriteriaFieldPoints: (point: CriteriaFieldPoint) => void;
   export let editCriteriaFieldPoints: (points: CriteriaFieldPoint) => void;
   export let category: CooperativeCategory;
   export let criteriaFieldPoints: Record<string, CriteriaFieldPoint>;
@@ -128,7 +129,7 @@
               <th>Criteria</th>
               <th>System Generated Value</th>
               <th>User Defined Value</th>
-              <th>Action</th>
+              <th />
             </tr>
           </thead>
           <tbody>
@@ -162,7 +163,7 @@
                         name: "Financial Performance",
                         type: PointTypes.Financial,
                       });
-                    }}>Edit</button
+                    }}><i class="fa-regular fa-pen-to-square" /></button
                   >
                 {/if}
 
@@ -180,7 +181,7 @@
                         name: "Financial Performance",
                         type: PointTypes.Financial,
                       });
-                    }}>Clear</button
+                    }}><i class="fa-solid fa-x" /></button
                   >
                 {/if}
               </td>
@@ -215,7 +216,7 @@
                         name: "Organization Management",
                         type: PointTypes.Management,
                       });
-                    }}>Edit</button
+                    }}><i class="fa-regular fa-pen-to-square" /></button
                   >
                 {/if}
                 {#if isManagementPointsOverriden}
@@ -232,7 +233,7 @@
                         name: "Organization Management",
                         type: PointTypes.Management,
                       });
-                    }}>Clear</button
+                    }}><i class="fa-solid fa-x" /></button
                   >
                 {/if}
               </td>
@@ -260,8 +261,23 @@
                           ]?.points ?? 0,
                         name: field.name,
                       });
-                    }}>Edit</button
+                    }}><i class="fa-regular fa-pen-to-square" /></button
                   >
+
+                  {#if criteriaFieldPoints[`${category.id}_${field.id}_${cooperative.id}`]?.points ?? 0 != 0}
+                    <button
+                      class="btn btn-warning text-white"
+                      on:click={() => {
+                        clearCriteriaFieldPoints({
+                          categoryId: category.id ?? "",
+                          cooperativeId: cooperative.id ?? "",
+                          criteriaFieldId: field.id ?? "",
+                          points: 0,
+                          name: field.name,
+                        });
+                      }}><i class="fa-solid fa-x" /></button
+                    >
+                  {/if}
                 </td>
               </tr>
             {/each}

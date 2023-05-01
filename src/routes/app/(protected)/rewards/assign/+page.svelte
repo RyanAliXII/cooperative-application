@@ -196,6 +196,16 @@
       toast.error("Unknown error occured, Please try again later.");
     }
   };
+
+  const clearCriteriaFieldPoints = async (points: CriteriaFieldPoint) => {
+    try {
+      await axios.post("/api/rewards/points/field", points);
+      invalidateAll();
+      toast.success("Points has been cleared.");
+    } catch (error) {
+      toast.error("Unknown error occured, Please try again later.");
+    }
+  };
   $: criteriaFieldPoints =
     data.categories
       .find((c) => c.id === selectedCategoryId)
@@ -225,9 +235,16 @@
     <h1 class="text-lg font-semibold text-gray-500 mt-5 ml-2">
       {category.name}
     </h1>
+    {#if category.cooperatives?.length != 0}
+      <button class="btn btn-primary text-white mt-3 ml-2">
+        <i class="fa-solid fa-rotate-left mr-2" /> Reset Points</button
+      >
+    {/if}
+
     <div class="grid grid-cols-1 2xl:grid-cols-2 mt-5 gap-2">
       {#each category?.cooperatives ?? [] as cooperative}
         <StatsCard
+          {clearCriteriaFieldPoints}
           {criteriaFieldPoints}
           {editCriteriaFieldPoints}
           {cooperative}
@@ -297,6 +314,7 @@
       errors={$editCriteriaFieldPointsErrors?.points?.[0]}
       value={$editCriteriaFieldPointsData.points}
       name="points"
+      label="Points"
       type="number"
     />
     <button class="btn btn-primary text-base-100 mt-3" type="submit"
