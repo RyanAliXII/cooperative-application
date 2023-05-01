@@ -109,6 +109,14 @@ export const CooperativeStatModel = sequelize.define(
         return Number(value);
       },
     },
+    exitedMembers: {
+      type: DataTypes.INTEGER,
+      field: "exited_members",
+      get() {
+        const value = this.getDataValue("exitedMembers");
+        return Number(value);
+      },
+    },
     liquidity: {
       type: DataTypes.DECIMAL(10, 2),
       field: "liquidity",

@@ -139,7 +139,7 @@ export const load: PageServerLoad = async ({ params }) => {
       throw error(StatusCodes.NOT_FOUND, { message: "Not Found" });
     }
     const coopStat = coopStatModel.get({ plain: true });
-
+    delete coop.dataValues["category_id"];
     return {
       cooperative: {
         ...coop?.dataValues,

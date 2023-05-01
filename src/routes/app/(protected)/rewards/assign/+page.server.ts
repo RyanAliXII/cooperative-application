@@ -1,20 +1,16 @@
+import type { CooperativeCategory as CooperativeCategoryType } from "$lib/definitions/types";
 import {
   Cooperative,
   CooperativeCategory,
+  CooperativeCriteria,
+  CooperativeRanking,
   CooperativeStat,
+  CriteriaField,
+  CriteriaFieldPoint,
 } from "$lib/models/model";
 import type { PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async ({ fetch }) => {
-  // const fetchSelectedCooperatives = await fetch("/api/rewards/cooperatives");
-  // const { data } = await fetchSelectedCooperatives.json();
-  // const fetchRewards = await fetch("/api/rewards");
-  // const { data: rewardsData } = await fetchRewards.json();
-  // return {
-  //   cooperatives: data?.cooperatives as Cooperative[],
-  //   rewards: (rewardsData?.rewards as Reward[]) ?? [],
-  // };
-
   try {
     const categories = await CooperativeCategory.findAll({
       include: [
@@ -26,16 +22,44 @@ export const load: PageServerLoad = async ({ fetch }) => {
               model: CooperativeStat,
               as: "stats",
             },
+            {
+              model: CooperativeRanking,
+              as: "rank",
+            },
+          ],
+        },
+        {
+          model: CriteriaFieldPoint,
+          as: "criteriaFieldPoints",
+        },
+        {
+          model: CooperativeCriteria,
+          as: "criteria",
+          include: [
+            {
+              model: CriteriaField,
+              as: "criteriaFields",
+            },
           ],
         },
       ],
     });
-    console.log(categories.map((c) => c.get({ plain: true })));
+
+    return {
+      categories: (categories.map((c) => {
+        const category = c.get({ plain: true }) as CooperativeCategoryType;
+        category.cooperatives =
+          category.cooperatives?.sort((a, b) => {
+            return (a.rank?.rankPosition ?? 0) - (b.rank?.rankPosition ?? 0);
+          }) ?? [];
+        return category;
+      }) ?? []) as CooperativeCategoryType[],
+    };
   } catch (er) {
     {
-      console.log(er);
+      return {
+        categories: [],
+      };
     }
   }
-
-  return {};
 };

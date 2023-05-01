@@ -95,6 +95,8 @@
     sharesPrincipal: 0,
     withdrawnSavings: 0,
     withdrawnShares: 0,
+    exitedMembers: 0,
+    exitedRatio: 0,
   };
 </script>
 

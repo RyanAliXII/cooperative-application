@@ -23,6 +23,7 @@ export const PUT: RequestHandler = async ({ request, params }) => {
   }
   try {
     const data = await EditCooperativeSchema.validate(body);
+    console.log(data);
     await Cooperative.update(data, {
       where: {
         id: coopId,

@@ -20,6 +20,10 @@ import { SelectedCooperativeModel } from "./selected_cooperative";
 import { RecognitionModel } from "./recognition";
 import { CooperativeCategoryModel } from "./cooperative_category";
 import { CooperativeCriteriaModel } from "./cooperative_criteria";
+import { CooperativeRankingModel } from "./ranking_view";
+import { CriteriaFieldModel } from "./criteria_field";
+import { DefaultCriteriaPointModel } from "./default_criteria_points";
+import { CriteriaFieldPointModel } from "./criteria_field_points";
 
 export const Member = MemberModel;
 export const Cooperative = CooperativeModel;
@@ -43,6 +47,12 @@ export const SelectedCooperative = SelectedCooperativeModel;
 export const Recognition = RecognitionModel;
 export const CooperativeCategory = CooperativeCategoryModel;
 export const CooperativeCriteria = CooperativeCriteriaModel;
+export const CooperativeRanking = CooperativeRankingModel;
+export const CriteriaField = CriteriaFieldModel;
+
+export const CriteriaFieldPoint = CriteriaFieldPointModel;
+export const DefaultCriteriaPoint = DefaultCriteriaPointModel;
+
 CooperativeAccount.belongsTo(Cooperative, {
   foreignKey: "cooperative_id",
 });
@@ -91,9 +101,36 @@ CooperativeCategory.hasMany(Cooperative, {
 
 CooperativeCategory.belongsTo(CooperativeCriteria, {
   foreignKey: "criteria_id",
+  as: "criteria",
 });
 
 CooperativeCriteria.hasMany(CooperativeCategory, {
   foreignKey: "criteria_id",
   as: "categories",
+});
+CooperativeRanking.belongsTo(Cooperative, { foreignKey: "cooperative_id" });
+Cooperative.hasOne(CooperativeRanking, {
+  foreignKey: "cooperative_id",
+  as: "rank",
+});
+
+CriteriaField.belongsTo(CooperativeCriteria, { foreignKey: "criteria_id" });
+CooperativeCriteria.hasMany(CriteriaField, {
+  foreignKey: "criteria_id",
+  as: "criteriaFields",
+});
+
+CriteriaFieldPoint.belongsTo(CriteriaField, {
+  foreignKey: "criteria_field_id",
+});
+CriteriaFieldPoint.belongsTo(CooperativeCategory, {
+  foreignKey: "category_id",
+});
+CooperativeCategory.hasMany(CriteriaFieldPoint, {
+  foreignKey: "category_id",
+  as: "criteriaFieldPoints",
+});
+CriteriaField.hasMany(CriteriaFieldPoint, {
+  foreignKey: "criteria_field_id",
+  as: "fieldPoints",
 });
