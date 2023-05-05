@@ -1,4 +1,7 @@
-import type { CooperativeCategory as CooperativeCategoryType } from "$lib/definitions/types";
+import type {
+  CooperativeCategory as CooperativeCategoryType,
+  RewardType,
+} from "$lib/definitions/types";
 import {
   Cooperative,
   CooperativeCategory,
@@ -7,6 +10,7 @@ import {
   CooperativeStat,
   CriteriaField,
   CriteriaFieldPoint,
+  Reward,
 } from "$lib/models/model";
 import type { PageServerLoad } from "./$types";
 
@@ -45,6 +49,8 @@ export const load: PageServerLoad = async ({ fetch }) => {
       ],
     });
 
+    const rewards = await Reward.findAll();
+
     return {
       categories: (categories.map((c) => {
         const category = c.get({ plain: true }) as CooperativeCategoryType;
@@ -54,6 +60,8 @@ export const load: PageServerLoad = async ({ fetch }) => {
           }) ?? [];
         return category;
       }) ?? []) as CooperativeCategoryType[],
+      rewards: (rewards.map((reward) => reward.get({ plain: true })) ??
+        []) as RewardType[],
     };
   } catch (er) {
     {

@@ -13,7 +13,6 @@
   import { createForm } from "felte";
   import { validator } from "@felte/validator-yup";
   import {
-    EditCooperativeCategoryValidation,
     EditCriteriaFieldPointValidation,
     EditDefaultCriteriaPointValidation,
     GiveRewardValidation,
@@ -59,27 +58,16 @@
       }),
     ],
   });
-  // const handleSelect = async (cooperative: Cooperative) => {
-  //   const coop = selectedCoopHashTable[cooperative.id ?? ""];
-  //   if (!coop) {
-  //     await axios.post("/api/rewards/cooperatives", {
-  //       cooperativeId: cooperative.id,
-  //     });
-  //     invalidate((url) => url.pathname === "/api/rewards/cooperatives");
-  //   }
-  // };
-  const deleteCooperative = async (cooperative: Cooperative) => {
-    await axios.delete(`/api/rewards/cooperatives/${cooperative.id}`);
-    invalidate((url) => url.pathname === "/api/rewards/cooperatives");
+
+  let selectedCooperative: Cooperative;
+  const giveReward = async (cooperative: Cooperative) => {
+    selectedCooperative = cooperative;
+    assignFormData.update((prev) => ({
+      ...prev,
+      cooperativeId: cooperative.id ?? "",
+    }));
+    openAssignModal();
   };
-  // const assign = async (cooperative: Cooperative) => {
-  //   selectedCooperative = cooperative;
-  //   assignFormData.update((prev) => ({
-  //     ...prev,
-  //     cooperativeId: cooperative.id ?? "",
-  //   }));
-  //   openAssignModal();
-  // };
 
   onMount(() => {
     selectedCategoryId = localStorage.getItem("selectedCategory") ?? "";
@@ -244,6 +232,7 @@
     <div class="grid grid-cols-1 2xl:grid-cols-2 mt-5 gap-2">
       {#each category?.cooperatives ?? [] as cooperative}
         <StatsCard
+          {giveReward}
           {clearCriteriaFieldPoints}
           {criteriaFieldPoints}
           {editCriteriaFieldPoints}
@@ -265,8 +254,12 @@
       labelFor="reward"
       name="rewardId"
       error={$assignFormErrors.rewardId?.[0]}
-    />
-    <TextField name="date" type="month" error={$assignFormErrors?.date?.[0]} />
+    >
+      {#each data.rewards ?? [] as reward}
+        <option value={reward?.id}>{reward.name}</option>
+      {/each}
+    </SelectField>
+    <TextField name="date" type="date" error={$assignFormErrors?.date?.[0]} />
     <button class="btn btn-primary text-base-100 mt-3" type="submit"
       >Give</button
     >

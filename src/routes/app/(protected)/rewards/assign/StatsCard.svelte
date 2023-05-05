@@ -13,6 +13,8 @@
   export let clearCriteriaFieldPoints: (point: CriteriaFieldPoint) => void;
   export let editCriteriaFieldPoints: (points: CriteriaFieldPoint) => void;
   export let category: CooperativeCategory;
+
+  export let giveReward: (cooperative: Cooperative) => void;
   export let criteriaFieldPoints: Record<string, CriteriaFieldPoint>;
   type Tab = "overview" | "points_summary";
   let activeTab: Tab = "overview";
@@ -111,8 +113,11 @@
         </div>
       </div>
       <div class="card-actions justify-end">
-        <button class="btn btn-primary text-white w-full xl:w-fit"
-          >Give Reward</button
+        <button
+          class="btn btn-primary text-white w-full xl:w-fit"
+          on:click={() => {
+            giveReward(cooperative);
+          }}>Give Reward</button
         >
         <a
           href="/app/cooperatives/view/{cooperative.id}"
