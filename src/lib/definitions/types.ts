@@ -6,10 +6,11 @@ export type Cooperative = {
   registrationNumber: string;
   initials: string;
   address: string;
-  province: string;
-  city: string;
+  registrationDate: string;
+  categoryId: string;
   stats?: CooperativeStats;
   account: CooperativeAccount;
+  rank?: CooperativeRank;
 };
 
 export type CooperativeAccount = {
@@ -18,6 +19,7 @@ export type CooperativeAccount = {
   middleName: string;
   surname: string;
   email: string;
+  password?: string;
   isOwner: boolean;
 };
 
@@ -123,6 +125,8 @@ export type CooperativeStats = {
   withdrawnShares: number;
   withdrawnSavings: number;
   registrationFees: number;
+  exitedMembers: number;
+  exitedRatio: number;
 };
 
 export type Saving = {
@@ -158,7 +162,7 @@ export type MemberStats = {
   shares: number;
   sharesPrincipal: number;
   sharesWithdrawal: number;
-  savings: number;
+  name: string;
   savingPrincipal: number;
   savingsWithdrawal: number;
   requestedLoan: number;
@@ -181,4 +185,56 @@ export type Recognition = {
   cooperativeId: string;
   cooperative?: Cooperative;
   reward?: Reward;
+};
+
+export type CooperativeCategory = {
+  id?: string;
+  name: string;
+  requiredAssets: number;
+  criteriaId: string;
+  criteria?: CooperativeCriteria;
+  criteriaFieldPoints: CriteriaFieldPoint[];
+  cooperatives?: Cooperative[];
+};
+export type CooperativeCriteria = {
+  id?: string;
+  name: string;
+  financialPerformancePoints: number;
+  organizationManagementPoints: number;
+  criteriaFields: CriteriaField[];
+};
+export type CooperativeRank = {
+  cooperativeId: string;
+  categoryId: string;
+  financialPerformancePoints: number;
+  organizationManagementPoints: number;
+  overridenFinancialPerformancePoints: number;
+  overridenOrganizationManagementPoints: number;
+  rankPosition: number;
+  points: number;
+};
+export type CriteriaField = {
+  id?: string;
+  criteriaId: string;
+  name: string;
+  maxPoints: number;
+};
+
+export type DefaultPoint = {
+  id?: string;
+  name?: string;
+  cooperativeId: string;
+  categoryId: string;
+  financialPerformancePoints: number;
+  organizationManagementPoints: number;
+  type?: string;
+};
+
+export type CriteriaFieldPoint = {
+  id?: string;
+  name?: string;
+  cooperativeId: string;
+  categoryId: string;
+  criteriaFieldId: string;
+  points: number;
 };

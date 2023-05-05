@@ -1,161 +1,318 @@
 <script lang="ts">
-  import { invalidate } from "$app/navigation";
+  import { invalidate, invalidateAll } from "$app/navigation";
   import CooperativeSelector from "$lib/components/cooperative-selector/CooperativeSelector.svelte";
   import SelectField from "$lib/components/form/SelectField.svelte";
   import TextField from "$lib/components/form/TextField.svelte";
   import Modal from "$lib/components/ui/Modal.svelte";
-  import type{ Cooperative} from "$lib/definitions/types"
+  import type {
+    Cooperative,
+    CriteriaFieldPoint,
+    DefaultPoint,
+  } from "$lib/definitions/types";
   import axios from "axios";
   import { createForm } from "felte";
-  import {validator} from "@felte/validator-yup"
-  import { GiveRewardValidation } from "$lib/definitions/schema.js";
+  import { validator } from "@felte/validator-yup";
+  import {
+    EditCriteriaFieldPointValidation,
+    EditDefaultCriteriaPointValidation,
+    GiveRewardValidation,
+  } from "$lib/definitions/schema.js";
   import toast, { Toaster } from "svelte-french-toast";
+  import StatsCard from "./StatsCard.svelte";
+  import { onMount } from "svelte";
+  import { PointTypes } from "$lib/internal/default_points";
+
   export let data;
-  
- let isAssignModalOpen = false;
 
-
- let selectedCooperative:Cooperative;
-  $:selectedCoopHashTable = data?.cooperatives.reduce<Record<string, Cooperative>>((a, c)=>{
-    a[c.id ?? ""] = c
-    return a
-  }, {})
-
-  const {form:assignForm, data:assignFormData, errors: assignFormErrors, reset: resetAssignForm}  = createForm({
-    initialValues:{
-      cooperativeId:"",
-      rewardId:"",
-      date:""
+  let isAssignModalOpen = false;
+  let isEditDefaultPointsOpen = false;
+  let isEditCriteriaFieldPointsOpen = false;
+  let selectedCategoryId: string = "";
+  const {
+    form: assignForm,
+    data: assignFormData,
+    errors: assignFormErrors,
+    reset: resetAssignForm,
+  } = createForm({
+    initialValues: {
+      cooperativeId: "",
+      rewardId: "",
+      date: "",
     },
-    onSubmit: async(body)=>{
-       try {
-          await axios.post("/api/recognitions", body);
-          toast.success("Reward given successfully")
-          
-       } catch {
-          toast.error("Unknown error occured, please try again later.")
-       }
-       finally{
-        closeAssignModal()
-        resetAssignForm()
-       }
-    },
-    onError: async(error)=>{
-      console.log(error)
-    },
-    extend:[
-      validator({schema: GiveRewardValidation, castValues: true, level: "error"})
-    ]
-  })
-  const handleSelect = async(cooperative: Cooperative )=>{
-      const coop = selectedCoopHashTable[cooperative.id ?? ""]
-      if (!coop) {
-          await axios.post("/api/rewards/cooperatives", {cooperativeId: cooperative.id})
-          invalidate((url)=>url.pathname === "/api/rewards/cooperatives")
-          
+    onSubmit: async (body) => {
+      try {
+        await axios.post("/api/recognitions", body);
+        toast.success("Reward given successfully");
+      } catch {
+        toast.error("Unknown error occured, please try again later.");
+      } finally {
+        closeAssignModal();
+        resetAssignForm();
       }
-  }
-  const deleteCooperative = async(cooperative:Cooperative)=>{
-    await axios.delete(`/api/rewards/cooperatives/${cooperative.id}`)
-    invalidate((url)=>url.pathname === "/api/rewards/cooperatives")
-  }
-  const assign = async(cooperative:Cooperative)=>{
-    selectedCooperative = cooperative
-    assignFormData.update((prev)=>({...prev, cooperativeId: cooperative.id ?? ''}))
-    openAssignModal()
-  }
+    },
+    extend: [
+      validator({
+        schema: GiveRewardValidation,
+        castValues: true,
+        level: "error",
+      }),
+    ],
+  });
 
-  const closeAssignModal = ()=>{
-    isAssignModalOpen = false
-  }
-  
-  const openAssignModal = ()=>{
-    isAssignModalOpen  = true
-  }
+  let selectedCooperative: Cooperative;
+  const giveReward = async (cooperative: Cooperative) => {
+    selectedCooperative = cooperative;
+    assignFormData.update((prev) => ({
+      ...prev,
+      cooperativeId: cooperative.id ?? "",
+    }));
+    openAssignModal();
+  };
 
- 
+  onMount(() => {
+    selectedCategoryId = localStorage.getItem("selectedCategory") ?? "";
+  });
+  const onSelectCategory = (event: Event) => {
+    if (!event?.target) return;
+    const select = event.target as HTMLSelectElement;
+    localStorage.setItem("selectedCategory", select.value);
+    selectedCategoryId = select.value;
+  };
+  const closeAssignModal = () => {
+    isAssignModalOpen = false;
+  };
 
+  const openAssignModal = () => {
+    isAssignModalOpen = true;
+  };
+
+  const {
+    form: editDefaultCriteriaPointsForm,
+    data: editDefaultCriteriaPointsData,
+    errors: editDefaultCriteriaPointsFormErrors,
+    reset: resetEditDefaultCriteriaPointsForm,
+  } = createForm({
+    initialValues: {
+      name: "",
+      cooperativeId: "",
+      categoryId: "",
+      financialPerformancePoints: 0,
+      organizationManagementPoints: 0,
+      type: "",
+    },
+    onSubmit: async (body) => {
+      try {
+        await axios.post("/api/rewards/points/default", body);
+        invalidateAll();
+        toast.success("Points assigned successfully");
+      } catch (error) {
+        toast.error("Unknown error occured, Please try again later.");
+      } finally {
+        resetEditDefaultCriteriaPointsForm();
+        isEditDefaultPointsOpen = false;
+      }
+    },
+    extend: [
+      validator({
+        schema: EditDefaultCriteriaPointValidation,
+        castValues: true,
+        level: "error",
+      }),
+    ],
+  });
+
+  const {
+    form: editCriteriaFieldPointsForm,
+    data: editCriteriaFieldPointsData,
+    errors: editCriteriaFieldPointsErrors,
+    reset: resetEditCriteriaFieldPointsForm,
+  } = createForm({
+    initialValues: {
+      name: "",
+      cooperativeId: "",
+      categoryId: "",
+      criteriaFieldId: "",
+      points: 0,
+    },
+    onSubmit: async (body) => {
+      try {
+        await axios.post("/api/rewards/points/field", body);
+        invalidateAll();
+        toast.success("Points assigned successfully");
+      } catch (error) {
+        toast.error("Unknown error occured, Please try again later.");
+      } finally {
+        isEditCriteriaFieldPointsOpen = false;
+        resetEditCriteriaFieldPointsForm();
+      }
+    },
+    extend: [
+      validator({
+        schema: EditCriteriaFieldPointValidation,
+        castValues: true,
+        level: "error",
+      }),
+    ],
+  });
+  const editDefaultCriteriaPoints = (points: DefaultPoint) => {
+    editDefaultCriteriaPointsData.set({
+      name: points.name ?? "",
+      cooperativeId: points.cooperativeId,
+      categoryId: points.categoryId,
+      financialPerformancePoints: points.financialPerformancePoints,
+      organizationManagementPoints: points.organizationManagementPoints,
+      type: points.type ?? "",
+    });
+    isEditDefaultPointsOpen = true;
+  };
+  const editCriteriaFieldPoints = (points: CriteriaFieldPoint) => {
+    editCriteriaFieldPointsData.set({
+      categoryId: points.categoryId,
+      cooperativeId: points.cooperativeId,
+      criteriaFieldId: points.criteriaFieldId,
+      points: points.points,
+      name: points.name ?? "",
+    });
+    isEditCriteriaFieldPointsOpen = true;
+  };
+  const clearDefaultCriteriaPoints = async (points: DefaultPoint) => {
+    try {
+      await axios.post("/api/rewards/points/default", points);
+      invalidateAll();
+      toast.success("Points has been cleared.");
+    } catch (error) {
+      toast.error("Unknown error occured, Please try again later.");
+    }
+  };
+
+  const clearCriteriaFieldPoints = async (points: CriteriaFieldPoint) => {
+    try {
+      await axios.post("/api/rewards/points/field", points);
+      invalidateAll();
+      toast.success("Points has been cleared.");
+    } catch (error) {
+      toast.error("Unknown error occured, Please try again later.");
+    }
+  };
+  $: criteriaFieldPoints =
+    data.categories
+      .find((c) => c.id === selectedCategoryId)
+      ?.criteriaFieldPoints.reduce<Record<string, CriteriaFieldPoint>>(
+        (a, c) => {
+          const key = `${c.categoryId}_${c.criteriaFieldId}_${c.cooperativeId}`;
+          a[key] = c;
+          return a;
+        },
+        {}
+      ) ?? {};
 </script>
-<div class="container bg-base-100 w-full  p-3 rounded pb-9">
-    <div>
-        <CooperativeSelector handleSelect={handleSelect}></CooperativeSelector>
-    </div>
 
+<div class="container bg-base-100 w-full p-3 rounded pb-4">
+  <div>
+    <SelectField value={selectedCategoryId} on:change={onSelectCategory}>
+      <option>Select category</option>
+      {#each data.categories as category}
+        <option value={category.id}>{category.name}</option>
+      {/each}
+    </SelectField>
+  </div>
 </div>
-<div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 mt-10 gap-2">
 
-  {#each data?.cooperatives as cooperative }
-  <div class="card bg-base-100 shadow-xl">
-    <div class="card-body">
-      <div class="flex gap-2 items-center h-30">
-      <img src="https://api.dicebear.com/6.x/initials/svg?seed={cooperative.name}&backgroundColor=EB7C2A" alt="avatar" class="w-12 rounded-full">
-      <div>
-      <h2 class="card-title">{cooperative.name}</h2>
-      <small class="text-gray-500">{cooperative.registrationNumber}</small>
-    </div>
-      </div>
-      <div class="container bg-base-100 w-full  p-3 rounded">
-        <div class="bg-base-200 w-full h-10 rounded flex items-center px-2 text-gray-600 font-semibold gap-2 mt-5">
-          <i class="fa-regular fa-address-card"></i>  SAVINGS
-        </div>
-         
-         <div class="grid grid-cols-2 border-b px-2 py-3 mt-5">
-          <span>Total Savings</span>
-          <span class="font-bold">PHP {cooperative?.stats?.savings.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) ?? 0}</span>
-          </div>
-       <div class="bg-base-200 w-full h-10 rounded flex items-center px-2 text-gray-600 font-semibold gap-2 mt-5">
-        <i class="fa-regular fa-address-card"></i>  SHARES
-      </div>
-      <div class="grid grid-cols-2 border-b px-2 py-3 mt-5">
-        <span>Total Shares</span>
-        <span class="font-bold">PHP {cooperative?.stats?.shares.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) ?? 0}</span>
-      </div>
-      <div class="bg-base-200 w-full h-10 rounded flex items-center px-2 text-gray-600 font-semibold gap-2 mt-5">
-        <i class="fa-regular fa-address-card"></i>  LOAN
-      </div>
-       
-      <div class="grid grid-cols-2 border-b px-2 py-3 mt-5">
-        <span>Loan</span>
-        <span class="font-bold">PHP {cooperative?.stats?.loan.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) ?? 0}</span>
-      </div>
-      <div class="grid grid-cols-2 border-b px-2 py-3 mt-5">
-        <span>Loan Interest</span>
-        <span class="font-bold">PHP {cooperative?.stats?.loanInterest.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) ?? 0}</span>
-      </div>
-      <div class="bg-base-200 w-full h-10 rounded flex items-center px-2 text-gray-600 font-semibold gap-2 mt-5">
-        <i class="fa-regular fa-address-card"></i>  SUMMARY
-      </div>
-      <div class="grid grid-cols-2 border-b px-2 py-3 mt-5">
-        <span>Assets</span>
-        <span class="font-bold">PHP {cooperative?.stats?.assets.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) ?? 0}</span>
-      </div>
-      <div class="grid grid-cols-2 border-b px-2 py-3 mt-5">
-        <span>Liquidity</span>
-        <span class="font-bold">PHP {cooperative?.stats?.liquidity.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) ?? 0}</span>
-      </div>
+{#each data.categories as category}
+  {#if selectedCategoryId === category.id}
+    <h1 class="text-lg font-semibold text-gray-500 mt-5 ml-2">
+      {category.name}
+    </h1>
+    {#if category.cooperatives?.length != 0}
+      <button class="btn btn-primary text-white mt-3 ml-2">
+        <i class="fa-solid fa-rotate-left mr-2" /> Reset Points</button
+      >
+    {/if}
 
-      </div>
-      <div class="card-actions justify-end">
-      
-        <button class="btn btn-primary text-white w-full xl:w-fit" on:click={()=>{assign(cooperative)}}>Give Reward</button>
-        <button class="btn btn-error w-full xl:w-fit" on:click={()=>{deleteCooperative(cooperative)}}>Remove</button>
-        <a href="/app/cooperatives/view/{cooperative.id}" class="btn btn-secondary btn-outline text-white w-full xl:w-fit">View Full Details</a>
-      </div>
+    <div class="grid grid-cols-1 2xl:grid-cols-2 mt-5 gap-2">
+      {#each category?.cooperatives ?? [] as cooperative}
+        <StatsCard
+          {giveReward}
+          {clearCriteriaFieldPoints}
+          {criteriaFieldPoints}
+          {editCriteriaFieldPoints}
+          {cooperative}
+          {category}
+          {clearDefaultCriteriaPoints}
+          {editDefaultCriteriaPoints}
+        />
+      {/each}
     </div>
-  </div> 
-  {/each}
-    
-</div>
-<Modal isOpen={isAssignModalOpen} close={closeAssignModal} >
+  {/if}
+{/each}
+
+<Modal isOpen={isAssignModalOpen} close={closeAssignModal}>
   <h1 class="text-lg font-bold">Give Reward</h1>
   <form use:assignForm>
-      <SelectField label={"Reward"} labelFor="reward" name="rewardId" error={$assignFormErrors.rewardId?.[0]}>
-         {#each data.rewards as reward }
-          <option value={reward.id}> {reward.name}</option>
-         {/each}
-      </SelectField>
-      <TextField name="date" type="month" error={$assignFormErrors?.date?.[0]}/>
-      <button class="btn btn-primary text-base-100 mt-3" type="submit">Give</button>
+    <SelectField
+      label={"Reward"}
+      labelFor="reward"
+      name="rewardId"
+      error={$assignFormErrors.rewardId?.[0]}
+    >
+      {#each data.rewards ?? [] as reward}
+        <option value={reward?.id}>{reward.name}</option>
+      {/each}
+    </SelectField>
+    <TextField name="date" type="date" error={$assignFormErrors?.date?.[0]} />
+    <button class="btn btn-primary text-base-100 mt-3" type="submit"
+      >Give</button
+    >
   </form>
 </Modal>
-<Toaster/>
+
+<Modal
+  isOpen={isEditDefaultPointsOpen}
+  close={() => {
+    isEditDefaultPointsOpen = false;
+  }}
+>
+  <h1 class="text-lg font-bold">{$editDefaultCriteriaPointsData.name}</h1>
+  <form use:editDefaultCriteriaPointsForm>
+    <TextField
+      type="number"
+      error={$editDefaultCriteriaPointsData.type === PointTypes.Financial
+        ? $editDefaultCriteriaPointsFormErrors?.financialPerformancePoints?.[0]
+        : $editDefaultCriteriaPointsFormErrors
+            ?.organizationManagementPoints?.[0]}
+      value={$editDefaultCriteriaPointsData.type === PointTypes.Financial
+        ? $editDefaultCriteriaPointsData.financialPerformancePoints
+        : $editDefaultCriteriaPointsData.organizationManagementPoints}
+      name={$editDefaultCriteriaPointsData.type === PointTypes.Financial
+        ? "financialPerformancePoints"
+        : "organizationManagementPoints"}
+      label="Points"
+      labelFor="points"
+    />
+    <button class="btn btn-primary text-base-100 mt-3" type="submit"
+      >Save</button
+    >
+  </form>
+</Modal>
+
+<Modal
+  isOpen={isEditCriteriaFieldPointsOpen}
+  close={() => {
+    isEditCriteriaFieldPointsOpen = false;
+  }}
+>
+  <h1 class="text-lg font-bold">{$editCriteriaFieldPointsData.name}</h1>
+  <form use:editCriteriaFieldPointsForm>
+    <TextField
+      errors={$editCriteriaFieldPointsErrors?.points?.[0]}
+      value={$editCriteriaFieldPointsData.points}
+      name="points"
+      label="Points"
+      type="number"
+    />
+    <button class="btn btn-primary text-base-100 mt-3" type="submit"
+      >Save</button
+    >
+  </form>
+</Modal>
+<Toaster />

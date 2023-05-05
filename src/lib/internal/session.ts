@@ -1,4 +1,3 @@
-import type { Cooperative, CooperativeAccount } from "$lib/definitions/types";
 import { Session } from "$lib/models/model";
 import type { RequestEvent } from "@sveltejs/kit";
 

@@ -6,7 +6,7 @@ import { NewMemberValidationSchema } from "$lib/definitions/schema";
 import { sequelize } from "$lib/models/sequelize";
 import generator from "generate-password";
 import { hash } from "bcrypt";
-import { QueryTypes } from "sequelize";
+import { Op, QueryTypes } from "sequelize";
 
 export const POST: RequestHandler = async ({ request, locals }) => {
   const transaction = await sequelize.transaction();
@@ -93,7 +93,7 @@ export const GET: RequestHandler = async ({ request, cookies, locals }) => {
             SELECT member_id ,SUM(amount) as saving from saving where deleted_at is null and type = 'Withdraw' group by member_id
           ) as w_saving on member.id = w_saving.member_id
           where search_vector @@ (plainto_tsquery('simple', :query) :: text || ':*' ) :: tsquery AND cooperative_id = :coopId
-
+          AND approved_at is not null AND exited_at is null
           ORDER BY (ts_rank(search_vector, (plainto_tsquery('simple', :query) :: text || ':*' ) :: tsquery ) 
           )  DESC
          
@@ -122,6 +122,10 @@ export const GET: RequestHandler = async ({ request, cookies, locals }) => {
     const memberModel = await Member.findAll({
       where: {
         cooperativeId: coopId,
+        approvedAt: {
+          [Op.not]: null,
+        },
+        exitedAt: null,
       },
     });
     return json(

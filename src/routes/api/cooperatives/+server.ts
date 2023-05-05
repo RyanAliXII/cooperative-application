@@ -9,7 +9,6 @@ import { CooperativeModel } from "$lib/models/cooperative";
 export const POST: RequestHandler = async ({ request }) => {
   const transaction = await sequelize.transaction();
   const body = await request.json();
-
   try {
     const coop = await Cooperative.create(body, { transaction });
     const password = generator.generate({ strict: true });

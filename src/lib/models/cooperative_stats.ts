@@ -101,7 +101,22 @@ export const CooperativeStatModel = sequelize.define(
         return Number(value);
       },
     },
-
+    exitedRatio: {
+      type: DataTypes.DECIMAL(10, 2),
+      field: "exited_ratio",
+      get() {
+        const value = this.getDataValue("exitedRatio");
+        return Number(value);
+      },
+    },
+    exitedMembers: {
+      type: DataTypes.INTEGER,
+      field: "exited_members",
+      get() {
+        const value = this.getDataValue("exitedMembers");
+        return Number(value);
+      },
+    },
     liquidity: {
       type: DataTypes.DECIMAL(10, 2),
       field: "liquidity",

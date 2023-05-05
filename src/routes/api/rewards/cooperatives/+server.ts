@@ -7,7 +7,6 @@ import {
   SelectedCooperative,
 } from "$lib/models/model";
 import { SelectedCooperativeModel } from "$lib/models/selected_cooperative";
-import type { Cooperative as CooperativeType } from "$lib/definitions/types";
 
 export const POST: RequestHandler = async ({ request }) => {
   try {

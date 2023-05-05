@@ -9,6 +9,8 @@ export const CreateCooperativeSchema = object({
   registrationNumber: string().required(
     "Cooperative registraion number is required."
   ),
+  registrationDate: string().required("Registration date is required"),
+  categoryId: string().uuid().required("Category is required"),
   initials: string().required("Cooperative initials is required."),
   address: string().required("Address is required."),
   account: object().shape({
@@ -27,6 +29,8 @@ export const EditCooperativeSchema = object({
   registrationNumber: string().required(
     "Cooperative registraion number is required."
   ),
+  registrationDate: string().required("Registration date is required"),
+  categoryId: string().uuid().required("Category is required"),
   initials: string().required("Cooperative initials is required."),
   address: string().required("Address is required."),
   account: object().shape({
@@ -63,7 +67,6 @@ export const NewMemberValidationSchema = object({
         validator.isMobilePhone(value ?? "", "en-PH")
       ),
   }),
-
   dependents: array()
     .of(
       object({
@@ -384,4 +387,88 @@ export const EditGivenRewardValidation = object({
   cooperativeId: string().required().uuid(),
   rewardId: string().uuid().required("Id is required."),
   date: string().required("Date is required"),
+});
+
+export const CreateCooperativeCategoryValidation = object({
+  name: string().required("Name is required."),
+  requiredAssets: number().required("Required assets is required."),
+  criteriaId: string().uuid().required("Criteria is required."),
+});
+
+export const EditCooperativeCategoryValidation = object({
+  id: string().required().uuid(),
+  name: string().required("Name is required."),
+  requiredAssets: number().required("Required assets is required."),
+  criteriaId: string().uuid().required("Criteria is required."),
+});
+
+export const CreateCriteriaValidation = object({
+  name: string().required("Criteria name is required."),
+  financialPerformancePoints: number()
+    .integer("Value should not be decimal value.")
+    .required("Financial Performance Points is required.")
+    .min(1, "Value should be greater than zero."),
+  organizationManagementPoints: number()
+    .integer("Value should not be decimal value.")
+    .required("Organization Management Points is required.")
+    .min(1, "Value should be greater than zero."),
+  criteriaFields: array().of(
+    object({
+      name: string().required("Name is required."),
+      maxPoints: number()
+        .min(1, "Value should be greter than zero")
+        .typeError("Invalid Value")
+        .integer("Value should not contain decimal values.")
+        .transform((value) => (isNaN(value) || value === null ? 0 : value))
+        .required("Max points is required."),
+    })
+  ),
+});
+
+export const EditCriteriaValidation = object({
+  id: string().required().uuid(),
+  name: string().required("Criteria name is required."),
+  financialPerformancePoints: number()
+    .integer("Value should not be decimal value.")
+    .required("Financial Performance Points is required.")
+    .min(1, "Value should be greater than zero."),
+  organizationManagementPoints: number()
+    .integer("Value should not be decimal value.")
+    .required("Organization Management Points is required.")
+    .min(1, "Value should be greater than zero."),
+  criteriaFields: array().of(
+    object({
+      name: string().required("Name is required."),
+      maxPoints: number()
+        .min(1, "Value should be greter than zero")
+        .typeError("Invalid Value")
+        .integer("Value should not contain decimal values.")
+        .transform((value) => (isNaN(value) || value === null ? 0 : value))
+        .required("Max points is required."),
+    })
+  ),
+});
+
+export const EditDefaultCriteriaPointValidation = object({
+  cooperativeId: string().required().uuid(),
+  categoryId: string().required().uuid(),
+  financialPerformancePoints: number()
+    .integer("Value should not be decimal value.")
+    .required("Financial Performance Points is required.")
+    .min(0, "Value should be greater than zero."),
+  organizationManagementPoints: number()
+    .integer("Value should not be decimal value.")
+    .required("Organization Management Points is required.")
+    .min(0, "Value should be greater than zero."),
+});
+
+export const EditCriteriaFieldPointValidation = object({
+  cooperativeId: string().required().uuid(),
+  categoryId: string().required().uuid(),
+  criteriaFieldId: string().required().uuid(),
+  points: number()
+    .integer("Value should not be decimal value.")
+    .required("Financial Performance Points is required.")
+    .transform((value) => (isNaN(value) || value === null ? 0 : value))
+    .min(0, "Value should be greater than zero."),
 });

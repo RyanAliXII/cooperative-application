@@ -1,6 +1,7 @@
 import {
   Cooperative,
   CooperativeAccount,
+  CooperativeCategory,
   CooperativeStat,
   LiquidityLog,
   Loan,
@@ -15,7 +16,7 @@ import { error } from "@sveltejs/kit";
 import { StatusCodes } from "http-status-codes";
 import { validate } from "uuid";
 import type { PageServerLoad } from "./$types";
-import { CooperativeStatModel } from "$lib/models/cooperative_stats";
+
 import type {
   CooperativeStats,
   ShareLog as ShareLogType,
@@ -24,6 +25,8 @@ import type {
   LoanRepayment as LoanRepaymentType,
   Share as ShareType,
   Saving as SavingType,
+  Cooperative as CooperativeType,
+  CooperativeCategory as CooperativeCategoryType,
 } from "$lib/definitions/types";
 
 export const load: PageServerLoad = async ({ params }) => {
@@ -120,7 +123,9 @@ export const load: PageServerLoad = async ({ params }) => {
         },
       ],
     });
-
+    const categoryModel = await CooperativeCategory.findAll({
+      order: [["created_at", "desc"]],
+    });
     if (
       !coopStatModel ||
       !shareLogModel ||
@@ -128,17 +133,18 @@ export const load: PageServerLoad = async ({ params }) => {
       !liquidityLogModel ||
       !sharesModel ||
       !savingsModel ||
-      !repaymentModel
+      !repaymentModel ||
+      !categoryModel
     ) {
       throw error(StatusCodes.NOT_FOUND, { message: "Not Found" });
     }
     const coopStat = coopStatModel.get({ plain: true });
-
+    delete coop.dataValues["category_id"];
     return {
       cooperative: {
         ...coop?.dataValues,
         account: accounts[0],
-      },
+      } as CooperativeType,
       stat: coopStat as CooperativeStats,
       shareLogs: shareLogModel.map((shareLog) =>
         shareLog.get({ plain: true })
@@ -158,6 +164,9 @@ export const load: PageServerLoad = async ({ params }) => {
       savingsTransactions: (savingsModel.map((saving) =>
         saving.get({ plain: true })
       ) ?? []) as SavingType[],
+
+      categories: (categoryModel?.map((c) => c.get()) ??
+        []) as CooperativeCategoryType[],
     };
   } catch (err) {
     console.log(err);
