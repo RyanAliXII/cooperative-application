@@ -1,15 +1,17 @@
-<style lang="postcss">
-    :global(html) {
-      background-color: theme(colors.gray.100);
-    }
-  </style>
-<div class="hero min-h-screen" style="background-image: url(/images/stock/photo-1507358522600-9f71e620c44e.jpg);">
-  <div class="hero-overlay bg-opacity-60"></div>
+<div class="hero min-h-screen bg-hero-img">
+  <div class="hero-overlay bg-opacity-80" />
   <div class="hero-content text-center text-neutral-content">
-    <div class="max-w-md">
-      <h1 class="mb-5 text-5xl font-bold">Hello there</h1>
-      <p class="mb-5">Provident cupiditate voluptatem et in. Quaerat fugiat ut assumenda excepturi exercitationem quasi. In deleniti eaque aut repudiandae et a id nisi.</p>
-      <a href="/cooperatives/login" class="btn btn-primary">Sign In</a>
+    <div class="max-w-md lg:max-w-xl">
+      <h1 class="mb-5 text-5xl font-bold text-white">
+        Empowering Cooperative Members and Admins
+      </h1>
+      <p class="mb-5 text-white">
+        Streamlined Transactions and Enhanced Management for Members and Admins
+      </p>
+      <a href="/members/login" class="btn btn-primary">Sign In as Member</a>
+      <a href="/cooperatives/login" class="btn btn-secondary"
+        >Sign In as Cooperative
+      </a>
     </div>
   </div>
 </div>
