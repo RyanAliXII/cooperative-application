@@ -1,6 +1,6 @@
 import type {
   CooperativeCategory as CooperativeCategoryType,
-  RewardType,
+  Reward as RewardType,
 } from "$lib/definitions/types";
 import {
   Cooperative,
