@@ -105,6 +105,38 @@ export const MemberStatModel = sequelize.define(
         return Number(value);
       },
     },
+    approvedLoanInterest: {
+      type: DataTypes.DECIMAL(10, 2),
+      field: "approved_loan_interest",
+      get() {
+        const value = this.getDataValue("approvedLoanInterest");
+        return Number(value);
+      },
+    },
+    requestedLoanInterest: {
+      type: DataTypes.DECIMAL(10, 2),
+      field: "requested_loan_interest",
+      get() {
+        const value = this.getDataValue("requestedLoanInterest");
+        return Number(value);
+      },
+    },
+    finishedLoanInterest: {
+      type: DataTypes.DECIMAL(10, 2),
+      field: "finished_loan_interest",
+      get() {
+        const value = this.getDataValue("finishedLoanInterest");
+        return Number(value);
+      },
+    },
+    disbursedLoanInterest: {
+      type: DataTypes.DECIMAL(10, 2),
+      field: "disbursed_loan_interest",
+      get() {
+        const value = this.getDataValue("disbursedLoanInterest");
+        return Number(value);
+      },
+    },
   },
   {
     underscored: true,

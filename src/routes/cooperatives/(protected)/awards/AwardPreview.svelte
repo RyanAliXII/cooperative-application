@@ -2,12 +2,12 @@
   import Modal from "$lib/components/ui/Modal.svelte";
   import type { Recognition } from "$lib/definitions/types";
   import html2canvas from "html2canvas";
+  import { jsPDF } from "jspdf";
   export let isOpen: boolean;
   export let close: () => void;
   export let recognition: Recognition;
   import logo from "$lib/assets/images/ccdco-logo.png";
   import ordinal from "ordinal";
-  import { jsPDF } from "jspdf";
   $: recognitionDate = new Date(recognition?.date);
 
   $: year = recognitionDate.getFullYear();
@@ -28,7 +28,6 @@
 <Modal
   {isOpen}
   {close}
-  modalBoxClass="py-3"
   style="width: 1500px; height:800px; overflow-x: scroll; max-width: none;"
 >
   <div
@@ -44,9 +43,9 @@
     style="width: 1300px"
   >
     <div
-      bind:this={certificateDiv}
       class="mx-auto bg-white rounded-lg border-primary bor flex items-center justify-center flex-col h-full"
       style="border-width: 40px;"
+      bind:this={certificateDiv}
     >
       <div class="px-4 py-4 sm:px-6 lg:px-8 w-full h-full">
         <div class="w-full flex flex-col items-center mb-16">

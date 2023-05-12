@@ -160,6 +160,7 @@ export type MemberStats = {
   givenName: string;
   surname: string;
   shares: number;
+  savings: number;
   sharesPrincipal: number;
   sharesWithdrawal: number;
   name: string;
@@ -169,6 +170,10 @@ export type MemberStats = {
   finishedLoan: number;
   approvedLoan: number;
   disbursedLoan: number;
+  requestedLoanInterest: number;
+  finishedLoanInterest: number;
+  approvedLoanInterest: number;
+  disbursedLoanInterest: number;
 };
 export type Reward = {
   id?: string;

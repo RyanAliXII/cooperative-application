@@ -57,7 +57,7 @@
     const result = await Swal.fire({
       title: "Reset Password",
       icon: "warning",
-      text: "Are you sure you want to recreate the password for this cooperative account? This action cannot be reverted.",
+      text: "Are you sure you want to reset the password for this cooperative account? This action cannot be reverted.",
       showCancelButton: true,
     });
     if (result.isConfirmed) {

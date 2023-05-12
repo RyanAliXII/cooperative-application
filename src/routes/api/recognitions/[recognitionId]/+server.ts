@@ -26,3 +26,18 @@ export const PUT: RequestHandler = async ({ params, request }) => {
     return json({}, { status: StatusCodes.INTERNAL_SERVER_ERROR });
   }
 };
+
+export const DELETE: RequestHandler = async ({ params }) => {
+  const id = params?.recognitionId;
+  try {
+    await Recognition.destroy({
+      where: {
+        id,
+      },
+    });
+    return json({ message: "Recognition has been deleted." });
+  } catch (error) {
+    console.log(error);
+    return json({}, { status: StatusCodes.INTERNAL_SERVER_ERROR });
+  }
+};

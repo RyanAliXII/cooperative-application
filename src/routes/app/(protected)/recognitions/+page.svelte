@@ -13,7 +13,10 @@
   import SelectField from "$lib/components/form/SelectField.svelte";
   import { invalidate } from "$app/navigation";
   import CertificatePreviewModal from "./CertificatePreviewModal.svelte";
+  import ConfirmDialog from "$lib/components/ui/ConfirmDialog.svelte";
+  import { text } from "svelte/internal";
   let isAssignModalOpen = false;
+  let isConfirmDialogOpen = false;
   let isCertificatePreviewOpen = false;
   export let data;
 
@@ -78,6 +81,21 @@
     selectedRecognition = recognition;
     openCertificatePreviewModal();
   };
+  const confirmDelete = (recognition: Recognition) => {
+    selectedRecognition = recognition;
+    isConfirmDialogOpen = true;
+  };
+  const onDeleteConfirm = async () => {
+    try {
+      await axios.delete(`/api/recognitions/${selectedRecognition.id}`);
+      toast.success("Recognition has been successfully deleted.");
+      invalidate((url) => url.pathname === "/api/recognitions");
+    } catch {
+      toast.error("Unknown error occured, please try again later.");
+    } finally {
+      isConfirmDialogOpen = false;
+    }
+  };
 </script>
 
 <h1 class="text-lg font-semibold mb-3 text-gray-500 ml-1">Recognitions</h1>
@@ -115,7 +133,12 @@
                   previewCertificate(recognition);
                 }}><i class="fa-solid fa-certificate" /></button
               >
-              <button class="btn btn-error btn-outline">
+              <button
+                class="btn btn-error btn-outline"
+                on:click={() => {
+                  confirmDelete(recognition);
+                }}
+              >
                 <i class="fa-solid fa-trash" />
               </button>
             </td>
@@ -156,5 +179,14 @@
   close={closeCertificatePreviewModal}
   isOpen={isCertificatePreviewOpen}
   recognition={selectedRecognition}
+/>
+<ConfirmDialog
+  title="Delete Cooperative Award!"
+  text="Are you sure you want to delete this cooperative award? this action is irreversible"
+  isOpen={isConfirmDialogOpen}
+  onConfirm={onDeleteConfirm}
+  close={() => {
+    isConfirmDialogOpen = false;
+  }}
 />
 <Toaster />

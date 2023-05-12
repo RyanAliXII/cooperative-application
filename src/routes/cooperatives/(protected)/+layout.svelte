@@ -182,12 +182,20 @@
             </div>
           {/if}
         </li>
+
+        <li>
+          <a href="/cooperatives/awards">
+            <i class="fa-solid fa-award" />
+            Awards
+          </a>
+        </li>
         <li>
           <a href="/cooperatives/settings">
             <i class="fa-solid fa-gear" />
             Settings
           </a>
         </li>
+
         <li>
           <button
             type="submit"
