@@ -1,4 +1,4 @@
-import { Member, MemberAccount, Session } from "$lib/models/model";
+import { Cooperative, Member, MemberAccount, Session } from "$lib/models/model";
 import { compare } from "bcrypt";
 import { redirect, type Actions } from "@sveltejs/kit";
 import { StatusCodes } from "http-status-codes";
@@ -19,6 +19,11 @@ export const actions: Actions = {
         include: [
           {
             model: Member,
+            include: [
+              {
+                model: Cooperative,
+              },
+            ],
           },
         ],
       });
@@ -32,6 +37,7 @@ export const actions: Actions = {
       }
 
       const account: MemberAccountType = accountModel.get({ plain: true });
+      console.log(account);
       if (account?.member?.declinedAt) {
         return {
           message:
@@ -74,7 +80,12 @@ export const actions: Actions = {
         maxAge: 3600 * 24, //one day
       });
     } catch (error) {
-      return { message: "Logged In" };
+      console.log(error);
+      return {
+        message: "Unknown error occured.",
+        error: true,
+        info: false,
+      };
     }
 
     throw redirect(StatusCodes.SEE_OTHER, "/members/dashboard");

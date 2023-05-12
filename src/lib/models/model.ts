@@ -64,6 +64,8 @@ Cooperative.hasMany(CooperativeAccount, {
 
 MemberAccount.belongsTo(Member, { foreignKey: "member_id" });
 Member.hasOne(MemberAccount, { foreignKey: "member_id", as: "account" });
+Member.belongsTo(Cooperative, { foreignKey: "cooperative_id" });
+Cooperative.hasMany(Member, { foreignKey: "cooperative_id" });
 
 Share.belongsTo(Member, { foreignKey: "member_id" });
 Member.hasMany(Share, { foreignKey: "member_id", as: "shares" });

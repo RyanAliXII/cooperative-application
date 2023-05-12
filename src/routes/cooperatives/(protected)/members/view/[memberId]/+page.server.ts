@@ -1,4 +1,4 @@
-import { error } from "@sveltejs/kit";
+import { error, type Actions } from "@sveltejs/kit";
 import {
   Loan,
   LoanRepayment,
