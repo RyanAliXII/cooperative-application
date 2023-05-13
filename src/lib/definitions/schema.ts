@@ -1,5 +1,6 @@
 import { array, number, object, string, ref } from "yup";
 import validator from "validator";
+import axios from "axios";
 import {
   SavingsTransactionTypes,
   SharesTransactionTypes,
@@ -43,6 +44,7 @@ export const EditCooperativeSchema = object({
       .required("Account email is required."),
   }),
 });
+
 export const NewMemberValidationSchema = object({
   givenName: string().required("Given name is required."),
   middleName: string().required("Middle name is required."),

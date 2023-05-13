@@ -7,6 +7,4 @@ module.exports = {
       unique: true,
     });
   },
-
-  async down(queryInterface, Sequelize) {},
 };

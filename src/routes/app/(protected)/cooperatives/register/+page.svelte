@@ -8,10 +8,20 @@
   import { createForm } from "felte";
   import { validator } from "@felte/validator-yup";
   import Swal from "sweetalert2";
+  import { validate } from "uuid";
   export let data;
-  const { form, errors } = createForm({
+  const {
+    form,
+    errors,
+    data: body,
+    setErrors,
+  } = createForm({
     onSubmit: async (body) => {
       try {
+        const isTaken = await validateEmail();
+        if (isTaken) {
+          return;
+        }
         const response = await axios.post("/api/cooperatives", body);
         const { data } = response.data;
         const account = data?.account;
@@ -35,6 +45,15 @@
       level: "error",
     }),
   });
+  const validateEmail = async () => {
+    const response = await axios.get(
+      `/api/cooperatives/email?email=${$body.account.email}`
+    );
+    if (response.data.exist) {
+      setErrors("account.email", "Email is taken.");
+    }
+    return response.data.exist;
+  };
 </script>
 
 <div>
@@ -119,6 +138,7 @@
           <TextField
             label="Email"
             labelFor="email"
+            on:blur={validateEmail}
             name="account.email"
             type="email"
             error={$errors?.account?.email?.[0]}
