@@ -38,6 +38,7 @@ export const actions: Actions = {
 
       const account: MemberAccountType = accountModel.get({ plain: true });
       console.log(account);
+      console.log(password);
       if (account?.member?.declinedAt) {
         return {
           message:
@@ -46,6 +47,7 @@ export const actions: Actions = {
           info: false,
         };
       }
+
       const isPasswordSame = await compare(
         password?.toString() ?? "",
         account?.password
