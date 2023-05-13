@@ -224,9 +224,9 @@
       {category.name}
     </h1>
     {#if category.cooperatives?.length != 0}
-      <button class="btn btn-primary text-white mt-3 ml-2">
+      <!-- <button class="btn btn-primary text-white mt-3 ml-2">
         <i class="fa-solid fa-rotate-left mr-2" /> Reset Points</button
-      >
+      > -->
     {/if}
 
     <div class="grid grid-cols-1 2xl:grid-cols-2 mt-5 gap-2">
