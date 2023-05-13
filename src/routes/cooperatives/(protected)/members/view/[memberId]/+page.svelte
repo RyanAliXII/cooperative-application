@@ -21,6 +21,7 @@
     form,
     data: body,
     errors,
+    setErrors,
   } = createForm<Member>({
     initialValues: data?.member,
     extend: [
@@ -28,13 +29,13 @@
     ],
     onSubmit: async (body) => {
       try {
-        const response = await axios.put(
-          `/api/members/${data?.memberId}`,
-          body,
-          {
-            withCredentials: true,
-          }
-        );
+        const isTaken = await validateEmail();
+        if (isTaken) {
+          return;
+        }
+        await axios.put(`/api/members/${data?.memberId}`, body, {
+          withCredentials: true,
+        });
 
         toast.success("Member data has been updated.");
         isViewMode = true;
@@ -86,7 +87,15 @@
       }
     }
   };
-
+  const validateEmail = async () => {
+    const response = await axios.get(
+      `/api/members/email?email=${$body.account.email}&except=${data.member.account.email}`
+    );
+    if (response.data.exist) {
+      setErrors("account.email", "Email is taken.");
+    }
+    return response.data.exist;
+  };
   type Tab = "details" | "account" | "transactions";
   let activeTab: Tab = "details";
 </script>
@@ -271,6 +280,7 @@
               labelFor="email"
               name="account.email"
               type="email"
+              on:blur={validateEmail}
               error={$errors?.account?.email?.[0]}
               disabled={isViewMode}
             />

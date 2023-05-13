@@ -1,9 +1,9 @@
 import { Cooperative } from "$lib/models/model";
 import { error } from "@sveltejs/kit";
 import { StatusCodes } from "http-status-codes";
+import type { PageServerLoad } from "./$types";
 
-/** @type {import('./$types').PageServerLoad} */
-export async function load({ params }) {
+export const load: PageServerLoad = async ({ params }) => {
   const cooperativeId = params?.cooperativeId;
 
   const coop = await Cooperative.findOne({
@@ -21,4 +21,4 @@ export async function load({ params }) {
   return {
     cooperative: coop?.dataValues,
   };
-}
+};

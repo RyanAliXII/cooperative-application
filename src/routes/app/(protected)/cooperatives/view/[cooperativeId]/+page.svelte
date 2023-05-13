@@ -23,6 +23,7 @@
     form,
     errors,
     data: formData,
+    setErrors,
   } = createForm({
     initialValues: {
       ...data.cooperative,
@@ -32,6 +33,10 @@
     onSubmit: async (body) => {
       if (isViewMode) return;
       try {
+        const isTaken = await validateEmail()
+        if(isTaken) {
+          return
+        }
         const response = await axios.put(`/api/cooperatives/${id}`, body);
         const { data } = response.data;
         toast.success("Cooperative has been updated.");
@@ -97,6 +102,16 @@
     withdrawnShares: 0,
     exitedMembers: 0,
     exitedRatio: 0,
+  };
+
+  const validateEmail = async () => {
+    const response = await axios.get(
+      `/api/cooperatives/email?email=${$formData.account.email}&except=${data.cooperative?.account.email}`
+    );
+    if (response.data.exist) {
+      setErrors("account.email", "Email is taken.");
+    }
+    return response.data.exist;
   };
 </script>
 
@@ -253,6 +268,7 @@
               labelFor="email"
               name="account.email"
               type="email"
+              on:blur={validateEmail}
               error={$errors?.account?.email?.[0]}
               disabled={isViewMode}
             />
