@@ -3,11 +3,8 @@
   import TextAreaField from "$lib/components/form/TextAreaField.svelte";
 
   import toast, { Toaster } from "svelte-french-toast";
-  import { EditCooperativeSchema } from "$lib/definitions/schema";
-  import { createForm } from "felte";
-  import { validator } from "@felte/validator-yup";
+
   import { onMount } from "svelte";
-  import axios from "axios";
 
   export let data;
   export let form;

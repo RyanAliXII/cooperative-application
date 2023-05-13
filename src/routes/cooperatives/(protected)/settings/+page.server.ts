@@ -2,7 +2,8 @@ import type { CooperativeAccount as CooperativeAccountType } from "$lib/definiti
 import { Cooperative, CooperativeAccount } from "$lib/models/model";
 import type { Actions } from "@sveltejs/kit";
 import { compare, hash } from "bcrypt";
-export const load = async ({ locals }) => {
+import type { PageServerLoad } from "./$types";
+export const load: PageServerLoad = async ({ locals }) => {
   const { session } = locals.session;
   const cooperativeModel = await Cooperative.findOne({
     where: {
@@ -32,7 +33,7 @@ export const load = async ({ locals }) => {
 };
 
 export const actions: Actions = {
-  changePassword: async ({ cookies, locals, request }) => {
+  changePassword: async ({ locals, request }) => {
     const { session } = locals.session;
     const accountId = session.data.id;
     const formData = await request.formData();

@@ -1,4 +1,4 @@
-import { error } from "@sveltejs/kit";
+import { error, type Actions } from "@sveltejs/kit";
 import {
   Loan,
   LoanRepayment,
@@ -14,8 +14,10 @@ import type {
   Member as MemberType,
   Share as ShareType,
   Saving as SavingType,
+  MemberAccount as MemberAccountType,
 } from "$lib/definitions/types.js";
 import type { PageServerLoad } from "./$types";
+import { compare, hash } from "bcrypt";
 export const load: PageServerLoad = async ({ cookies, params, locals }) => {
   const { session } = locals.session;
   const id = session.data.member?.id;
@@ -89,4 +91,64 @@ export const load: PageServerLoad = async ({ cookies, params, locals }) => {
       savingsTransaction.get({ plain: true })
     ) ?? []) as SavingType[],
   };
+};
+
+export const actions: Actions = {
+  changePassword: async ({ locals, request }) => {
+    const { session } = locals.session;
+    const memberId = session.data.memberId;
+    const formData = await request.formData();
+    const newPassword = formData.get("newPassword") as string;
+    const confirmPassword = formData.get("confirmPassword") as string;
+    const oldPassword = formData.get("oldPassword") as string;
+    try {
+      if (newPassword != confirmPassword) {
+        return {
+          error: true,
+          success: false,
+          message:
+            "New password doesn't match with password confirmation field.",
+        };
+      }
+      const accountModel = await MemberAccount.findOne({
+        where: { memberId },
+      });
+      if (!accountModel) {
+        return {
+          error: true,
+          success: false,
+          message: "Request cannot be fulfilled right now.",
+        };
+      }
+      const account = accountModel.get({
+        plain: true,
+      }) as MemberAccountType;
+      const isOldPasswordSame = await compare(
+        oldPassword,
+        account.password ?? ""
+      );
+      if (!isOldPasswordSame) {
+        return {
+          error: true,
+          success: false,
+          message: "Old password is incorrect.",
+        };
+      }
+      const newHashedPassword = await hash(newPassword, 5);
+      await accountModel.update({
+        password: newHashedPassword,
+      });
+      return {
+        error: false,
+        success: true,
+        message: "Password has been changed.",
+      };
+    } catch {
+      return {
+        error: true,
+        success: false,
+        message: "Request cannot be fulfilled right now.",
+      };
+    }
+  },
 };

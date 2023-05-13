@@ -16,8 +16,9 @@
 
   let isViewMode = true;
   export let data;
+  export let form;
   const {
-    form,
+    form: editMemberForm,
     data: body,
     errors,
   } = createForm<Member>({
@@ -56,8 +57,8 @@
   const toggleMode = () => {
     isViewMode = !isViewMode;
   };
-  type Tab = "details" | "account" | "transactions";
-  let activeTab: Tab = "details";
+  type Tab = "details" | "account" | "transactions" | "password";
+  let activeTab: Tab = form?.error || form?.success ? "password" : "details";
 </script>
 
 <div>
@@ -83,6 +84,13 @@
       on:click={() => {
         activeTab = "transactions";
       }}>Transactions</button
+    >
+    <button
+      class="tab tab-lifted"
+      class:tab-active={activeTab === "password"}
+      on:click={() => {
+        activeTab = "password";
+      }}>Change Password</button
     >
   </div>
   {#if activeTab === "details"}
@@ -115,7 +123,7 @@
           ><i class="fa-regular fa-eye mr-2" /> Switch to View Mode</button
         >
       {/if} -->
-      <form use:form>
+      <form use:editMemberForm>
         <div>
           <div
             class="w-full h-10 rounded flex items-center px-2 text-gray-600 font-semibold gap-2"
@@ -594,6 +602,86 @@
             {/each}
           </tbody>
         </table>
+      </div>
+    </div>
+  {/if}
+
+  {#if activeTab === "password"}
+    <div class="container bg-base-100 w-full p-3 rounded">
+      <div class="mb-10 mt-10 flex items-center gap-5 ml-3">
+        <img
+          src="https://api.dicebear.com/6.x/initials/svg?seed={data.member
+            .givenName} {data.member.surname}&backgroundColor=EB7C2A"
+          alt="avatar"
+          class="w-12 rounded-full"
+        />
+        <div>
+          <h1 class="text-lg font-bold">
+            {data.member.givenName}
+            {data.member.surname}
+          </h1>
+          <small class="text-gray-500">Member ID: {data.member.id}</small>
+        </div>
+      </div>
+
+      <div
+        class="bg-base-200 w-full h-10 rounded flex items-center px-2 text-gray-600 font-semibold gap-2 mt-5"
+      >
+        <i class="fa-regular fa-address-card" /> CHANGE PASSWORD
+      </div>
+      {#if form?.error === true}
+        <div class="alert alert-error shadow-lg text-white mb-3 mt-3">
+          <div>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="stroke-current flex-shrink-0 h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              ><path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+              /></svg
+            >
+            <span>{form?.message}</span>
+          </div>
+        </div>
+      {/if}
+
+      {#if form?.success === true}
+        <div class="alert alert-success shadow-lg text-white mb-3 mt-3">
+          <div>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="stroke-current flex-shrink-0 h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              ><path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+              /></svg
+            >
+            <span>Password has been changed successfully.</span>
+          </div>
+        </div>
+      {/if}
+      <div>
+        <form method="POST" action="?/changePassword">
+          <TextField name="oldPassword" label="Old Password" type="password" />
+          <TextField name="newPassword" label="New Password" type="password" />
+          <TextField
+            name="confirmPassword"
+            label="Confirm New Password"
+            type="password"
+          />
+          <button class="btn btn-primary text-base-100 mt-5">
+            <i class="fa-regular fa-floppy-disk mr-2 text-lg" />
+            Save</button
+          >
+        </form>
       </div>
     </div>
   {/if}
