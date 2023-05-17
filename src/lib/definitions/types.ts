@@ -52,6 +52,7 @@ export type Member = {
   shares?: [];
   share: number;
   saving: number;
+  filledAt: string | null; //date
   registrationFee: number;
 };
 

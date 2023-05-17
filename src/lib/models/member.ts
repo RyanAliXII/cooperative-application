@@ -58,6 +58,10 @@ export const MemberModel = sequelize.define(
       type: DataTypes.DATE,
       field: "approved_at",
     },
+    filledAt: {
+      type: DataTypes.DATE,
+      field: "filled_at",
+    },
     exitedAt: {
       type: DataTypes.DATE,
       field: "exited_at",
