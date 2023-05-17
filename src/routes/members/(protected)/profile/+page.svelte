@@ -13,6 +13,7 @@
     SavingsTransactionTypes,
     SharesTransactionTypes,
   } from "$lib/internal/transaction.js";
+  import { invalidateAll } from "$app/navigation";
 
   let isViewMode = true;
   export let data;
@@ -31,8 +32,8 @@
         await axios.put(`/api/members/${data?.memberId}`, body, {
           withCredentials: true,
         });
-
         toast.success("Member data has been updated.");
+        invalidateAll();
         isViewMode = true;
       } catch (error) {
         console.log(error);
@@ -110,19 +111,21 @@
           <small class="text-gray-500">Member ID: {data?.member?.id}</small>
         </div>
       </div>
-      <!-- {#if isViewMode}
-        <button
-          class="btn btn-secondary btn-outline my-3 mx-1"
-          on:click={toggleMode}
-          ><i class="fa-regular fa-pen-to-square mr-2" /> Switch to Edit Mode</button
-        >
-      {:else}
-        <button
-          class="btn btn-secondary btn-outline my-3 mx-1"
-          on:click={toggleMode}
-          ><i class="fa-regular fa-eye mr-2" /> Switch to View Mode</button
-        >
-      {/if} -->
+      {#if data.member.filledAt === null}
+        {#if isViewMode}
+          <button
+            class="btn btn-secondary btn-outline my-3 mx-1"
+            on:click={toggleMode}
+            ><i class="fa-regular fa-pen-to-square mr-2" /> Switch to Edit Mode</button
+          >
+        {:else}
+          <button
+            class="btn btn-secondary btn-outline my-3 mx-1"
+            on:click={toggleMode}
+            ><i class="fa-regular fa-eye mr-2" /> Switch to View Mode</button
+          >
+        {/if}
+      {/if}
       <form use:editMemberForm>
         <div>
           <div
@@ -265,14 +268,6 @@
               error={$errors?.officePhoneNumber?.[0]}
               disabled={isViewMode}
             />
-            <TextField
-              label="Registration Fee"
-              labelFor="registrationFee"
-              name="registrationFee"
-              type="number"
-              error={$errors?.registrationFee?.[0]}
-              disabled={isViewMode}
-            />
           </div>
           <div
             class="bg-base-200 w-full h-10 rounded flex items-center px-2 text-gray-600 font-semibold gap-2 mt-5"
@@ -365,17 +360,18 @@
             </table>
           </div>
         </div>
-
-        <!-- <div class="mt-5 w-full flex justify-end">
-          <button
-            class="btn btn-primary mr-2 text-base-100"
-            type="submit"
-            disabled={isViewMode}
-          >
-            <i class="fa-regular fa-floppy-disk mr-2 text-lg" />
-            Save</button
-          >
-        </div> -->
+        {#if data.member.filledAt === null}
+          <div class="mt-5 w-full flex justify-end">
+            <button
+              class="btn btn-primary mr-2 text-base-100"
+              type="submit"
+              disabled={isViewMode}
+            >
+              <i class="fa-regular fa-floppy-disk mr-2 text-lg" />
+              Save</button
+            >
+          </div>
+        {/if}
       </form>
     </div>
   {/if}

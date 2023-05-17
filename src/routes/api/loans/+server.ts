@@ -10,7 +10,8 @@ export const POST: RequestHandler = async (event) => {
     const { session } = event.locals.session;
 
     const body = await request.json();
-    const coopId = session.data?.cooperative?.id;
+    const coopId =
+      session.data?.cooperative?.id ?? session.data?.member.cooperative?.id;
     const parsedBody = await AddLoanSchemaValidation.validate(body);
     const interest = (parsedBody.interest / 100) * parsedBody.amount;
     const totalDue = parsedBody.amount + interest;

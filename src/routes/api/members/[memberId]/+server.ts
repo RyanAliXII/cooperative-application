@@ -17,12 +17,15 @@ export const PUT: RequestHandler = async ({ request, params }) => {
   try {
     const body: MemberType = await request.json();
     const data = await EditMemberValidationSchema.validate(body);
-    await Member.update(data, {
-      where: {
-        id: memberId,
-      },
-      transaction,
-    });
+    await Member.update(
+      { ...data, filledAt: sequelize.fn("NOW") },
+      {
+        where: {
+          id: memberId,
+        },
+        transaction,
+      }
+    );
 
     await MemberAccount.update(data.account, {
       where: {

@@ -1,13 +1,19 @@
 <script lang="ts">
+  import { invalidate, invalidateAll } from "$app/navigation";
   import Modal from "$lib/components/ui/Modal.svelte";
   import type { Loan, Member } from "$lib/definitions/types";
   import { MONETARY } from "$lib/internal/config.js";
+  import axios from "axios";
   import { createForm } from "felte";
+  import toast from "svelte-french-toast";
+  import { validator } from "@felte/validator-yup";
+  import { AddLoanSchemaValidation } from "$lib/definitions/schema.js";
+  import TextField from "$lib/components/form/TextField.svelte";
 
   export let data;
 
   let isLoanPreviewModalOpen = false;
-
+  let isAddLoanModalOpen = false;
   let selectedLoan: Loan;
 
   const { data: editLoanData } = createForm({
@@ -18,6 +24,39 @@
       interest: 0,
       tenure: 0,
     },
+  });
+  const {
+    form: addLoanForm,
+    data: addLoanData,
+    errors: addLoanFormErrors,
+    isSubmitting,
+    reset: resetAddLoanForm,
+  } = createForm({
+    initialValues: {
+      memberId: data.sessionData.member.id,
+      amount: 0,
+      interest: 0,
+      tenure: 0,
+    },
+    onSubmit: async (body) => {
+      try {
+        await axios.post("/api/loans", body);
+        toast.success("Loan has been requested.");
+        invalidateAll();
+      } catch {
+        toast.error("Unknown error occured, Please try again later.");
+      } finally {
+        isAddLoanModalOpen = false;
+        resetAddLoanForm();
+      }
+    },
+    extend: [
+      validator({
+        schema: AddLoanSchemaValidation,
+        level: "error",
+        castValues: true,
+      }),
+    ],
   });
 
   const preview = (loan: Loan) => {
@@ -31,6 +70,13 @@
     isLoanPreviewModalOpen = true;
     selectedLoan = loan;
   };
+
+  $: interest =
+    (($addLoanData.interest ?? 0) / 100) * ($addLoanData.amount ?? 0);
+  $: totalDue = ($addLoanData.amount ?? 0) + interest;
+  $: repaymentPrincipal = $addLoanData.amount / $addLoanData.tenure;
+  $: repaymentInterest = interest / $addLoanData.tenure;
+  $: repaymentTotalDue = repaymentPrincipal + repaymentInterest;
 
   $: editLoanInterest =
     (($editLoanData.interest ?? 0) / 100) * ($editLoanData.amount ?? 0);
@@ -67,6 +113,14 @@
     </div>
   </div>
   <div class="container bg-base-100 w-full p-3 rounded">
+    <button
+      class="btn modal-button btn-primary mb-3 text-white"
+      on:click={() => {
+        isAddLoanModalOpen = true;
+      }}
+    >
+      <i class="fa-solid fa-plus mr-1" />Request Loan</button
+    >
     <div class="overflow-x-auto">
       <table class="table w-full">
         <!-- head -->
@@ -198,3 +252,122 @@
   </div></Modal
 >
 <!-- End of Loan Preview Modal -->
+
+<Modal
+  isOpen={isAddLoanModalOpen}
+  modalBoxClass={"w-11/12 max-w-5xl"}
+  close={() => {
+    isAddLoanModalOpen = false;
+  }}
+>
+  <h3 class="font-bold text-lg">Add Loan</h3>
+  <form use:addLoanForm>
+    <TextField
+      label="Amount"
+      name="amount"
+      type="number"
+      step={0.01}
+      error={$addLoanFormErrors?.amount?.[0]}
+    />
+    <TextField
+      label="Interest Rate(%)"
+      name="interest"
+      type="number"
+      min="1"
+      error={$addLoanFormErrors?.interest?.[0]}
+    />
+    <TextField
+      label="Tenure(In Months)"
+      name="tenure"
+      type="number"
+      min="1"
+      error={$addLoanFormErrors?.tenure?.[0]}
+    />
+    <div
+      class="bg-base-200 w-full h-10 rounded flex items-center px-2 text-gray-600 font-semibold gap-2 mt-5"
+    >
+      <i class="fa-solid fa-calendar" />LOAN SCHEDULE
+    </div>
+    <div class=" w-full h-30 rounded p-5">
+      <div class="grid grid-cols-2 border-b py-2">
+        <span>Principal</span>
+        <span class="font-bold"
+          >{$addLoanData?.amount?.toLocaleString(undefined, {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          }) ?? 0}</span
+        >
+      </div>
+      <div class="grid grid-cols-2 border-b py-2">
+        <span>Interest</span>
+        <span class="font-bold"
+          >{interest?.toLocaleString(undefined, {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })}</span
+        >
+      </div>
+      <div class="grid grid-cols-2 border-b py-2">
+        <span>Total Due</span>
+        <span class="font-bold"
+          >{totalDue?.toLocaleString(undefined, {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })}</span
+        >
+      </div>
+    </div>
+
+    <div class=" w-full h-30 rounded p-5 flex flex-col gap-1">
+      <h3 class="font-bold mb-2">Repayment</h3>
+      <div class="px-2">
+        <div class="grid grid-cols-2 py-2 border-b">
+          <span>Principal</span>
+          <span class="font-bold"
+            >{isNaN(repaymentPrincipal) || !isFinite(repaymentPrincipal)
+              ? (0).toLocaleString(undefined, { minimumFractionDigits: 2 })
+              : repaymentPrincipal?.toLocaleString(undefined, {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}</span
+          >
+        </div>
+        <div class="grid grid-cols-2 py-2 border-b">
+          <span>Interest</span>
+          <span class="font-bold"
+            >{isNaN(repaymentInterest) || !isFinite(repaymentPrincipal)
+              ? (0).toLocaleString(undefined, { minimumFractionDigits: 2 })
+              : repaymentInterest?.toLocaleString(undefined, {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}</span
+          >
+        </div>
+
+        <div class="grid grid-cols-2 py-2 border-b">
+          <span>Total Monthly Due</span>
+          <span class="font-bold"
+            >{isNaN(repaymentTotalDue) || !isFinite(repaymentPrincipal)
+              ? (0).toLocaleString(undefined, { minimumFractionDigits: 2 })
+              : repaymentTotalDue.toLocaleString(undefined, {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}</span
+          >
+        </div>
+      </div>
+    </div>
+    <button
+      type="submit"
+      class="btn btn-primary mt-5 text-white"
+      disabled={$isSubmitting}>Save</button
+    >
+    <button
+      type="button"
+      class="btn btn-secondary btn-outline"
+      on:click={() => {
+        isAddLoanModalOpen = false;
+      }}>Cancel</button
+    >
+  </form>
+</Modal>
